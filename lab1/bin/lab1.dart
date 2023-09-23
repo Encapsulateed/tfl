@@ -25,8 +25,7 @@ class LinearMatrixFunction {
 }
 
 String arctic_sum(String x, String y) => "(arctic_sum $x $y)";
-String arctic_mult(String x, String y) => "arctic_mult $x $y";
-//String arctic_max(String x, String y) => "(arctic_max $x $y)";
+String arctic_mult(String x, String y) => "(arctic_mult $x $y)";
 
 Matrix ArcticMatrix_Mult(Matrix A, Matrix B) {
   //строк в А всегда 2  вне зависимости вектор это или матрица
@@ -214,13 +213,29 @@ List<LinearMatrixFunction> CalculateFunctionComposes(List<String> HS, funcMap) {
     //f0(f1...(fn1(fn(x)))....)
     LinearMatrixFunction result = funcMap[term[0]];
     for (int i = 1; i < term.length; i++) {
-         result = result.Compose(funcMap[term[i]]);
+      result = result.Compose(funcMap[term[i]]);
     }
     composedFunctions.add(result);
-    
   }
 
   return composedFunctions;
+}
+
+void smtWriter(List<LinearMatrixFunction> leftResFunctions,
+    List<LinearMatrixFunction> rightResFunctions) {
+  File smtFile = File('solution.smt2');
+  smtFile.create();
+
+  writeSmtBegin(smtFile);
+
+  // writeSmtEnd(smtFile);
+}
+
+void writeSmtBegin(File f) {
+  String smtBegin =
+      "(set-logic QF_NIA)\n" + "(define-fun arcmax ((a Int) (b Int)) Int\n";
+
+  f.writeAsString(smtBegin);
 }
 
 void main(List<String> arguments) {
@@ -239,8 +254,5 @@ void main(List<String> arguments) {
   var left = CalculateFunctionComposes(LHS, funcMap);
   var right = CalculateFunctionComposes(RHS, funcMap);
 
-  // print(ArcticMatrix_Mult(funcMap['f']!.a, funcMap['g']!.a));
-
-  print(left[0].a);
-  // print(left[0].b);1
+  smtWriter(left, right);
 }
