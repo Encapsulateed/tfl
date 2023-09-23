@@ -24,8 +24,8 @@ class LinearMatrixFunction {
   }
 }
 
-String arctic_sum(String x, String y) => "($x+$y)";
-String arctic_mult(String x, String y) => "$x*$y";
+String arctic_sum(String x, String y) => "(arctic_sum $x $y)";
+String arctic_mult(String x, String y) => "arctic_mult $x $y";
 //String arctic_max(String x, String y) => "(arctic_max $x $y)";
 
 Matrix ArcticMatrix_Mult(Matrix A, Matrix B) {
@@ -212,17 +212,12 @@ List<LinearMatrixFunction> CalculateFunctionComposes(List<String> HS, funcMap) {
 
   for (var term in HS) {
     //f0(f1...(fn1(fn(x)))....)
-
-    var f_n = funcMap[term[term.length - 1]];
-    var f_n1 = funcMap[term[(term.length - 1) - 1]];
-    var temp_f = f_n1?.Compose(f_n);
-
-    int len = ((term.length - 1) - 1) - 1;
-    for (int i = len; i > 0; i--) {
-      temp_f = funcMap[i]?.Compose(temp_f);
+    LinearMatrixFunction result = funcMap[term[0]];
+    for (int i = 1; i < term.length; i++) {
+         result = result.Compose(funcMap[term[i]]);
     }
-
-    composedFunctions.add(funcMap[term[0]]?.Compose(temp_f));
+    composedFunctions.add(result);
+    
   }
 
   return composedFunctions;
@@ -244,8 +239,8 @@ void main(List<String> arguments) {
   var left = CalculateFunctionComposes(LHS, funcMap);
   var right = CalculateFunctionComposes(RHS, funcMap);
 
- // print(ArcticMatrix_Mult(funcMap['f']!.a, funcMap['g']!.a));
-  var f = funcMap['f']!.Compose(funcMap['g']);
-  print(f.a);
- // print(left[0].b);
+  // print(ArcticMatrix_Mult(funcMap['f']!.a, funcMap['g']!.a));
+
+  print(left[0].a);
+  // print(left[0].b);1
 }
