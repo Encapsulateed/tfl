@@ -30,7 +30,6 @@ String arctic_bigger(String x, String y) => "(arctic_bigger $x $y)";
 
 Matrix ArcticMatrix_Mult(Matrix A, Matrix B) {
   //строк в А всегда 2  вне зависимости вектор это или матрица
- 
 
   // Количество столбцов в матрице А и B
   int colsA = A[0].length;
@@ -43,7 +42,8 @@ Matrix ArcticMatrix_Mult(Matrix A, Matrix B) {
   }
 
   //result matrix init
-  Matrix C = List.generate(rowsA, (_) => List<String>.filled(colsB, ''));;
+  Matrix C = List.generate(rowsA, (_) => List<String>.filled(colsB, ''));
+  ;
 
   for (int i = 0; i < rowsA; i++) {
     for (int j = 0; j < colsB; j++) {
@@ -56,7 +56,6 @@ Matrix ArcticMatrix_Mult(Matrix A, Matrix B) {
         }
       }
       C[i][j] = item;
-      
     }
   }
 
@@ -217,21 +216,18 @@ List<LinearMatrixFunction> CalculateFunctionComposes(List<String> HS, funcMap) {
 }
 
 void writeSmtBegin(File f) {
-
-
   // ignore: prefer_interpolation_to_compose_strings
   String smtBegin = "(set-logic QF_NIA)\n" +
       "(define-fun arctic_sum ((x Int) (y Int)) Int (ite(>= x y) x y))\n" +
-      "(define-fun arctic_mult ((x Int) (y Int)) Int (ite(or (<= x -1) (<= y -1) -1 (+ x y))))\n" +
+      "(define-fun arctic_mult ((x Int) (y Int)) Int (ite(or (<= x -1) (<= y -1)) -1 (+ x y)))\n" +
       "(define-fun arctic_bigger ((x Int) (y Int)) Bool (ite (or (> x y) (and (= x y) (<= y -1))) true false))\n";
 
   f.writeAsStringSync(smtBegin, mode: FileMode.write);
 }
-void writeSmtEnd(File f){
-    // ignore: prefer_interpolation_to_compose_strings
-   String smtend = "(check-sat)\n" +
-      "(get-model)\n" +
-      "(exit)\n";
+
+void writeSmtEnd(File f) {
+  // ignore: prefer_interpolation_to_compose_strings
+  String smtend = "(check-sat)\n" + "(get-model)\n" + "(exit)\n";
 
   f.writeAsStringSync(smtend, mode: FileMode.append);
 }
@@ -255,48 +251,41 @@ void declareVars(Map<String, LinearMatrixFunction> funcMap, File f) {
   }
 }
 
-void writeForNotInf(Map<String, LinearMatrixFunction> funcMap, File f){
- List<String> lines = <String>[];
+void writeForNotInf(Map<String, LinearMatrixFunction> funcMap, File f) {
+  List<String> lines = <String>[];
 
-  bool isLeftHigher = true;
-  for (var fun in funcMap.values) {
+  bool isLeftHigher = true;  for (var fun in funcMap.values) {
     for (var matrixRow in fun.a) {
       for (var item in matrixRow) {
-          if(isLeftHigher){
-            lines.add("(assert (> $item -1))\n");
-            isLeftHigher = false;
-          }
-          else{
-             lines.add("(assert (>= $item -1))\n");
-
-          }
-
+        if (item.contains('11')) {
+          lines.add("(assert (> $item -1))\n");
+        } else {
+          lines.add("(assert (>= $item -1))\n");
+        }
       }
     }
     isLeftHigher = true;
     for (var vectorItem in fun.b) {
-
-       if(isLeftHigher){
-            lines.add("(assert (> ${vectorItem[0]} -1))\n");
-            isLeftHigher = false;
-          }
-          else{
-             lines.add("(assert (>= ${vectorItem[0]} -1))\n");
-
-          }
+    if (vectorItem.contains('0')) {
+        lines.add("(assert (> ${vectorItem[0]} -1))\n");
+        isLeftHigher = false;
+      } else {
+        lines.add("(assert (>= ${vectorItem[0]} -1))\n");
+      }
     }
+  
   }
 
   for (var line in lines) {
     f.writeAsStringSync(line, mode: FileMode.append);
-  }}
+  }
+}
 
 void writeCompareMatrixItems(List<LinearMatrixFunction> leftResFunctions,
     List<LinearMatrixFunction> rightResFunctions, File f) {
   List<String> lines = <String>[];
-
+  //Matrix
   for (int i = 0; i < leftResFunctions.length; i++) {
-    //Matrix
     lines.add(arctic_bigger(
         leftResFunctions[i].a[0][0], rightResFunctions[i].a[0][0]));
     lines.add(arctic_bigger(
@@ -306,18 +295,29 @@ void writeCompareMatrixItems(List<LinearMatrixFunction> leftResFunctions,
     lines.add(arctic_bigger(
         leftResFunctions[i].a[1][1], rightResFunctions[i].a[1][1]));
     //Vector
+  }
+  var item = '';
+  for (var line in lines) {
+    item += line + ' ';
+  }
+
+  f.writeAsStringSync("(assert (and $item))\n", mode: FileMode.append);
+
+  lines = <String>[];
+  for (int i = 0; i < leftResFunctions.length; i++) {
     lines.add(arctic_bigger(
         leftResFunctions[i].b[0][0], rightResFunctions[i].b[0][0]));
     lines.add(arctic_bigger(
         leftResFunctions[i].b[1][0], rightResFunctions[i].b[1][0]));
   }
 
+  item = '';
   for (var line in lines) {
-    f.writeAsStringSync("(assert $line)\n", mode: FileMode.append);
+    item += line + ' ';
   }
+
+  f.writeAsStringSync("(assert (and $item))\n", mode: FileMode.append);
 }
-
-
 
 void main(List<String> arguments) {
   List<String> parts = InputSRS();
@@ -329,7 +329,7 @@ void main(List<String> arguments) {
 
   var funcMap = generateMatrixFunction(unicFuns, matrixes);
 
-   //print(ArcticMatrix_Mult(funcMap['f']!.a, funcMap['g']!.b));
+  //print(ArcticMatrix_Mult(funcMap['f']!.a, funcMap['g']!.b));
   // print(ArcticMatrix_Mult(funcMap['f']!.a, funcMap['g']!.a)[1]);
 
   var left = CalculateFunctionComposes(LHS, funcMap);
@@ -337,9 +337,9 @@ void main(List<String> arguments) {
 
   File smtFile = File('solution.smt2');
   //print(left[0].a);
-   writeSmtBegin(smtFile);
-   declareVars(funcMap, smtFile);
-   writeForNotInf(funcMap,smtFile);
-   writeCompareMatrixItems(left, right,smtFile);
-   writeSmtEnd(smtFile);
+  writeSmtBegin(smtFile);
+  declareVars(funcMap, smtFile);
+  writeForNotInf(funcMap, smtFile);
+  writeCompareMatrixItems(left, right, smtFile);
+  writeSmtEnd(smtFile);
 }
