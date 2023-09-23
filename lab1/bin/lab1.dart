@@ -1,6 +1,6 @@
 import 'dart:io';
 
-//this type can be Matrix 2x2 or vector 1x2
+//this type can be Matrix or vector
 typedef Matrix = List<List<String>>;
 
 class LinearMatrixFunction {
@@ -294,7 +294,7 @@ void writeCompareMatrixItems(List<LinearMatrixFunction> leftResFunctions,
         leftResFunctions[i].a[1][0], rightResFunctions[i].a[1][0]));
     lines.add(arctic_bigger(
         leftResFunctions[i].a[1][1], rightResFunctions[i].a[1][1]));
-    //Vector
+    
   }
   var item = '';
   for (var line in lines) {
@@ -303,6 +303,7 @@ void writeCompareMatrixItems(List<LinearMatrixFunction> leftResFunctions,
 
   f.writeAsStringSync("(assert (and $item))\n", mode: FileMode.append);
 
+//Vector
   lines = <String>[];
   for (int i = 0; i < leftResFunctions.length; i++) {
     lines.add(arctic_bigger(
@@ -320,6 +321,12 @@ void writeCompareMatrixItems(List<LinearMatrixFunction> leftResFunctions,
 }
 
 void main(List<String> arguments) {
+  // На вход поступают строки вида:
+  // fg->gf или
+  // f(g(x))->g(f(x))
+
+  //Окончанием ввода является пустая строка
+  
   List<String> parts = InputSRS();
   List<String> LHS = getElements(parts, (i) => i % 2 == 0);
   List<String> RHS = getElements(parts, (i) => i % 2 != 0);
@@ -329,14 +336,11 @@ void main(List<String> arguments) {
 
   var funcMap = generateMatrixFunction(unicFuns, matrixes);
 
-  //print(ArcticMatrix_Mult(funcMap['f']!.a, funcMap['g']!.b));
-  // print(ArcticMatrix_Mult(funcMap['f']!.a, funcMap['g']!.a)[1]);
-
   var left = CalculateFunctionComposes(LHS, funcMap);
   var right = CalculateFunctionComposes(RHS, funcMap);
 
   File smtFile = File('solution.smt2');
-  //print(left[0].a);
+
   writeSmtBegin(smtFile);
   declareVars(funcMap, smtFile);
   writeForNotInf(funcMap, smtFile);
