@@ -1,2 +1,2 @@
-Formal languagle theory
+Formal language theory
 ------------
