@@ -2,7 +2,7 @@ import 'dart:io';
 
 const List<String> op = ['|', '#', '*'];
 
-Map<String, String> parseRegexIntoConcat(String regex) {
+parseRegex(String regex) {
   // R = r1r2...rn
   var map = <String, String>{};
   List<String> subRegexes = [];
@@ -25,35 +25,58 @@ Map<String, String> parseRegexIntoConcat(String regex) {
           if (regex[i] == ')') {
             in_group = false;
           }
+          if (regex[i + 1] == '*') {
+            subRegex += '*';
+            i++;
+          }
         }
-        if (regex[i + 1] == '|' || regex[i + 1] == '#' || regex[i + 1] == '*') {
+        if (regex[i + 1] == '|' || regex[i + 1] == '#') {
           operands.add(regex[i + 1]);
+
           i++;
         }
       } else {
         subRegex = regex[i];
-        if (regex[i + 1] == '|' || regex[i + 1] == '#' || regex[i + 1] == '*') {
+
+        if (regex[i + 1] == '*') {
+          subRegex += '*';
+          i++;
+        }
+
+        if (regex[i + 1] == '|' || regex[i + 1] == '#') {
           operands.add(regex[i + 1]);
           i++;
+        } else {
+          //Плюсом обозначаем конкатенацию
+          operands.add('+');
         }
       }
     } catch (Exeption) {
       // Здесь значит, что мы вышли за пределы строки
       // Так легче всего отслеживать
     }
-    print(subRegex);
-    print(operands);
+    subRegexes.add(subRegex);
   }
+
+  for (var i = 0; i < operands.length; i++) {
+    String subConcat = '';
+    while (operands[i] == '+') {
+      subConcat += subRegexes[i] + subRegexes[i + 1];
+      i++;
+    }
+  }
+  print(subRegexes);
+  print(operands);
   return map;
 }
 
 void main(List<String> arguments) {
-  print('Input shuffle regex: ');
+  print('Input shuffle regex:');
   String input_regex = stdin.readLineSync() ?? 'null';
 
   if (input_regex == 'null') {
     throw 'Incorrect input!';
   }
 
-  parseRegexIntoConcat(input_regex);
+  parseRegex(input_regex);
 }
