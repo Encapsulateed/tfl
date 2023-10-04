@@ -9,3 +9,6 @@ pubspec.yaml
 pubspec.lock
 dart-sdk/
 *.smt2
+solver.sh
+solver.py
+*.txt

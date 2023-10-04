@@ -1,6 +1,6 @@
 import 'dart:io';
 
-//this type can be Matrix 2x2 or vector 1x2
+//this type can be Matrix or vector
 typedef Matrix = List<List<String>>;
 
 class LinearMatrixFunction {
@@ -26,6 +26,7 @@ class LinearMatrixFunction {
 
 String arctic_sum(String x, String y) => "(arctic_sum $x $y)";
 String arctic_mult(String x, String y) => "(arctic_mult $x $y)";
+String arctic_bigger(String x, String y) => "(arctic_bigger $x $y)";
 
 Matrix ArcticMatrix_Mult(Matrix A, Matrix B) {
   //строк в А всегда 2  вне зависимости вектор это или матрица
@@ -39,17 +40,10 @@ Matrix ArcticMatrix_Mult(Matrix A, Matrix B) {
   if (colsA != rowsB) {
     throw ArgumentError('Неподходящие размеры матриц для умножения.');
   }
-  Matrix C = List.empty(growable: true);
 
   //result matrix init
-  List<String> lst = [];
-  for (int i = 0; i < colsB; i++) {
-    lst.add('');
-  }
-
-  for (int j = 0; j < colsA; j++) {
-    C.add(lst);
-  }
+  Matrix C = List.generate(rowsA, (_) => List<String>.filled(colsB, ''));
+  ;
 
   for (int i = 0; i < rowsA; i++) {
     for (int j = 0; j < colsB; j++) {
@@ -221,30 +215,121 @@ List<LinearMatrixFunction> CalculateFunctionComposes(List<String> HS, funcMap) {
   return composedFunctions;
 }
 
-void smtWriter(List<LinearMatrixFunction> leftResFunctions,
-    List<LinearMatrixFunction> rightResFunctions) {
-  File smtFile = File('solution.smt2');
-  smtFile.create();
+void writeSmtBegin(File f) {
+  // ignore: prefer_interpolation_to_compose_strings
+  String smtBegin = "(set-logic QF_NIA)\n" +
+      "(define-fun arctic_sum ((x Int) (y Int)) Int (ite(>= x y) x y))\n" +
+      "(define-fun arctic_mult ((x Int) (y Int)) Int (ite(or (<= x -1) (<= y -1)) -1 (+ x y)))\n" +
+      "(define-fun arctic_bigger ((x Int) (y Int)) Bool (ite (or (> x y) (and (= x y) (<= y -1))) true false))\n";
 
-  writeSmtBegin(smtFile);
-
-  // writeSmtEnd(smtFile);
+  f.writeAsStringSync(smtBegin, mode: FileMode.write);
 }
 
-void writeSmtBegin(File f) {
-  String smtBegin =
-      "(set-logic QF_NIA)\n" + "(define-fun arcmax ((a Int) (b Int)) Int\n";
+void writeSmtEnd(File f) {
+  // ignore: prefer_interpolation_to_compose_strings
+  String smtend = "(check-sat)\n" + "(get-model)\n" + "(exit)\n";
 
-  f.writeAsString(smtBegin);
+  f.writeAsStringSync(smtend, mode: FileMode.append);
+}
+
+void declareVars(Map<String, LinearMatrixFunction> funcMap, File f) {
+  List<String> lines = <String>[];
+  for (var fun in funcMap.values) {
+    for (var matrixRow in fun.a) {
+      for (var item in matrixRow) {
+        lines.add("(declare-fun $item () Int)\n");
+      }
+    }
+
+    for (var vectorItem in fun.b) {
+      lines.add("(declare-fun ${vectorItem[0]} () Int)\n");
+    }
+  }
+
+  for (var line in lines) {
+    f.writeAsStringSync(line, mode: FileMode.append);
+  }
+}
+
+void writeForNotInf(Map<String, LinearMatrixFunction> funcMap, File f) {
+  List<String> lines = <String>[];
+
+  bool isLeftHigher = true;  for (var fun in funcMap.values) {
+    for (var matrixRow in fun.a) {
+      for (var item in matrixRow) {
+        if (item.contains('11')) {
+          lines.add("(assert (> $item -1))\n");
+        } else {
+          lines.add("(assert (>= $item -1))\n");
+        }
+      }
+    }
+    isLeftHigher = true;
+    for (var vectorItem in fun.b) {
+    if (vectorItem.contains('0')) {
+        lines.add("(assert (> ${vectorItem[0]} -1))\n");
+        isLeftHigher = false;
+      } else {
+        lines.add("(assert (>= ${vectorItem[0]} -1))\n");
+      }
+    }
+  
+  }
+
+  for (var line in lines) {
+    f.writeAsStringSync(line, mode: FileMode.append);
+  }
+}
+
+void writeCompareMatrixItems(List<LinearMatrixFunction> leftResFunctions,
+    List<LinearMatrixFunction> rightResFunctions, File f) {
+  List<String> lines = <String>[];
+  //Matrix
+  for (int i = 0; i < leftResFunctions.length; i++) {
+    lines.add(arctic_bigger(
+        leftResFunctions[i].a[0][0], rightResFunctions[i].a[0][0]));
+    lines.add(arctic_bigger(
+        leftResFunctions[i].a[0][1], rightResFunctions[i].a[0][1]));
+    lines.add(arctic_bigger(
+        leftResFunctions[i].a[1][0], rightResFunctions[i].a[1][0]));
+    lines.add(arctic_bigger(
+        leftResFunctions[i].a[1][1], rightResFunctions[i].a[1][1]));
+    
+  }
+  var item = '';
+  for (var line in lines) {
+    item += line + ' ';
+  }
+
+  f.writeAsStringSync("(assert (and $item))\n", mode: FileMode.append);
+
+//Vector
+  lines = <String>[];
+  for (int i = 0; i < leftResFunctions.length; i++) {
+    lines.add(arctic_bigger(
+        leftResFunctions[i].b[0][0], rightResFunctions[i].b[0][0]));
+    lines.add(arctic_bigger(
+        leftResFunctions[i].b[1][0], rightResFunctions[i].b[1][0]));
+  }
+
+  item = '';
+  for (var line in lines) {
+    item += line + ' ';
+  }
+
+  f.writeAsStringSync("(assert (and $item))\n", mode: FileMode.append);
 }
 
 void main(List<String> arguments) {
+  // На вход поступают строки вида:
+  // fg->gf или
+  // f(g(x))->g(f(x))
+
+  //Окончанием ввода является пустая строка
+  
   List<String> parts = InputSRS();
   List<String> LHS = getElements(parts, (i) => i % 2 == 0);
   List<String> RHS = getElements(parts, (i) => i % 2 != 0);
-
-  List<LinearMatrixFunction> leftResFunctions;
-  List<LinearMatrixFunction> rightResFunctions;
 
   var unicFuns = getUnicFunctions(parts);
   var matrixes = MakeFunctionMatrix(unicFuns);
@@ -254,5 +339,11 @@ void main(List<String> arguments) {
   var left = CalculateFunctionComposes(LHS, funcMap);
   var right = CalculateFunctionComposes(RHS, funcMap);
 
-  smtWriter(left, right);
+  File smtFile = File('solution.smt2');
+
+  writeSmtBegin(smtFile);
+  declareVars(funcMap, smtFile);
+  writeForNotInf(funcMap, smtFile);
+  writeCompareMatrixItems(left, right, smtFile);
+  writeSmtEnd(smtFile);
 }
