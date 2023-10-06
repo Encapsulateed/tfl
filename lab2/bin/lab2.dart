@@ -2,15 +2,14 @@ import 'dart:io';
 
 const List<String> op = ['|', '#', '*'];
 
-parseRegex(String regex) {
-  // R = r1r2...rn
-  var map = <String, String>{};
+List<String> parseRegex(String regex) {
   List<String> subRegexes = [];
   List<String> operands = [];
+  List<String> subConcatRegexes = [];
 
   for (var i = 0; i < regex.length; i++) {
     // Смотрим является ли первый символ началом регулярки в скобках
-    bool in_group = regex[i] == '(';
+    bool in_group = regex[i] == '(' && regex[i + 1] != '(';
     String subRegex = '';
     try {
       if (in_group) {
@@ -30,10 +29,18 @@ parseRegex(String regex) {
             i++;
           }
         }
-        if (regex[i + 1] == '|' || regex[i + 1] == '#') {
-          operands.add(regex[i + 1]);
+        if (subRegex != '(' &&
+            subRegex != ')' &&
+            subRegex != '*' &&
+            subRegex != '**' &&
+            regex[i + 1] != '*') {
+          if (regex[i + 1] == '|' || regex[i + 1] == '#') {
+            operands.add(regex[i + 1]);
 
-          i++;
+            i++;
+          } else {
+            operands.add('+');
+          }
         }
       } else {
         subRegex = regex[i];
@@ -43,31 +50,59 @@ parseRegex(String regex) {
           i++;
         }
 
-        if (regex[i + 1] == '|' || regex[i + 1] == '#') {
-          operands.add(regex[i + 1]);
-          i++;
-        } else {
-          //Плюсом обозначаем конкатенацию
-          operands.add('+');
+        if (subRegex != '(' &&
+            subRegex != ')' &&
+            subRegex != '*' &&
+            subRegex != '**' &&
+            regex[i + 1] != '*') {
+          if (regex[i + 1] == '|' || regex[i + 1] == '#') {
+            operands.add(regex[i + 1]);
+
+            i++;
+          } else {
+            // + == конкатенация
+            operands.add('+');
+          }
         }
       }
     } catch (Exeption) {
       // Здесь значит, что мы вышли за пределы строки
       // Так легче всего отслеживать
     }
-    subRegexes.add(subRegex);
+    if (subRegex != '(' &&
+        subRegex != ')' &&
+        subRegex != '*' &&
+        subRegex != '**') {
+      subRegexes.add(subRegex);
+    }
+  }
+
+  print(subRegexes);
+  print(operands);
+
+  // Представим входную регулярку в виде
+  // R = r1+...+rn
+  // так проще всего брать производную Брозозовски
+  // + - конкатенация
+  //
+
+  var subConcatRegex = '';
+
+  if(operands.length == 0){
+    subConcatRegex = subRegexes[0];
   }
 
   for (var i = 0; i < operands.length; i++) {
-    String subConcat = '';
-    while (operands[i] == '+') {
-      subConcat += subRegexes[i] + subRegexes[i + 1];
-      i++;
-    }
+    var suff = i + 1 < subRegexes.length ? subRegexes[i + 1] : '';
+    var perf = i == 0 ? subRegexes[i] : '';
+
+    subConcatRegex += perf + operands[i] + suff;
   }
-  print(subRegexes);
-  print(operands);
-  return map;
+
+  print(subConcatRegex.split('+'));
+  //print(subConcatRegexes);
+
+  return <String>[];
 }
 
 void main(List<String> arguments) {
