@@ -2,6 +2,13 @@ import 'dart:io';
 
 const List<String> op = ['|', '#', '*'];
 
+String sliceString(String input, int startIndex, int endIndex) {
+  if (startIndex >= 0 && endIndex >= 0 && startIndex < endIndex) {
+    return input.substring(startIndex, endIndex);
+  }
+  return '';
+}
+
 List<String> parseRegex(String regex) {
   List<String> subRegexes = [];
   List<String> operands = [];
@@ -32,8 +39,7 @@ List<String> parseRegex(String regex) {
         if (subRegex != '(' &&
             subRegex != ')' &&
             subRegex != '*' &&
-            subRegex != '**' &&
-            regex[i + 1] != '*') {
+            subRegex != '**') {
           if (regex[i + 1] == '|' || regex[i + 1] == '#') {
             operands.add(regex[i + 1]);
 
@@ -53,8 +59,7 @@ List<String> parseRegex(String regex) {
         if (subRegex != '(' &&
             subRegex != ')' &&
             subRegex != '*' &&
-            subRegex != '**' &&
-            regex[i + 1] != '*') {
+            subRegex != '**') {
           if (regex[i + 1] == '|' || regex[i + 1] == '#') {
             operands.add(regex[i + 1]);
 
@@ -77,18 +82,17 @@ List<String> parseRegex(String regex) {
     }
   }
 
-  print(subRegexes);
-  print(operands);
+  //print(subRegexes);
+  // print(operands);
 
   // Представим входную регулярку в виде
   // R = r1+...+rn
   // так проще всего брать производную Брозозовски
   // + - конкатенация
-  //
 
   var subConcatRegex = '';
 
-  if(operands.length == 0){
+  if (operands.length == 0) {
     subConcatRegex = subRegexes[0];
   }
 
@@ -96,22 +100,56 @@ List<String> parseRegex(String regex) {
     var suff = i + 1 < subRegexes.length ? subRegexes[i + 1] : '';
     var perf = i == 0 ? subRegexes[i] : '';
 
+    if (suff == '' && perf == '') {
+      operands[i] = '';
+    }
     subConcatRegex += perf + operands[i] + suff;
   }
-
-  print(subConcatRegex.split('+'));
-  //print(subConcatRegexes);
-
-  return <String>[];
+  return subConcatRegex.split('+');
 }
 
+//Функция проверки регулярного выражения на содержание пустой строки
+bool isEpsilonInRegex(String regex) {
+  // Можно так сделать, потому что шафл - просто перестановка сиволов
+  // Она не сделает из регулярки не содержащей пустую строку, регулярку ее содержающую
+  // вроде...
+  regex = regex.replaceAll('#', '|');
+  RegExp r = RegExp(regex);
+
+  return r.hasMatch('');
+}
+
+// Функция поиска минимальной конкатенации регулярных выражений, такой что
+// пустая строка НЕ будет содержаться в данной конкатенации
+int FindMinimalNonEpsilonConcatenationCount(List<String> Regexes) {
+  String concat = '';
+  int counter = 0;
+  for (var regex in Regexes) {
+    concat += regex;
+    if (isEpsilonInRegex(concat)) {
+      break;
+    }
+    counter++;
+  }
+
+  return counter;
+}
+
+//Взятие производной Брозозовски
+void derivative(String regex, String char) {}
+
 void main(List<String> arguments) {
+  String input_regex;
+  List<String> ConcatRegexes = [];
+
   print('Input shuffle regex:');
-  String input_regex = stdin.readLineSync() ?? 'null';
+  input_regex = stdin.readLineSync() ?? 'null';
 
   if (input_regex == 'null') {
     throw 'Incorrect input!';
   }
-
-  parseRegex(input_regex);
+  if (input_regex != '') {
+    ConcatRegexes = parseRegex(input_regex);
+  }
+  print(FindMinimalNonEpsilonConcatenationCount(ConcatRegexes));
 }
