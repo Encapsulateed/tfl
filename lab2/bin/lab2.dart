@@ -1,18 +1,19 @@
 import 'dart:io';
+import 'dart:math';
 
-const List<String> op = ['|', '#', '*'];
-
-String sliceString(String input, int startIndex, int endIndex) {
-  if (startIndex >= 0 && endIndex >= 0 && startIndex < endIndex) {
-    return input.substring(startIndex, endIndex);
-  }
-  return '';
-}
-
-List<String> parseRegex(String regex) {
+List<String> parseRegex(String regex, Set<String> alf) {
   List<String> subRegexes = [];
-  List<String> operands = [];
-  List<String> subConcatRegexes = [];
+
+  for (var i = 0; i < regex.length; i++) {
+    if (regex[i] != '*' &&
+        regex[i] != '|' &&
+        regex[i] != '#' &&
+        regex[i] != '+' &&
+        regex[i] != '(' &&
+        regex[i] != ')') {
+      alf.add(regex[i]);
+    }
+  }
 
   for (var i = 0; i < regex.length; i++) {
     // Смотрим является ли первый символ началом регулярки в скобках
@@ -21,18 +22,22 @@ List<String> parseRegex(String regex) {
     try {
       if (in_group) {
         subRegex = '(';
-
+        int group_balance = 1;
         //Бежим по группе пока не дойдём до ее конца
-        while (in_group) {
+        while (group_balance != 0) {
           i++;
           subRegex += regex[i];
 
           // Любая скобка, очевидно, должна закрыться.
           if (regex[i] == ')') {
-            in_group = false;
+            group_balance--;
           }
+          if (regex[i] == '(') {
+            group_balance++;
+          }
+
           if (regex[i + 1] == '*') {
-            subRegex += '*';
+            subRegex = "${subRegex}*";
             i++;
           }
         }
@@ -41,18 +46,21 @@ List<String> parseRegex(String regex) {
             subRegex != '*' &&
             subRegex != '**') {
           if (regex[i + 1] == '|' || regex[i + 1] == '#') {
-            operands.add(regex[i + 1]);
+            subRegex = '$subRegex';
 
+            subRegex += regex[i + 1];
             i++;
           } else {
-            operands.add('+');
+            subRegex = '$subRegex';
+
+            subRegex += '+';
           }
         }
       } else {
-        subRegex = regex[i];
+        subRegex = "(${regex[i]})";
 
         if (regex[i + 1] == '*') {
-          subRegex += '*';
+          subRegex = "(${regex[i]}*)";
           i++;
         }
 
@@ -61,12 +69,14 @@ List<String> parseRegex(String regex) {
             subRegex != '*' &&
             subRegex != '**') {
           if (regex[i + 1] == '|' || regex[i + 1] == '#') {
-            operands.add(regex[i + 1]);
+            subRegex = '$subRegex';
+            subRegex += regex[i + 1];
 
             i++;
           } else {
             // + == конкатенация
-            operands.add('+');
+            subRegex = '$subRegex';
+            subRegex += '+';
           }
         }
       }
@@ -82,36 +92,36 @@ List<String> parseRegex(String regex) {
     }
   }
 
-  //print(subRegexes);
-  // print(operands);
+  subRegexes.removeWhere(
+      (element) => !(alf.any((letter) => element.contains(letter))));
 
-  // Представим входную регулярку в виде
-  // R = r1+...+rn
-  // так проще всего брать производную Брозозовски
-  // + - конкатенация
-
-  var subConcatRegex = '';
-
-  if (operands.length == 0) {
-    subConcatRegex = subRegexes[0];
+  var lastItem = subRegexes[subRegexes.length - 1];
+  if (lastItem.endsWith('+')) {
+    lastItem = lastItem.substring(0, lastItem.length - 1);
   }
 
-  for (var i = 0; i < operands.length; i++) {
-    var suff = i + 1 < subRegexes.length ? subRegexes[i + 1] : '';
-    var perf = i == 0 ? subRegexes[i] : '';
+  subRegexes =
+      subRegexes.map((e) => e = e.replaceAll(RegExp(r'\*+'), '*')).toList();
 
-    if (suff == '' && perf == '') {
-      operands[i] = '';
-    }
-    subConcatRegex += perf + operands[i] + suff;
+  subRegexes[subRegexes.length - 1] = lastItem;
+  return subRegexes;
+}
+
+String buildRegex(String regex, List<String> SubRegexes) {
+  SubRegexes.removeAt(0);
+  regex = '${regex}(';
+
+  for (var reg in SubRegexes) {
+    regex += reg;
   }
-  return subConcatRegex.split('+');
+  regex += ')';
+  return regex;
 }
 
 //Функция проверки регулярного выражения на содержание пустой строки
 bool isEpsilonInRegex(String regex) {
   // Можно так сделать, потому что шафл - просто перестановка сиволов
-  // Она не сделает из регулярки не содержащей пустую строку, регулярку ее содержающую
+  // Он не сделает из регулярки не содержащей пустую строку, регулярку ее содержающую
   // вроде...
   regex = regex.replaceAll('#', '|');
   RegExp r = RegExp(regex);
@@ -126,7 +136,7 @@ int FindMinimalNonEpsilonConcatenationCount(List<String> Regexes) {
   int counter = 0;
   for (var regex in Regexes) {
     concat += regex;
-    if (isEpsilonInRegex(concat)) {
+    if (!isEpsilonInRegex(concat)) {
       break;
     }
     counter++;
@@ -135,21 +145,90 @@ int FindMinimalNonEpsilonConcatenationCount(List<String> Regexes) {
   return counter;
 }
 
-//Взятие производной Брозозовски
-void derivative(String regex, String char) {}
+String derivative(String regex, String char) {
+  print(regex);
 
-void main(List<String> arguments) {
-  String input_regex;
+  if (regex.isEmpty || regex == 'ES') {
+    return 'ES'; // Производная символа равна ε (пустой строке)
+  } else if (regex == '(${char})') {
+    return 'ε'; // Производная символа равна ε (пустой строке)
+  } else if (regex == '(${char}*)') {
+    return char + '*';
+  } else {
+    var regexes = parseRegex(regex, {});
+    regex = buildRegex(regexes[0], regexes);
+    //  print(regex);
+
+    String left = regex[0];
+    String right = '';
+    int balance = 1;
+    int i = 1;
+
+    // Находим первую группу регулярок (левую)
+    // Вторая определиться как исходная регулярка без первой группы
+
+    while (balance != 0) {
+      if (regex[i] == '(') {
+        balance++;
+      }
+      if (regex[i] == ')') {
+        balance--;
+      }
+      left += regex[i];
+      i++;
+    }
+
+    right = regex.substring(i, regex.length);
+    //print(left);
+
+    // Значит перед нами бинарная операция, такая что регулярку можно разделить на лево и право
+    if (right != '' && right.length > 1) {
+      String op = right[0];
+      right = right.substring(1, right.length);
+      //print("$left $op $right");
+
+      if (op == '+') {
+        if (isEpsilonInRegex(regex)) {
+          return "${derivative(left, char)}${right} | ${left}${derivative(right, char)}";
+        } else {
+          return "${derivative(left, char)}${right}";
+        }
+      }
+      if (op == '|') {
+        return '${derivative(left, char)}|${derivative(right, char)}';
+      }
+      if (op == '#') {
+        return '${derivative(left, char)}#${right}|${left}#${derivative(right, char)}';
+      }
+    }
+    //Значит это регулярка без бинарной операции, это возможно только если на высшем уровне вложенности расположена звезда клини
+    // например, (((r1|r2)#r3)*)
+    else {
+      //var left_no_klini = left.split('');
+      //  left_no_klini.removeAt(regex.length - 2);
+
+      // print( left_no_klini.join());
+      //return "${derivative(left.substring(0, left.length - 2), char)}+${left}";
+    }
+  }
+  return 'ES';
+}
+
+void main() {
+  String regex;
   List<String> ConcatRegexes = [];
-
+  Set<String> alf = {};
   print('Input shuffle regex:');
-  input_regex = stdin.readLineSync() ?? 'null';
+  regex = stdin.readLineSync() ?? 'null';
 
-  if (input_regex == 'null') {
+  if (regex == 'null') {
     throw 'Incorrect input!';
   }
-  if (input_regex != '') {
-    ConcatRegexes = parseRegex(input_regex);
+  if (regex != '') {
+    //  var s = derivative(input_regex, 'a');
+    // ConcatRegexes = parseRegex(input_regex);
   }
-  print(FindMinimalNonEpsilonConcatenationCount(ConcatRegexes));
+
+  var d = derivative(regex, 'a');
+  print("d = ${d}");
 }
