@@ -17,7 +17,7 @@ List<String> parseRegex(String regex) {
 
   for (var i = 0; i < regex.length; i++) {
     // Смотрим является ли первый символ началом регулярки в скобках
-    bool in_group = regex[i] == '(' && regex[i + 1] != '(';
+    bool in_group = regex[i] == '(';
     String subRegex = '';
     try {
       if (in_group) {
@@ -29,15 +29,15 @@ List<String> parseRegex(String regex) {
           subRegex += regex[i];
 
           // Любая скобка, очевидно, должна закрыться.
-          if (regex[i] == ')') {
-            group_balance--;
-          }
           if (regex[i] == '(') {
             group_balance++;
           }
+          if (regex[i] == ')') {
+            group_balance--;
+          }
 
           if (regex[i + 1] == '*') {
-            subRegex = "${subRegex}*";
+            subRegex += "*";
             i++;
           }
         }
@@ -108,6 +108,13 @@ List<String> parseRegex(String regex) {
       .map((e) => e = (e[e.length - 1] == '*' ? "(${e})" : e))
       .toList();
 
+  subRegexes = subRegexes
+      .map((e) => e = (e.contains('*)*') ? e.substring(1, e.length - 2) : e))
+      .toList();
+  //print('REGEXES START' );
+  //print(subRegexes);
+  // print('REGEXES END' );
+
   return subRegexes;
 }
 
@@ -119,11 +126,14 @@ String buildRegex(String regex, List<String> SubRegexes) {
     regex += reg;
   }
   regex += ')';
-
   if (SubRegexes.length == 0) {
     regex = regex.substring(0, regex.length - 2);
+    regex = regex.substring(1, regex.length - 1);
+
+    //  SubRegexes = parseRegex(regex);
+    //regex = buildRegex(regex, SubRegexes);
   }
-  // print(regex);
+
   return regex;
 }
 
@@ -142,12 +152,11 @@ bool isEpsilonInRegex(String regex) {
 // пустая строка НЕ будет содержаться в данной конкатенации
 
 String simplifyRegex(String regex) {
-  regex = regex.replaceAll(RegExp(r'\(+'), '(');
-  regex = regex.replaceAll(RegExp(r'\)+'), ')');
-  regex = regex.replaceAll(RegExp(r'\*+'), '*');
+  
 
-  // print(regex);
-
+ var regexes = parseRegex(regex);
+  regex = buildRegex(regexes[0], regexes);
+  print(regex);
   return regex;
 }
 
@@ -167,92 +176,90 @@ int FindMinimalNonEpsilonConcatenationCount(List<String> Regexes) {
 
 String derivative(String regex, String char) {
   // regex = simplifyRegex(regex);
-
+ // print('INPUT REGEX ' + regex);
   var regexes = parseRegex(regex);
   regex = buildRegex(regexes[0], regexes);
+  //print('BUILDING ' + regex);
+  if (regexes.length == 0) {
+    regexes = parseRegex(regex);
+    regex = buildRegex(regexes[0], regexes);
+  }
 
   if (regex.isEmpty || regex == '∅') {
     return '∅'; // Производная символа равна ε (пустой строке)
-  } else if (regex == '($char)') {
-    return 'ε'; // Производная символа равна ε (пустой строке)
-  } else if (regex == '(${char}*)') {
-    return char + '*';
-    // Производная символа равна ε (пустой строке)
-  } else if (regex.length == 3) {
-    var char_in_case = regex[1];
-    if (char_in_case != '#' &&
-        char_in_case != '|' &&
-        char_in_case != '+' &&
-        char_in_case != '(' &&
-        char_in_case != ')' &&
-        char_in_case != char) {
-      //Это обработка случая a^(-1)b
+  } else if (regex.length == 1) {
+    if (regex == char) {
+      return 'ε';
+    } else {
       return '∅';
     }
   } else {
-    String left = regex[0];
+    String left = '';
     String right = '';
-    int balance = 1;
-    int i = 1;
 
-    // Находим первую группу регулярок (левую)
-    // Вторая определиться как исходная регулярка без первой группы
+    bool in_group = regex[0] == '(';
+    if (in_group) {
+      left = regex[0];
+      int balance = 1;
+      int i = 1;
 
-    while (balance != 0) {
-      if (regex[i] == '(') {
-        balance++;
+      // Находим первую группу регулярок (левую)
+      // Вторая определиться как исходная регулярка без первой группы
+
+      while (balance != 0) {
+        if (regex[i] == '(') {
+          balance++;
+        }
+        if (regex[i] == ')') {
+          balance--;
+        }
+        left += regex[i];
+        i++;
       }
-      if (regex[i] == ')') {
-        balance--;
-      }
-      left += regex[i];
-      i++;
+      right = regex.substring(i, regex.length);
+    } else {
+      left = regex;
     }
-    right = regex.substring(i, regex.length);
-    // print('LEFT ' + left);
-    // print('RIGHT ' + right);
+    // print('INPUT ' + regex);
+   // print('LEFT ' + left);
+   // print('RIGHT ' + right);
+
     // Значит перед нами бинарная операция, такая что регулярку можно разделить на лево и право
-    if (right != '') {
+    if (right != '' && right != '*') {
       String op = right[0];
       right = right.substring(1, right.length);
 
       if (op == '+') {
         if (isEpsilonInRegex(regex)) {
-          return "${derivative(left, char)}${right} | ${left}${derivative(right, char)}";
+          return "(${derivative(left, char)}${right} | ${left}${derivative(right, char)})";
         } else {
-          return "${derivative(left, char)}${right}";
+          return "(${derivative(left, char)}${right})";
         }
       }
       if (op == '|') {
-        return '${derivative(left, char)}|${derivative(right, char)}';
+        return '(${derivative(left, char)}|${derivative(right, char)})';
       }
       if (op == '#') {
-        return '${derivative(left, char)}#${right}|${left}#${derivative(right, char)}';
+        return '(${derivative(left, char)}#${right}|${left}#${derivative(right, char)})';
       }
     }
     //Значит это регулярка без бинарной операции
     else {
-      //Если есть скобки на верхнем уровне - удаляем их
+      if (right == '*') {
+        left += right;
+      }
 
+     // print('LEFT BEFORE ' + left);
       if (left.startsWith('(') && left.endsWith(')')) {
-        var tmp_left = left.split('');
+        left = left.substring(1, left.length - 1);
+     //   print('LEFT AFTER ' + left);
 
-        tmp_left.removeAt(0);
-        tmp_left.removeAt(tmp_left.length - 1);
-        left = tmp_left.join();
-        print('LEFT ' + left);
-        if (!left.startsWith('(')) {
-          return derivative(left, char);
-        }
-      }
-      if (left.endsWith('*')) {
-        var no_klini = left.substring(0, left.length - 1);
-        print('NO KL ' + left);
-        return "${derivative(no_klini, char)}${left}";
-      } else {
-        print('LEFT 2' + left);
         return derivative(left, char);
+      } else if (left.endsWith('*')) {
+        var no_klini = left.substring(0, left.length - 1);
+        return "(${derivative(no_klini, char)})${left}";
       }
+      //Если есть скобки на верхнем уровне - удаляем их
     }
   }
   return '∅';
@@ -269,6 +276,8 @@ void main() {
     throw 'Incorrect input!';
   }
   if (regex != '') {}
+
+  //parseRegex(regex);
 
   var d = derivative(regex, 'a');
   print("d = ${d}");
