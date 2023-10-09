@@ -166,10 +166,10 @@ String BaseSymplify(String regex) {
   //regex = Reduction(regex);
   //print("REDUCTED " + regex);
 
-  if (regex == '') {
-    return '';
-  } else if (regex == '-') {
-    return '-';
+  if (regex == 'ε') {
+    return 'ε';
+  } else if (regex == 'ε') {
+    return 'ε';
   } else if (regex.length == 1) {
     return regex;
   } else {
@@ -205,42 +205,54 @@ String BaseSymplify(String regex) {
       right = right.substring(1, right.length);
       // right = simplifyBrackets(right);
 
+//      print("$left $op $right");
 
       if (op == '+') {
-        if (left == '(-)' ||
-            right == '(-)' ||
-            left == '((-))' ||
-            right == '((-))' ||
-            left == '-' ||
-            right == '-') {
-          return '-';
+        if (left == '(∅)' ||
+            right == '(∅)' ||
+            left == '((∅))' ||
+            right == '((∅))' ||
+            left == '∅' ||
+            right == '∅') {
+          return '∅';
+        }
+         if (left == '(ε)' || left == '((ε))' || left == 'ε') {
+          return right;
+        }
+        if (right == '(ε)' || right == '((ε))' || right == 'ε') {
+          return left;
         }
         return '(${BaseSymplify(left)}${BaseSymplify(right)})';
       }
       if (op == '|') {
-
-        if (left == '(-)' || left == '((-))' || left == '-') {
+        if (left == '(∅)' || left == '((∅))' || left == '∅') {
           return right;
         }
-        if (right == '(-)' || right == '((-))' || right == '-') {
+        if (right == '(∅)' || right == '((∅))' || right == '∅') {
           return left;
         }
         if (simplifyBrackets(left) == simplifyBrackets(right)) {
-          print('YEAH');
           return right;
         }
         return '(${BaseSymplify(left)}|${BaseSymplify(right)})';
       }
       if (op == '#') {
-        if (left == '(-)' ||
-            right == '(-)' ||
-            left == '((-))' ||
-            right == '((-))' ||
-            left == '-' ||
-            right == '-') {
-          return '-';
+        if (left == '(∅)' ||
+            right == '(∅)' ||
+            left == '((∅))' ||
+            right == '((∅))' ||
+            left == '∅' ||
+            right == '∅') {
+          return '∅';
         }
-        //print('SHUFFLE $simplified_left $simplified_right');
+
+        if (left == '(ε)' || left == '((ε))' || left == 'ε') {
+          return right;
+        }
+        if (right == '(ε)' || right == '((ε))' || right == 'ε') {
+          return left;
+        }
+
         return '(${BaseSymplify(left)}#${BaseSymplify(right)})';
       }
     } else {
@@ -249,10 +261,12 @@ String BaseSymplify(String regex) {
       }
       // print('R_NULL $left');
 
-      if (left == '(-)*') {
-        return '-';
-      } else if (left == '()*') {
-        return '';
+      if (left == '(∅)*') {
+        return '∅';
+      }
+
+      if (left == '(ε)*') {
+        return 'ε';
       }
 
       if (left.startsWith('(') && left.endsWith(')')) {
@@ -284,6 +298,9 @@ String simplifyBrackets(String regex) {
   int back_couter = 0;
   int j = regex.length - 1;
 
+  if (regex.length == 0) {
+    return '';
+  }
   while (regex[i] == '(') {
     i++;
   }
@@ -322,16 +339,16 @@ String derivative(String regex, String char) {
   //stdin.readLineSync();
 
   if (regex.isEmpty) {
-    return '';
+    return 'ε';
   }
   if (regex.length == 1) {
     if (regex == char) {
-      return '';
+      return 'ε';
     } else {
-      return '-';
+      return '∅';
     }
   } else if (regex[0] == char && regex[1] != '*') {
-    return '' + regex.substring(1, regex.length);
+    return 'ε' + regex.substring(1, regex.length);
   } else {
     String left = '';
     String right = '';
@@ -422,7 +439,5 @@ void main() {
     print('Распознанно: ');
   }
 
-
+  print(MainSymplify(derivative(regex, 'a')));
 }
-
-
