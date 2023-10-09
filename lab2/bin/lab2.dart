@@ -94,12 +94,13 @@ List<String> parseRegex(String regex) {
   subRegexes.removeWhere(
       (element) => !(alf.any((letter) => element.contains(letter))));
 
-  var lastItem = subRegexes[subRegexes.length - 1];
-  if (lastItem.endsWith('+')) {
-    lastItem = lastItem.substring(0, lastItem.length - 1);
+  if (subRegexes.length != 0) {
+    var lastItem = subRegexes[subRegexes.length - 1];
+    if (lastItem.endsWith('+')) {
+      lastItem = lastItem.substring(0, lastItem.length - 1);
+    }
+    subRegexes[subRegexes.length - 1] = lastItem;
   }
-
-  subRegexes[subRegexes.length - 1] = lastItem;
 
   subRegexes =
       subRegexes.map((e) => e = e.replaceAll(RegExp(r'\*+'), '*')).toList();
@@ -108,11 +109,9 @@ List<String> parseRegex(String regex) {
       .map((e) => e = (e[e.length - 1] == '*' ? "(${e})" : e))
       .toList();
 
-  subRegexes = subRegexes
-      .map((e) => e = (e.contains('*)*') ? e.substring(1, e.length - 2) : e))
-      .toList();
-
-//print(subRegexes);
+  subRegexes = subRegexes.map((e) => e = e.replaceAll('*)*', ')*')).toList();
+  subRegexes = subRegexes.map((e) => e = e.replaceAll('*))*', '))*')).toList();
+  // print(subRegexes);
   return subRegexes;
 }
 
@@ -145,20 +144,30 @@ bool isEpsilonInRegex(String regex) {
 
 // Функция поиска минимальной конкатенации регулярных выражений, такой что
 // пустая строка НЕ будет содержаться в данной конкатенации
+String MainSymplify(String regex) {
+  var prev = '';
+  var curr = regex;
 
-String simplifyRegex(String regex) {
+  while (prev != curr) {
+    prev = curr;
+    curr = BaseSymplify(curr);
+    //print(curr);
+  }
+  return curr;
+}
+
+String BaseSymplify(String regex) {
   var regexes = parseRegex(regex);
-  regex = buildRegex(regexes[0], regexes);
-
-  if (regexes.length == 0) {
-    regexes = parseRegex(regex);
+  if (regexes.length != 0) {
     regex = buildRegex(regexes[0], regexes);
   }
 
-  print("REGEX " + regex);
+  //print("REGEX " + regex);
+  //regex = Reduction(regex);
+  //print("REDUCTED " + regex);
 
-  if (regex == 'ε') {
-    return 'ε';
+  if (regex == '') {
+    return '';
   } else if (regex == '-') {
     return '-';
   } else if (regex.length == 1) {
@@ -188,103 +197,111 @@ String simplifyRegex(String regex) {
       left = regex;
     }
 
+    left = Reduction(left);
+    right = Reduction(right);
+
     if (right != '' && right != '*') {
       String op = right[0];
       right = right.substring(1, right.length);
-      right = simplifyBrackets(right);
+      // right = simplifyBrackets(right);
 
-      var simplified_right = simplifyRegex(right);
-      var simplified_left = simplifyRegex(left);
+      // print('REG $left $op $right');
+
       if (op == '+') {
-     //   print('CONCAT $simplified_left $simplified_right');
-        if (simplified_left == '-' || simplified_right == '') {
+        if (left == '(-)' ||
+            right == '(-)' ||
+            left == '((-))' ||
+            right == '((-))' ||
+            left == '-' ||
+            right == '-') {
           return '-';
-        } else {
-          return "${simplified_left}${simplified_right}";
         }
+        return '(${BaseSymplify(left)}${BaseSymplify(right)})';
       }
       if (op == '|') {
-       // print('ALTER $simplified_left $simplified_right');
-        if (simplified_left == '-' && simplified_right != '-') {
-          return simplified_right;
-        } else if (simplified_left != '-' && simplified_right == '-') {
-          return simplified_left;
-        } else if (simplified_left == '-' && simplified_right == '-') {
-          return '-';
-        } else {
-          return "${simplified_left}|${simplified_right}";
+        if (left == '(-)' || left == '((-))' || left == '-') {
+          return right;
         }
+        if (right == '(-)' || right == '((-))' || right == '-') {
+          return left;
+        }
+        return '(${BaseSymplify(left)}|${BaseSymplify(right)})';
       }
       if (op == '#') {
-        //print('SHUFFLE $simplified_left $simplified_right');
-        if (simplified_left == '-' || simplified_right == '') {
+        if (left == '(-)' ||
+            right == '(-)' ||
+            left == '((-))' ||
+            right == '((-))' ||
+            left == '-' ||
+            right == '-') {
           return '-';
-        } else {
-          return "${simplified_left}#${simplified_right}";
         }
+        //print('SHUFFLE $simplified_left $simplified_right');
+        return '(${BaseSymplify(left)}#${BaseSymplify(right)})';
       }
     } else {
       if (right == '*') {
         left += right;
       }
+      // print('R_NULL $left');
+
+      if (left == '(-)*') {
+        return '-';
+      } else if (left == '()*') {
+        return '';
+      }
 
       if (left.startsWith('(') && left.endsWith(')')) {
         left = left.substring(1, left.length - 1);
-
-        return simplifyRegex(left);
+        return BaseSymplify(left);
       } else if (left.endsWith('*')) {
         var no_klini = left.substring(0, left.length - 1);
-        return "(${simplifyRegex(no_klini)})*";
+        return "(${BaseSymplify(no_klini)})*";
       }
     }
 
     //Если есть скобки на верхнем уровне - удаляем их
   }
-
-  return simplifyRegex(regex);
+  return BaseSymplify(regex);
 }
 
-// ((...(reg_exp)...)) -> (reg_exp)
-String simplifyBrackets(String input) {
-  StringBuffer result = StringBuffer();
-  int openCount = 0;
-
-  for (int i = 0; i < input.length; i++) {
-    if (input[i] == '(') {
-      openCount++;
-      if (openCount == 1) {
-        result.write('('); // Сохраняем первую открывающую скобку
-      }
-    } else if (input[i] == ')') {
-      if (openCount > 0) {
-        openCount--;
-        if (openCount == 0) {
-          result.write(')'); // Сохраняем последнюю закрывающую скобку
-        }
-      }
-    } else {
-      if (openCount > 0) {
-        result.write(input[i]); // Сохраняем символы внутри скобок
-      }
-    }
+String Reduction(String regex) {
+  if (regex.startsWith('-#') || regex.endsWith('#-')) {
+    //regex = '-';
   }
-
-  return result.toString();
+  if (regex.startsWith('(-#') || regex.endsWith('#-)')) {
+    // regex = '-';
+  }
+  return regex;
 }
 
+String simplifyBrackets(String regex) {
+  int i = 0;
+  int back_couter = 0;
+  int j = regex.length - 1;
 
-int FindMinimalNonEpsilonConcatenationCount(List<String> Regexes) {
-  String concat = '';
-  int counter = 0;
-  for (var regex in Regexes) {
-    concat += regex;
-    if (!isEpsilonInRegex(concat)) {
-      break;
-    }
-    counter++;
+  while (regex[i] == '(') {
+    i++;
   }
 
-  return counter;
+  if (i == 0) {
+    return regex;
+  } else {
+    while (regex[j] == ')') {
+      j--;
+      if (back_couter == i) {
+        break;
+      }
+      back_couter++;
+    }
+  }
+  if (i != back_couter) {
+    i = back_couter;
+  }
+  if (i == 1 && back_couter == 1) {
+    return regex;
+  }
+  return regex.substring(i, regex.length - back_couter);
 }
 
 String derivative(String regex, String char) {
@@ -296,23 +313,20 @@ String derivative(String regex, String char) {
     regex = buildRegex(regexes[0], regexes);
   }
 
-  //print('REGEX ' + regex);
   //stdin.readLineSync();
 
   if (regex.isEmpty) {
-    return 'ε';
+    return '';
   }
   if (regex.length == 1) {
     if (regex == char) {
-      return 'ε';
+      return '';
     } else {
       return '-';
     }
-  } 
-  else if(regex[0] == char){
-    return 'ε'+ regex.substring(1,regex.length);
-  }
-  else {
+  } else if (regex[0] == char && regex[1] != '*') {
+    return '' + regex.substring(1, regex.length);
+  } else {
     String left = '';
     String right = '';
 
@@ -340,26 +354,26 @@ String derivative(String regex, String char) {
       left = regex;
     }
 
-   // print('LEFT ' + left);
+    // print('LEFT ' + left);
 
     if (right != '' && right != '*') {
       String op = right[0];
       right = right.substring(1, right.length);
-          
-      right = simplifyBrackets(right);
-      //left = simplifyBrackets(left);
+
+      print('EXPRESSION $left $op $right');
+
       if (op == '+') {
         if (isEpsilonInRegex(left)) {
-          return "(${derivative(left, char)}${right}|${derivative(right, char)})";
+          return "(((${derivative(left, char)})(${right}))|(${derivative(right, char)}))";
         } else {
-          return "${derivative(left, char)}${right}";
+          return "((${derivative(left, char)})(${right}))";
         }
       }
       if (op == '|') {
-        return '(${derivative(left, char)}|${derivative(right, char)})';
+        return '((${derivative(left, char)})|(${derivative(right, char)}))';
       }
       if (op == '#') {
-        return '(${derivative(left, char)}#${right}|${left}#(${derivative(right, char)})';
+        return '(((${derivative(left, char)})#(${right}))|((${left})#(${derivative(right, char)})))';
       }
     }
     //Значит это регулярка без бинарной операции
@@ -374,12 +388,12 @@ String derivative(String regex, String char) {
         return derivative(left, char);
       } else if (left.endsWith('*')) {
         var no_klini = left.substring(0, left.length - 1);
-       // print('KLINI LEFT '+ left);
-        return "(${derivative(no_klini, char)})(${left})";
+
+        return "(${derivative(no_klini, char)})${left}";
       }
     }
   }
-   return derivative(regex, char);
+  return derivative(regex, char);
 }
 
 void main() {
@@ -394,8 +408,21 @@ void main() {
   if (regex != '') {}
 
   //print(a);
-  var d = derivative(regex, 'a');
-  print("d = ${d}");
-  var s = simplifyRegex(d);
-  print("s = ${s}");
+  //print(regex);
+  var r = parseRegex(regex);
+  if (r.length != 0) {
+    print('Распознанно: '+ buildRegex(r[0], r));
+  } else {
+    print('Распознанно: ');
+  }
+
+  //var d = derivative(regex, 'a');
+  // print(MainSymplify(d));
+
+  var d = derivative(regex, 'b');
+  //print(d);
+
+  //d = derivative(regex, 'a');
+  //print(d);
+  print(MainSymplify(d));
 }
