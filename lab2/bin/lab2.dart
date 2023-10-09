@@ -205,7 +205,6 @@ String BaseSymplify(String regex) {
       right = right.substring(1, right.length);
       // right = simplifyBrackets(right);
 
-      // print('REG $left $op $right');
 
       if (op == '+') {
         if (left == '(-)' ||
@@ -219,11 +218,16 @@ String BaseSymplify(String regex) {
         return '(${BaseSymplify(left)}${BaseSymplify(right)})';
       }
       if (op == '|') {
+
         if (left == '(-)' || left == '((-))' || left == '-') {
           return right;
         }
         if (right == '(-)' || right == '((-))' || right == '-') {
           return left;
+        }
+        if (simplifyBrackets(left) == simplifyBrackets(right)) {
+          print('YEAH');
+          return right;
         }
         return '(${BaseSymplify(left)}|${BaseSymplify(right)})';
       }
@@ -289,6 +293,7 @@ String simplifyBrackets(String regex) {
   } else {
     while (regex[j] == ')') {
       j--;
+
       if (back_couter == i) {
         break;
       }
@@ -301,7 +306,8 @@ String simplifyBrackets(String regex) {
   if (i == 1 && back_couter == 1) {
     return regex;
   }
-  return regex.substring(i, regex.length - back_couter);
+
+  return regex.substring(i - 1, regex.length - back_couter + 1);
 }
 
 String derivative(String regex, String char) {
@@ -360,7 +366,7 @@ String derivative(String regex, String char) {
       String op = right[0];
       right = right.substring(1, right.length);
 
-      print('EXPRESSION $left $op $right');
+      //print('EXPRESSION $left $op $right');
 
       if (op == '+') {
         if (isEpsilonInRegex(left)) {
@@ -411,18 +417,12 @@ void main() {
   //print(regex);
   var r = parseRegex(regex);
   if (r.length != 0) {
-    print('Распознанно: '+ buildRegex(r[0], r));
+    print('Распознанно: ' + buildRegex(r[0], r));
   } else {
     print('Распознанно: ');
   }
 
-  //var d = derivative(regex, 'a');
-  // print(MainSymplify(d));
 
-  var d = derivative(regex, 'b');
-  //print(d);
-
-  //d = derivative(regex, 'a');
-  //print(d);
-  print(MainSymplify(d));
 }
+
+
