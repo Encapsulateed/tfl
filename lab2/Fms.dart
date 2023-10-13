@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'lab2.dart';
-import 'dart:io';
 
 class FMS {
   Set<String> alphabet = {};

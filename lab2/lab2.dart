@@ -429,7 +429,6 @@ Set<String> getRegexAlf(String regex) {
 
 void main() {
   String regex;
-  Set<String> alf = {};
   print('Input shuffle regex:');
   regex = stdin.readLineSync() ?? 'null';
 

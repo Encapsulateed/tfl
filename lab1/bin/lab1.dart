@@ -254,7 +254,7 @@ void declareVars(Map<String, LinearMatrixFunction> funcMap, File f) {
 void writeForNotInf(Map<String, LinearMatrixFunction> funcMap, File f) {
   List<String> lines = <String>[];
 
-  bool isLeftHigher = true;  for (var fun in funcMap.values) {
+  for (var fun in funcMap.values) {
     for (var matrixRow in fun.a) {
       for (var item in matrixRow) {
         if (item.contains('11')) {
@@ -264,16 +264,13 @@ void writeForNotInf(Map<String, LinearMatrixFunction> funcMap, File f) {
         }
       }
     }
-    isLeftHigher = true;
     for (var vectorItem in fun.b) {
-    if (vectorItem.contains('0')) {
+      if (vectorItem.contains('0')) {
         lines.add("(assert (> ${vectorItem[0]} -1))\n");
-        isLeftHigher = false;
       } else {
         lines.add("(assert (>= ${vectorItem[0]} -1))\n");
       }
     }
-  
   }
 
   for (var line in lines) {
@@ -294,7 +291,6 @@ void writeCompareMatrixItems(List<LinearMatrixFunction> leftResFunctions,
         leftResFunctions[i].a[1][0], rightResFunctions[i].a[1][0]));
     lines.add(arctic_bigger(
         leftResFunctions[i].a[1][1], rightResFunctions[i].a[1][1]));
-    
   }
   var item = '';
   for (var line in lines) {
@@ -326,7 +322,7 @@ void main(List<String> arguments) {
   // f(g(x))->g(f(x))
 
   //Окончанием ввода является пустая строка
-  
+
   List<String> parts = InputSRS();
   List<String> LHS = getElements(parts, (i) => i % 2 == 0);
   List<String> RHS = getElements(parts, (i) => i % 2 != 0);
