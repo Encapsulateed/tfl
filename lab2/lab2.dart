@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'Fms.dart';
 
 List<String> parseRegex(String regex) {
   List<String> subRegexes = [];
@@ -53,7 +54,7 @@ List<String> parseRegex(String regex) {
         subRegex = "(${regex[i]})";
 
         if (regex[i + 1] == '*') {
-          subRegex = "${regex[i]}*";
+          subRegex = "(${regex[i]})*";
           i++;
         }
 
@@ -92,7 +93,6 @@ List<String> parseRegex(String regex) {
     }
     subRegexes[subRegexes.length - 1] = lastItem;
   }
-
   subRegexes =
       subRegexes.map((e) => e = e.replaceAll(RegExp(r'\*+'), '*')).toList();
   subRegexes =
@@ -103,7 +103,7 @@ List<String> parseRegex(String regex) {
 
   subRegexes = subRegexes.map((e) => e = e.replaceAll('*)*', ')*')).toList();
   subRegexes = subRegexes.map((e) => e = e.replaceAll('*))*', '))*')).toList();
-  // print(subRegexes);
+
   return subRegexes;
 }
 
@@ -440,14 +440,13 @@ void main() {
 
   var r = parseRegex(regex);
   if (r.length != 0) {
-    print('Распознанно: ' + buildRegex(r[0], r));
+    regex = buildRegex(r[0], r);
+    print('Распознанно: ' + regex);
   } else {
     print('Распознанно: ');
   }
 
-  print(getRegexAlf(regex));
-
-  print('d(a) = ' + MainSymplify(derivative(regex, 'a')));
-  print('d(b) = ' + MainSymplify(derivative(regex, 'b')));
-  print('d(c) = ' + MainSymplify(derivative(regex, 'c')));
+  var fms = FMS(regex);
+  fms.build(regex);
+  fms.Print();
 }
