@@ -2,17 +2,11 @@ import 'dart:io';
 
 List<String> parseRegex(String regex) {
   List<String> subRegexes = [];
-  Set<String> alf = {};
-  for (var i = 0; i < regex.length; i++) {
-    if (regex[i] != '*' &&
-        regex[i] != '|' &&
-        regex[i] != '#' &&
-        regex[i] != '+' &&
-        regex[i] != '(' &&
-        regex[i] != ')') {
-      alf.add(regex[i]);
-    }
-  }
+
+  regex = regex.replaceAll(RegExp(r'\*+'), '*');
+  regex = regex.replaceAll(RegExp(r'\|+'), '|');
+  regex = regex.replaceAll('*)*', ')*');
+  regex = regex.replaceAll('*))*', '))*');
 
   for (var i = 0; i < regex.length; i++) {
     // Смотрим является ли первый символ началом регулярки в скобках
@@ -91,9 +85,6 @@ List<String> parseRegex(String regex) {
     }
   }
 
-  subRegexes.removeWhere(
-      (element) => !(alf.any((letter) => element.contains(letter))));
-
   if (subRegexes.length != 0) {
     var lastItem = subRegexes[subRegexes.length - 1];
     if (lastItem.endsWith('+')) {
@@ -104,7 +95,8 @@ List<String> parseRegex(String regex) {
 
   subRegexes =
       subRegexes.map((e) => e = e.replaceAll(RegExp(r'\*+'), '*')).toList();
-
+  subRegexes =
+      subRegexes.map((e) => e = e.replaceAll(RegExp(r'\|+'), '|')).toList();
   subRegexes = subRegexes
       .map((e) => e = (e[e.length - 1] == '*' ? "(${e})" : e))
       .toList();
@@ -137,6 +129,7 @@ bool isEpsilonInRegex(String regex) {
   // вроде...
   regex = regex.replaceAll('#', '|');
   regex = regex.replaceAll('+', '');
+  regex = regex.replaceAll('ε', '');
   RegExp r = RegExp(regex);
 
   return r.hasMatch('');
@@ -162,8 +155,6 @@ String BaseSymplify(String regex) {
     regex = buildRegex(regexes[0], regexes);
   }
 
-  //print("REGEX " + regex);
-  //regex = Reduction(regex);
   //print("REDUCTED " + regex);
 
   if (regex == 'ε') {
@@ -216,7 +207,7 @@ String BaseSymplify(String regex) {
             right == '∅') {
           return '∅';
         }
-         if (left == '(ε)' || left == '((ε))' || left == 'ε') {
+        if (left == '(ε)' || left == '((ε))' || left == 'ε') {
           return right;
         }
         if (right == '(ε)' || right == '((ε))' || right == 'ε') {
@@ -419,6 +410,23 @@ String derivative(String regex, String char) {
   return derivative(regex, char);
 }
 
+Set<String> getRegexAlf(String regex) {
+  Set<String> alf = {};
+  for (var i = 0; i < regex.length; i++) {
+    if (regex[i] != '*' &&
+        regex[i] != '|' &&
+        regex[i] != '#' &&
+        regex[i] != '+' &&
+        regex[i] != '(' &&
+        regex[i] != ')' &&
+        regex[i] != 'ε' &&
+        regex[i] != '∅') {
+      alf.add(regex[i]);
+    }
+  }
+  return alf;
+}
+
 void main() {
   String regex;
   Set<String> alf = {};
@@ -430,8 +438,6 @@ void main() {
   }
   if (regex != '') {}
 
-  //print(a);
-  //print(regex);
   var r = parseRegex(regex);
   if (r.length != 0) {
     print('Распознанно: ' + buildRegex(r[0], r));
@@ -439,5 +445,9 @@ void main() {
     print('Распознанно: ');
   }
 
-  print(MainSymplify(derivative(regex, 'a')));
+  print(getRegexAlf(regex));
+
+  print('d(a) = ' + MainSymplify(derivative(regex, 'a')));
+  print('d(b) = ' + MainSymplify(derivative(regex, 'b')));
+  print('d(c) = ' + MainSymplify(derivative(regex, 'c')));
 }
