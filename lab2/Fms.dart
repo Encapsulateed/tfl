@@ -30,6 +30,10 @@ class FMS {
     return 'q' + States.length.toString();
   }
 
+  int getStateNumber(String s) {
+    return int.parse(s.substring(1));
+  }
+
   State getStateByRegex(String regex) {
     return States.where((element) => element.regex == regex).first;
   }
@@ -84,6 +88,42 @@ class FMS {
       print(
           '(${transaction.from.name}->${transaction.to.name}) by character ${transaction.letter} [${transaction.from.regex}]->[${transaction.to.regex}]');
     }
+    for (var state in this.StartStates) {
+      print('start state ${state.name} [${state.regex}]');
+    }
+
+    for (var state in this.FinalStates) {
+      print('final state ${state.name} [${state.regex}]');
+    }
+  }
+
+  String DumpDot() {
+    String res = "";
+
+    for (var state in this.States) {
+      String shape = "circle";
+      if (FinalStates.contains(state)) {
+        shape = "doublecircle";
+      }
+      res += "${state.name} [label = \"${state.name}\", shape = ${shape}]\n";
+    }
+
+    for (var state in this.StartStates) {
+      res += "dummy -> ${state.name}\n";
+    }
+
+    for (var transaction in this.Transactions) {
+      res +=
+          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+    }
+
+    res = "digraph {\n"
+        "rankdir = LR\n"
+        "dummy [shape=none, label=\"\", width=0, height=0]"
+        "$res"
+        "}\n";
+
+    return "";
   }
 }
 

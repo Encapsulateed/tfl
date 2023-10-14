@@ -1,31 +1,11 @@
 // some empty lines at the start of file for it to look more nice
 
-import 'dart:math';
+import '../config/RegexConfig.dart';
 
 /// <init> ::= <regex>
 /// <regex> ::= <regex><binary><regex> | (<regex>) | <regex><unary> | <symbol> | eps
 /// <binary> ::= | | # | eps
 /// <unary> ::= *
-
-class RegexConfig {
-  int alphabetSize = 0;
-  int starLevel = 0;
-  int maxLength = 0;
-  int length = 0;
-
-  // forbiddenRegexStates is an illegal hack in attempt to make regex result more nice
-  List<int> forbiddenRegexStates = [4];
-
-  Random fortuneWheel = new Random();
-
-  RegexConfig(this.alphabetSize, this.starLevel, this.maxLength);
-  RegexConfig.fromRegexConfig(RegexConfig conf) {
-    this.alphabetSize = conf.alphabetSize;
-    this.starLevel = conf.starLevel;
-    this.maxLength = conf.maxLength;
-    this.length = conf.length;
-  }
-}
 
 String GenerateRegexInit(int alphabetSize, int starLevel, int maxLength) {
   return GenerateRegex(RegexConfig(alphabetSize, starLevel, maxLength));

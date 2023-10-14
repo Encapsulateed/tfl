@@ -1,5 +1,7 @@
 import 'dart:io';
-import 'Fms.dart';
+import 'dart:math';
+// import 'Fms.dart';
+import 'src/fms/TestingFms.dart';
 
 List<String> parseRegex(String regex) {
   List<String> subRegexes = [];
@@ -445,7 +447,15 @@ void main() {
     print('Распознанно: ');
   }
 
-  var fms = FMS(regex);
+  var fms = TestingFms(regex);
   fms.build(regex);
-  fms.Print();
+  // fms.Print();
+  print(fms.DumpDot());
+  fms.CalculateAdjacencyMatrix();
+  print(fms.adjacency);
+  fms.CalculateReachabilityMatrix();
+  print(fms.reachability);
+  fms.BuildPossibilityMap();
+  print(fms.possibility);
+  print(fms.ChooseRandomStateChain(Random()));
 }
