@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 // import 'Fms.dart';
 import 'src/fms/TestingFms.dart';
 
@@ -429,6 +428,14 @@ Set<String> getRegexAlf(String regex) {
   return alf;
 }
 
+String prepareRegex(String regex) {
+  var r = parseRegex(regex);
+  if (r.length != 0) {
+    regex = buildRegex(r[0], r);
+  }
+  return regex;
+}
+
 void main() {
   String regex;
   print('Input shuffle regex:');
@@ -439,23 +446,17 @@ void main() {
   }
   if (regex != '') {}
 
-  var r = parseRegex(regex);
-  if (r.length != 0) {
-    regex = buildRegex(r[0], r);
-    print('Распознанно: ' + regex);
-  } else {
-    print('Распознанно: ');
-  }
+  regex = prepareRegex(regex);
+  print("распознано: " + regex);
 
   var fms = TestingFms(regex);
   fms.build(regex);
   // fms.Print();
   print(fms.DumpDot());
+  fms.CalculateTransitionMatrix();
   fms.CalculateAdjacencyMatrix();
-  print(fms.adjacency);
   fms.CalculateReachabilityMatrix();
-  print(fms.reachability);
   fms.BuildPossibilityMap();
-  print(fms.possibility);
-  print(fms.ChooseRandomStateChain(Random()));
+  fms.BuildValidityMap();
+  print(fms.validity);
 }

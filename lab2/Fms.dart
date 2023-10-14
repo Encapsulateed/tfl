@@ -119,11 +119,11 @@ class FMS {
 
     res = "digraph {\n"
         "rankdir = LR\n"
-        "dummy [shape=none, label=\"\", width=0, height=0]"
+        "dummy [shape=none, label=\"\", width=0, height=0]\n"
         "$res"
         "}\n";
 
-    return "";
+    return res;
   }
 }
 

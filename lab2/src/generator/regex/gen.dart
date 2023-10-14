@@ -80,7 +80,7 @@ String GenerateBinary(RegexConfig config) {
     case 0:
       return "|";
     case 1:
-      return "#";
+      return "|";
     case 2:
       return "";
     default:
@@ -89,7 +89,7 @@ String GenerateBinary(RegexConfig config) {
 }
 
 String GenerateUnary(RegexConfig config) {
-  return "*";
+  return ""; //TODO: return star
 }
 
 String GenerateSymbol(RegexConfig config) {
