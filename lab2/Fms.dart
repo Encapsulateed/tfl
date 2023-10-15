@@ -27,7 +27,8 @@ class FMS {
     return this.States.any((state) =>
         state.regex == regex ||
         regex == '(${state.regex})' ||
-        state.regex == '(${regex})');
+        state.regex == '(${regex})' ||
+        state.regex == prepareRegex(regex));
   }
 
   String getCurrentStateTitle() {
@@ -42,7 +43,8 @@ class FMS {
     return States.where((state) =>
         state.regex == regex ||
         regex == '(${state.regex})' ||
-        state.regex == '(${regex})').first;
+        state.regex == '(${regex})' ||
+        state.regex == prepareRegex(regex)).first;
   }
 
   void build(String prevRegex) {
@@ -63,10 +65,11 @@ class FMS {
       transaction.to = newState;
       transaction.letter = term;
 
-      print('Derivative is $simpeleDerivative');
+      //  print('Derivative is $simpeleDerivative');
 
       if (simpeleDerivative == '∅') {
       } else {
+        ;
         if (isRegexAlreadyExits(simpeleDerivative)) {
           transaction.from = prevState;
           transaction.to = getStateByRegex(simpeleDerivative);
@@ -133,7 +136,8 @@ class FMS {
     File file = File('solution.txt');
     file.writeAsStringSync(res);
   }
-    String DumpDot() {
+
+  String DumpDot() {
     String res = "";
 
     for (var state in this.States) {
@@ -161,10 +165,7 @@ class FMS {
 
     return res;
   }
-
 }
-
-
 
 class State {
   String name = '';

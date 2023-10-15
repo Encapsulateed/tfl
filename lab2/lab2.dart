@@ -279,7 +279,7 @@ String BaseSymplify(String regex) {
           if (right == '(ε)' || right == '((ε))' || right == 'ε') {
             return '($left)';
           }
-          return '((${BaseSymplify(left)})(${BaseSymplify(right)}))';
+          return '(${BaseSymplify(left)}${BaseSymplify(right)})';
         }
         if (op == '|') {
           if (left == '(∅)' || left == '((∅))' || left == '∅') {
@@ -290,9 +290,9 @@ String BaseSymplify(String regex) {
           }
 
           if (simplifyBrackets(left) == simplifyBrackets(right)) {
-            return '($left)';
+            return simplifyBrackets(left);
           }
-          return '((${BaseSymplify(left)})|(${BaseSymplify(right)}))';
+          return '(${BaseSymplify(left)}|${BaseSymplify(right)})';
         }
         if (op == '#') {
           if (left == '(∅)' ||
@@ -311,7 +311,7 @@ String BaseSymplify(String regex) {
             return '($left)';
           }
 
-          return '((${BaseSymplify(left)})#(${BaseSymplify(right)}))';
+          return '(${BaseSymplify(left)}#${BaseSymplify(right)})';
         }
       }
     } else {
@@ -325,9 +325,8 @@ String BaseSymplify(String regex) {
 
       if (left.startsWith('(') && left.endsWith(')')) {
         left = left.substring(1, left.length - 1);
-        if (countCharacters(left, '(') > 1 && countCharacters(left, ')') > 1) {
           return BaseSymplify(left);
-        }
+        
       } else if (left.endsWith('*')) {
         var no_klini = left.substring(0, left.length - 1);
         return "(${BaseSymplify(no_klini)}*)";
@@ -483,7 +482,7 @@ String derivative(String regex, String char) {
         var no_klini = left.substring(0, left.length - 1);
         //print('LEFT ' + left);
 
-        return "(${derivative(no_klini, char)})(${left})";
+        return "(${derivative(no_klini, char)})${left}";
       }
     }
   }
@@ -581,13 +580,14 @@ void main() {
   if (regex != '') {}
   //SimpifyRepetedKlini(regex);
   regex = InitRegex(regex);
+  regex=MainSymplify(regex);
   // var s = MainSymplify(regex);
   print("распознано: " + regex);
-/*
+
   var da = derivative(regex, 'a');
   var db = derivative(regex, 'b');
 //  var dc = derivative(regex, 'c');
-
+/*
   print('a: $da');
   print('s:' + MainSymplify(da));
 
@@ -595,6 +595,7 @@ void main() {
    print('s:' + MainSymplify(db));
 
 */
+
   var fms = TestingFms(regex);
   fms.build(regex);
   fms.Print();
@@ -605,6 +606,5 @@ void main() {
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
   //print(fms.validity);
-
 
 }
