@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 // import 'Fms.dart';
 import 'src/fms/TestingFms.dart';
@@ -40,7 +39,8 @@ List<String> parseRegex(String regex) {
         }
         var srCopy = '';
 
-        if (getRegexinBrakets(subRegex).length != 2) {
+        if (getRegexinBrakets(subRegex).length != 2 &&
+            getRegexinBrakets(subRegex).length != 1) {
           for (var i = 0; i < subRegex.length; i++) {
             if (getRegexAlf(subRegex).contains(subRegex[i])) {
               if (i + 1 < subRegex.length && subRegex[i + 1] == '*') {
@@ -59,9 +59,10 @@ List<String> parseRegex(String regex) {
             }
           }
           subRegex = srCopy;
+        } else {
+          print(subRegex);
         }
-       
-        
+
         if (subRegex != '(' &&
             subRegex != ')' &&
             subRegex != '*' &&
@@ -269,7 +270,7 @@ String BaseSymplify(String regex) {
       // right = simplifyBrackets(right);
 
       //  print('REGEX $regex');
-      print("EXPRESSION $left $op $right");
+   //   print("EXPRESSION $left $op $right");
 
       // stdin.readByteSync();
       if (op == '+' || op == '#' || op == '|') {
@@ -324,8 +325,6 @@ String BaseSymplify(String regex) {
           if (right == '(ε)' || right == '((ε))' || right == 'ε') {
             return '$left';
           }
-
-        
 
           return '${BaseSymplify(left)}#${BaseSymplify(right)}';
         }
@@ -584,20 +583,20 @@ List<String> SimpifyRepetedKlini(String regex) {
           newR[newR.length - 1].substring(0, newR[newR.length - 1].length - 1);
     }
   }
-   print(newR);
+  print(newR);
   return newR;
 }
 
 void main() {
   //'(a|b|c|d)*#d'
-  String regex = 'b|c';
+  String regex = '(c*)';
 
   regex = InitRegex(regex);
-  // regex = MainSymplify(regex);
+ regex = MainSymplify(regex);
   print("распознано как: " + regex);
-  var dc = derivative(regex, 'a');
+  //var dc = derivative(regex, 'a');
 
-  print('sc:' + MainSymplify(dc));
+  // print('sc:' + MainSymplify(dc));
   //
   //String regex = '((((ca*|a*|c*(c)*#b*)|(b)*)*)#c)|a|(a)*';
 
@@ -624,8 +623,6 @@ void main() {
 
 */
 
- 
-
   var fms = TestingFms(regex);
   fms.build(regex);
   fms.Print();
@@ -636,6 +633,6 @@ void main() {
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
   //print(fms.validity);
-   /*
+  /*
    */
 }
