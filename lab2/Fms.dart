@@ -23,7 +23,10 @@ class FMS {
   }
 
   bool isRegexAlreadyExits(String regex) {
-    return this.States.any((state) => state.regex == regex);
+    return this.States.any((state) =>
+        state.regex == regex ||
+        regex == '(${state.regex})' ||
+        state.regex == '(${regex})');
   }
 
   String getCurrentStateTitle() {
@@ -35,7 +38,10 @@ class FMS {
   }
 
   State getStateByRegex(String regex) {
-    return States.where((element) => element.regex == regex).first;
+    return States.where((state) =>
+        state.regex == regex ||
+        regex == '(${state.regex})' ||
+        state.regex == '(${regex})').first;
   }
 
   void build(String prevRegex) {
@@ -56,7 +62,7 @@ class FMS {
       transaction.to = newState;
       transaction.letter = term;
 
-      //   print('Derivative is $simpeleDerivative');
+      print('Derivative is $simpeleDerivative');
 
       if (simpeleDerivative == '∅') {
       } else {
