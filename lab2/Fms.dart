@@ -1,4 +1,5 @@
 import 'lab2.dart';
+import 'dart:io';
 
 class FMS {
   Set<String> alphabet = {};
@@ -103,7 +104,36 @@ class FMS {
     }
   }
 
-  String DumpDot() {
+  void DumpDotToFile() {
+    String res = "";
+
+    for (var state in this.States) {
+      String shape = "circle";
+      if (FinalStates.contains(state)) {
+        shape = "doublecircle";
+      }
+      res += "${state.name} [label = \"${state.name}\", shape = ${shape}]\n";
+    }
+
+    for (var state in this.StartStates) {
+      res += "dummy -> ${state.name}\n";
+    }
+
+    for (var transaction in this.Transactions) {
+      res +=
+          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+    }
+
+    res = "digraph {\n"
+        "rankdir = LR\n"
+        "dummy [shape=none, label=\"\", width=0, height=0]\n"
+        "$res"
+        "}\n";
+
+    File file = File('solution.txt');
+    file.writeAsStringSync(res);
+  }
+    String DumpDot() {
     String res = "";
 
     for (var state in this.States) {
@@ -131,7 +161,10 @@ class FMS {
 
     return res;
   }
+
 }
+
+
 
 class State {
   String name = '';
