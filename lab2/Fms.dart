@@ -125,8 +125,7 @@ class FMS {
     }
 
     for (var transaction in this.Transactions) {
-      res +=
-          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+      res += "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
     }
 
     res = "digraph {\n"
@@ -155,8 +154,7 @@ class FMS {
     }
 
     for (var transaction in this.Transactions) {
-      res +=
-          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+      res += "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
     }
 
     res = "digraph {\n"
@@ -168,16 +166,129 @@ class FMS {
     return res;
   }
 
- 
+  Map<String, List<Transaction>> transitionsTo = {};
+  Map<String, List<Transaction>> transitionsFrom = {};
+  Map<String, String> loops = {};
+
+  String DumpRegex() {
+    for (var state in States) {
+      transitionsFrom[state.name] = [];
+      transitionsTo[state.name] = [];
+      loops[state.name] = "";
+    }
+
+    for (var transition in Transactions) {
+      if (transition.to.name == transition.from.name) {
+        if (loops[transition.to.name] == "") {
+          loops[transition.to.name] = transition.letter + "*";
+        } else {
+          loops[transition.to.name] = "(${loops[transition.to.name]}|${transition.letter}*)";
+        }
+      } else {
+        transitionsFrom[transition.from.name]!.add(transition);
+        transitionsTo[transition.to.name]!.add(transition);
+      }
+    }
+
+    for (var state in StartStates) {
+      if (transitionsTo[state.name]!.length > 0) {
+        State newState = State();
+        newState.name = state.name + "'";
+        transitionsFrom[newState.name] = [Transaction.fromData(state, newState, "")];
+        transitionsTo[state.name]!.add(Transaction.fromData(state, newState, ""));
+
+        StartStates = Set();
+        StartStates.add(newState);
+      }
+    }
+
+    if (true) {
+      State newFinalState = State();
+      newFinalState.name = "finalState";
+      transitionsTo[newFinalState.name] = [];
+
+      for (var state in FinalStates) {
+        transitionsTo[newFinalState.name]!.add(Transaction.fromData(state, newFinalState, ""));
+        transitionsFrom[state.name]!.add(Transaction.fromData(state, newFinalState, ""));
+      }
+
+      FinalStates = Set();
+      FinalStates.add(newFinalState);
+    }
+
+    Set<State> states = States;
+
+    for (var state in states) {
+      if (FinalStates.contains(state) || StartStates.contains(state)) {
+        continue;
+      }
+
+      var transOut = new List.from(transitionsFrom[state.name]!);
+      var transIn = new List.from(transitionsTo[state.name]!);
+
+      for (var inTransition in transIn) {
+        for (var outTransition in transOut) {
+          String from = inTransition.from.name;
+          String to = outTransition.to.name;
+          String letter = inTransition.letter + loops[state.name]! + outTransition.letter;
+
+          transitionsFrom[from]!.remove(inTransition);
+          transitionsFrom[from]!.add(Transaction.fromData(inTransition.from, outTransition.to, letter));
+
+          transitionsTo[to]!.remove(outTransition);
+          transitionsTo[to]!.add(Transaction.fromData(inTransition.from, outTransition.to, letter));
+        }
+      }
+      transitionsTo[state.name] = [];
+      transitionsFrom[state.name] = [];
+    }
+
+    String res = "";
+    for (var transition in transitionsFrom[StartStates.elementAt(0).name]!) {
+      if (res != "" && res != "|" || transition.letter == "") {
+        res += "|";
+      }
+      String letter = transition.letter;
+      if (letter.length > 1) {
+        letter = "($letter)";
+      }
+      res += letter;
+    }
+    res = "^(${res})\$";
+    res = res;
+
+    return res;
+  }
 }
 
 class State {
   String name = '';
   String regex = '';
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return "${name}";
+  }
 }
 
 class Transaction {
   State from = State();
   State to = State();
   String letter = '';
+
+  Transaction();
+
+  Transaction.fromData(this.from, this.to, this.letter);
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return "${from} -> ${to} [${letter}]";
+  }
+
+  @override
+  bool operator ==(covariant Transaction rhs) {
+    return (rhs.letter == letter && from == rhs.from && to == rhs.to);
+  }
 }

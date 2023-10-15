@@ -2,15 +2,17 @@
 
 import 'dart:math';
 
-// import '../Fms.dart';
+import '../Fms.dart';
 import '../lab2.dart';
 import '../src/fms/TestingFms.dart';
-// import '../src/generator/regex/gen.dart';
+import '../src/generator/regex/gen.dart';
 
 class Tester {
   late TestingFms fms;
   late RegExp solutionRegex;
   Random enigmaOracle = Random();
+  /// Store previous generations so we don't test on same words
+  Set<String> previousWords = {};
 
   Tester(this.fms, this.solutionRegex);
 
@@ -24,6 +26,13 @@ class Tester {
 
   void RunRandomTest({bool? mutate}) {
     String word = fms.GenerateWord(enigmaOracle);
+    int i = 10;
+    while (previousWords.contains(word) && i > 0) {
+      word = fms.GenerateWord(enigmaOracle);
+      i--;
+    }
+
+    previousWords.add(word);
     if (mutate ?? false) {
       word = fms.MutateWord(word);
     }
@@ -35,7 +44,7 @@ class Tester {
     print("comparing results on word: " + word);
     bool testRes = fms.ValidateWord(word);
     bool solutionRes = solutionRegex.stringMatch(word) == word;
-
+    
     if (testRes != solutionRes) {
       throw "test error: unequal result: got ${testRes} from test and ${solutionRes} from solution";
     }
@@ -44,25 +53,27 @@ class Tester {
 }
 
 void TestRandomNoMutate() {
-  // String regex = GenerateRegexInit(3, 2, 10);
-  String regex = "(c|cb)|b|b";
+  String regex = "";
+  while (regex.length < 3) {
+    regex = GenerateRegexInit(3, 2, 7);
+  }
+  // String regex =  "c|(c)c";
   print("generated regex: " + regex);
 
   regex = prepareRegex(regex);
   print("parsed regex: " + regex);
 
   // I build both fms to ensure tests quality and reliability
-  // FMS fms = FMS(regex);
-  // fms.build(regex);
+  FMS fms = FMS(regex);
+  fms.build(regex);
   TestingFms testingFms = TestingFms(regex);
   testingFms.build(regex);
-  testingFms.Print();
-  print(testingFms.DumpDot());
+  // testingFms.Print();
+  // print(testingFms.DumpDot());
 
-  // TODO: get regex from fms
-  String solutionRegex = regex;
+  String solutionRegex = fms.DumpRegex();
   print("solution regex: " + solutionRegex);
-  RegExp reg = RegExp(regex);
+  RegExp reg = RegExp(solutionRegex);
 
   Tester tester = Tester(testingFms, reg);
   tester.PrepareTestingFms();
@@ -76,9 +87,4 @@ void TestSeedNoMutate() {}
 
 void main(List<String> args) {
   TestRandomNoMutate();
-  // String regex = "abc|de";
-  // RegExp reg = RegExp(regex);
-  // String word = "abc";
-
-  // print(reg.stringMatch(word) == word);
 }

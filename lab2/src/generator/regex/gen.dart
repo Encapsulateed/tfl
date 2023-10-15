@@ -20,8 +20,7 @@ String GenerateRegex(RegexConfig config) {
   }
 
   int round = config.fortuneWheel.nextInt(5);
-  if (config.forbiddenRegexStates.contains(round) ||
-      (round == 2 && config.starLevel == 0)) {
+  if (config.forbiddenRegexStates.contains(round) || (round == 2 && config.starLevel == 0)) {
     return GenerateRegex(config);
   }
 
@@ -89,7 +88,7 @@ String GenerateBinary(RegexConfig config) {
 }
 
 String GenerateUnary(RegexConfig config) {
-  return ""; //TODO: return star
+  return "*";
 }
 
 String GenerateSymbol(RegexConfig config) {
