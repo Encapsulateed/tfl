@@ -60,6 +60,8 @@ List<String> parseRegex(String regex) {
           }
           subRegex = srCopy;
         }
+       
+        
         if (subRegex != '(' &&
             subRegex != ')' &&
             subRegex != '*' &&
@@ -132,6 +134,7 @@ List<String> parseRegex(String regex) {
 
 String buildRegex(String regex, List<String> SubRegexes) {
   SubRegexes.removeAt(0);
+
   regex = '${regex}(';
 
   for (var reg in SubRegexes) {
@@ -205,7 +208,7 @@ String MainSymplify(String regex) {
     //print(curr);
   }
   if (curr.startsWith('(') && curr.endsWith(')')) {
-    curr = curr.substring(1, curr.length - 1);
+    // curr = curr.substring(1, curr.length - 1);
   }
   return curr;
 }
@@ -215,8 +218,8 @@ String BaseSymplify(String regex) {
   regex = buildRegex(regexes[0], regexes);
 
   if (regexes.length == 0) {
-    regexes = parseRegex(regex);
-    regex = buildRegex(regexes[0], regexes);
+    //  regexes = parseRegex(regex);
+    //  regex = buildRegex(regexes[0], regexes);
   }
 
   //regex = InitRegex(regex);
@@ -268,7 +271,7 @@ String BaseSymplify(String regex) {
       //  print('REGEX $regex');
       print("EXPRESSION $left $op $right");
 
-       stdin.readByteSync();
+      // stdin.readByteSync();
       if (op == '+' || op == '#' || op == '|') {
         if (op == '+') {
           if (left == '(∅)' ||
@@ -280,30 +283,30 @@ String BaseSymplify(String regex) {
             return '∅';
           }
           if (left == '(ε)' || left == '((ε))' || left == 'ε') {
-            return '($right)';
+            return '$right';
           }
           if (right == '(ε)' || right == '((ε))' || right == 'ε') {
-            return '($left)';
+            return '$left';
           }
-          return '(${BaseSymplify(left)}${BaseSymplify(right)})';
+          return '${BaseSymplify(left)}${BaseSymplify(right)}';
         }
         if (op == '|') {
           if (left == '(∅)' || left == '((∅))' || left == '∅') {
-            return '($right)';
+            return '$right';
           }
           if (right == '(∅)' || right == '((∅))' || right == '∅') {
-            return '($left)';
+            return '$left';
           }
 
           if (simplifyBrackets(left) == simplifyBrackets(right)) {
-            return simplifyBrackets(left);
+            return left;
           } else if (simplifyBrackets(left).endsWith('*') &&
               simplifyBrackets(right).endsWith('*')) {
             if (getRegexinBrakets(left) == getRegexinBrakets(right)) {
-              return simplifyBrackets(left);
+              return left;
             }
           }
-          return '(${BaseSymplify(left)}|${BaseSymplify(right)})';
+          return '${BaseSymplify(left)}|${BaseSymplify(right)}';
         }
         if (op == '#') {
           if (left == '(∅)' ||
@@ -322,7 +325,9 @@ String BaseSymplify(String regex) {
             return '$left';
           }
 
-          return '(${BaseSymplify(left)}#${BaseSymplify(right)})';
+        
+
+          return '${BaseSymplify(left)}#${BaseSymplify(right)}';
         }
       }
     } else {
@@ -535,11 +540,12 @@ String InitRegex(String regex) {
     regex = buildRegex(r[0], r);
   }
 
-  return regex.replaceAll('+', '');
+  return regex;
 }
 
 List<String> SimpifyRepetedKlini(String regex) {
   var r = parseRegex(regex);
+  print(r);
   List<String> newR = [];
 
   for (var i = 0; i < r.length; i++) {
@@ -578,19 +584,18 @@ List<String> SimpifyRepetedKlini(String regex) {
           newR[newR.length - 1].substring(0, newR[newR.length - 1].length - 1);
     }
   }
+   print(newR);
   return newR;
 }
 
 void main() {
   //'(a|b|c|d)*#d'
-  String regex =
-      '((c*)#c)|(c*)';
-  print(countCharacters(regex, '('));
-  print(countCharacters(regex, ')'));
+  String regex = 'b|c';
+
   regex = InitRegex(regex);
-  regex = MainSymplify(regex);
+  // regex = MainSymplify(regex);
   print("распознано как: " + regex);
- var dc = derivative(regex, 'c');
+  var dc = derivative(regex, 'a');
 
   print('sc:' + MainSymplify(dc));
   //
@@ -619,7 +624,7 @@ void main() {
 
 */
 
-  /*
+ 
 
   var fms = TestingFms(regex);
   fms.build(regex);
@@ -631,5 +636,6 @@ void main() {
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
   //print(fms.validity);
+   /*
    */
 }
