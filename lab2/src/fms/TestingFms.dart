@@ -98,6 +98,10 @@ class TestingFms extends FMS {
   }
 
   String Bfs(int startPos, int endPos) {
+    if (startPos == endPos) {
+      return transition[startPos][endPos]; // Yup, it's a hardcode!
+    }
+
     List<bool> visited = List.filled(States.length, false);
     List<Path> queue = [];
     queue.add(Path(startPos, ""));
@@ -123,20 +127,26 @@ class TestingFms extends FMS {
     return "";
   }
 
-  String GenerateWord(Random wheel) {
+  String GenerateWord(Random wheel, {bool mutate = false}) {
     List<int> path = ChooseRandomStateChain(wheel);
     String res = "";
 
     for (var i = 0; i < path.length - 1; i++) {
       String s = Bfs(path[i], path[i + 1]);
+      if (mutate) {
+        s = MutateWord(wheel, s);
+      }
       res += s;
     }
 
     return res;
   }
 
-  String MutateWord(String word) {
-    // TODO: make an external word mutator
+  String MutateWord(Random wheel, String word) {
+    if (word.length < 2) {
+      return word;
+    }
+    int mutation = wheel.nextInt(6);
     return word;
   }
 
@@ -152,10 +162,8 @@ class TestingFms extends FMS {
       pos = validity[pos][char]!;
       word = word.substring(1);
     }
-    return true;
+    return FinalStates.contains(State.fromData("q${pos}", ""));
   }
-
-  
 }
 
 class Path {

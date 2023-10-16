@@ -264,12 +264,25 @@ class FMS {
 class State {
   String name = '';
   String regex = '';
+  
+  State();
+
+  State.fromData(this.name, this.regex);
 
   @override
   String toString() {
     // TODO: implement toString
     return "${name}";
   }
+
+  @override
+  bool operator ==(covariant State rhs) {
+    return (rhs.name == name);
+  }
+
+  @override
+  // TODO: implement hashCode
+  int get hashCode => name.hashCode;
 }
 
 class Transaction {

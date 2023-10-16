@@ -11,6 +11,7 @@ class Tester {
   late TestingFms fms;
   late RegExp solutionRegex;
   Random enigmaOracle = Random();
+
   /// Store previous generations so we don't test on same words
   Set<String> previousWords = {};
 
@@ -24,18 +25,15 @@ class Tester {
     fms.BuildValidityMap();
   }
 
-  void RunRandomTest({bool? mutate}) {
-    String word = fms.GenerateWord(enigmaOracle);
+  void RunRandomTest({bool mutate = true}) {
+    String word = fms.GenerateWord(enigmaOracle, mutate: mutate);
     int i = 10;
     while (previousWords.contains(word) && i > 0) {
-      word = fms.GenerateWord(enigmaOracle);
+      word = fms.GenerateWord(enigmaOracle, mutate: mutate);
       i--;
     }
 
     previousWords.add(word);
-    if (mutate ?? false) {
-      word = fms.MutateWord(word);
-    }
 
     RunTest(word);
   }
@@ -44,7 +42,7 @@ class Tester {
     print("comparing results on word: " + word);
     bool testRes = fms.ValidateWord(word);
     bool solutionRes = solutionRegex.stringMatch(word) == word;
-    
+
     if (testRes != solutionRes) {
       throw "test error: unequal result: got ${testRes} from test and ${solutionRes} from solution";
     }
@@ -55,9 +53,9 @@ class Tester {
 void TestRandomNoMutate() {
   String regex = "";
   while (regex.length < 3) {
-    regex = GenerateRegexInit(3, 2, 7);
+    regex = GenerateRegexInit(7, 2, 10);
   }
-  // String regex =  "c|(c)c";
+  // String regex =  "e";
   print("generated regex: " + regex);
 
   regex = prepareRegex(regex);
@@ -77,6 +75,7 @@ void TestRandomNoMutate() {
 
   Tester tester = Tester(testingFms, reg);
   tester.PrepareTestingFms();
+  print("testing fms prepared");
 
   for (var i = 0; i < 10; i++) {
     tester.RunRandomTest();

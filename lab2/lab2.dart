@@ -60,7 +60,7 @@ List<String> parseRegex(String regex) {
           }
           subRegex = srCopy;
         } else {
-          print(subRegex);
+          // print(subRegex);
         }
 
         if (subRegex != '(' &&
@@ -270,7 +270,7 @@ String BaseSymplify(String regex) {
       // right = simplifyBrackets(right);
 
       //  print('REGEX $regex');
-   //   print("EXPRESSION $left $op $right");
+      // print("EXPRESSION $left $op $right");
 
       // stdin.readByteSync();
       if (op == '+' || op == '#' || op == '|') {
