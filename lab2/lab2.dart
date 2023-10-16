@@ -1,6 +1,7 @@
 import 'dart:io';
 // import 'Fms.dart';
 import 'src/fms/TestingFms.dart';
+import 'functions.dart';
 
 List<String> parseRegex(String regex) {
   List<String> subRegexes = [];
@@ -39,8 +40,7 @@ List<String> parseRegex(String regex) {
         }
         var srCopy = '';
 
-        if (getRegexinBrakets(subRegex).length != 2 &&
-            getRegexinBrakets(subRegex).length != 1) {
+        if (getRegexinBrakets(subRegex).length != 2) {
           for (var i = 0; i < subRegex.length; i++) {
             if (getRegexAlf(subRegex).contains(subRegex[i])) {
               if (i + 1 < subRegex.length && subRegex[i + 1] == '*') {
@@ -59,10 +59,7 @@ List<String> parseRegex(String regex) {
             }
           }
           subRegex = srCopy;
-        } else {
-          // print(subRegex);
         }
-
         if (subRegex != '(' &&
             subRegex != ')' &&
             subRegex != '*' &&
@@ -133,69 +130,6 @@ List<String> parseRegex(String regex) {
   return subRegexes;
 }
 
-String buildRegex(String regex, List<String> SubRegexes) {
-  SubRegexes.removeAt(0);
-
-  regex = '${regex}(';
-
-  for (var reg in SubRegexes) {
-    regex += reg;
-  }
-  regex += ')';
-  if (SubRegexes.length == 0) {
-    regex = regex.substring(0, regex.length - 2);
-    regex = regex.substring(1, regex.length - 1);
-  }
-  return regex;
-}
-
-String getRegexinBrakets(String regex) {
-  if (regex.endsWith('*')) {
-    var noKlini = regex.substring(0, regex.length - 1);
-    if (!(noKlini.startsWith('(') && noKlini.endsWith(')'))) {
-      return regex;
-    }
-    return getRegexinBrakets(noKlini);
-  }
-  if (regex.startsWith('(') && regex.endsWith(')')) {
-    return getRegexinBrakets(regex.substring(1, regex.length - 1));
-  }
-  return regex;
-}
-
-String SimplifyKlini(String regex) {
-  String simplify = '';
-
-  //regex = regex.replaceFirst('*)*', '*)');
-  int i = regex.indexOf('*)*');
-  if (i == -1) {
-    return regex;
-  }
-
-  simplify = regex.substring(0, i + 2);
-
-  if (regex.endsWith('*')) {
-    regex = regex.substring(0, regex.length - 1);
-  }
-
-  var regexSub = regex.substring(i + 2, regex.length);
-  regexSub = regexSub.replaceAll('*)', ')');
-  return simplify + regexSub;
-}
-
-//Функция проверки регулярного выражения на содержание пустой строки
-bool isEpsilonInRegex(String regex) {
-  // Можно так сделать, потому что шафл - просто перестановка сиволов
-  // Он не сделает из регулярки не содержащей пустую строку, регулярку ее содержающую
-  // вроде...
-  regex = regex.replaceAll('#', '|');
-  regex = regex.replaceAll('+', '');
-  regex = regex.replaceAll('ε', '');
-  RegExp r = RegExp(regex);
-
-  return r.hasMatch('');
-}
-
 // Функция поиска минимальной конкатенации регулярных выражений, такой что
 // пустая строка НЕ будет содержаться в данной конкатенации
 String MainSymplify(String regex) {
@@ -205,201 +139,149 @@ String MainSymplify(String regex) {
   while (prev != curr) {
     prev = curr;
     curr = BaseSymplify(curr);
-
     //print(curr);
-  }
-  if (curr.startsWith('(') && curr.endsWith(')')) {
-    // curr = curr.substring(1, curr.length - 1);
   }
   return curr;
 }
 
 String BaseSymplify(String regex) {
-  var regexes = parseRegex(regex);
-  regex = buildRegex(regexes[0], regexes);
+ 
 
-  if (regexes.length == 0) {
-    //  regexes = parseRegex(regex);
-    //  regex = buildRegex(regexes[0], regexes);
-  }
+  regex = regex.replaceAll('(', '');
+  regex = regex.replaceAll(')', '');
 
-  //regex = InitRegex(regex);
+  regex = regex.replaceAll('[', '(');
+  regex = regex.replaceAll(']*', ')*');
 
-  if (regex == 'ε' || regex == '') {
-    return 'ε';
-  } else if (regex.length == 1) {
-    return regex;
-  } else {
-    String left = '';
-    String right = '';
-    // print('REGEX $regex');
-    bool in_group = regex[0] == '(';
-    if (in_group) {
-      left = regex[0];
-      int balance = 1;
-      int i = 1;
+  var items = parseRegex(regex);
+  var prevItems = [];
+   regex = regex.replaceAllMapped(RegExp( r'\((.)\)\*'), (match) {
+    String x = match.group(1) ?? ''; // Захваченный символ x
+    return '($x*)';
+  });
+  print(regex);
+  // 1) Конкатенации
+  // 2) Шафлы
+  // 3) Альтернативы
+  while (!areListsEqual(items, prevItems)) {
+    print(items);
 
-      // Находим первую группу регулярок (левую)
-      // Вторая определиться как исходная регулярка без первой группы
+    for (int i = 0; i < items.length - 1; i++) {
+      var item = items[i];
+      if (item.endsWith('+')) {
+        var rightOperand = '';
+        item = item.substring(0, item.length - 1);
 
-      while (balance != 0) {
-        if (regex[i] == '(') {
-          balance++;
+        var nextItem = items[i + 1];
+        if (nextItem.endsWith('+') ||
+            nextItem.endsWith('|') ||
+            nextItem.endsWith('#')) {
+          rightOperand = nextItem[nextItem.length - 1];
+          nextItem = nextItem.substring(0, nextItem.length - 1);
         }
-        if (regex[i] == ')') {
-          balance--;
+
+        var itemIn = getRegexinBrakets(item);
+        nextItem = getRegexinBrakets(nextItem);
+        if (itemIn == 'ε') {
+          items[i] = '';
         }
-
-        left += regex[i];
-        i++;
-      }
-      // print('$left');
-      if (i < regex.length && regex[i] == '*') {
-        left = '$left*';
-        i++;
-      }
-      // print('$left');
-
-      right = regex.substring(i, regex.length);
-    } else {
-      left = regex;
-    }
-    if (right != '' && right != '*') {
-      String op = right[0];
-      right = right.substring(1, right.length);
-      // right = simplifyBrackets(right);
-
-      //  print('REGEX $regex');
-      // print("EXPRESSION $left $op $right");
-
-      // stdin.readByteSync();
-      if (op == '+' || op == '#' || op == '|') {
-        if (op == '+') {
-          if (left == '(∅)' ||
-              right == '(∅)' ||
-              left == '((∅))' ||
-              right == '((∅))' ||
-              left == '∅' ||
-              right == '∅') {
-            return '∅';
-          }
-          if (left == '(ε)' || left == '((ε))' || left == 'ε') {
-            return '$right';
-          }
-          if (right == '(ε)' || right == '((ε))' || right == 'ε') {
-            return '$left';
-          }
-          return '${BaseSymplify(left)}${BaseSymplify(right)}';
+        if (itemIn == '∅') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
         }
-        if (op == '|') {
-          if (left == '(∅)' || left == '((∅))' || left == '∅') {
-            return '$right';
-          }
-          if (right == '(∅)' || right == '((∅))' || right == '∅') {
-            return '$left';
-          }
-
-          if (simplifyBrackets(left) == simplifyBrackets(right)) {
-            return left;
-          } else if (simplifyBrackets(left).endsWith('*') &&
-              simplifyBrackets(right).endsWith('*')) {
-            if (getRegexinBrakets(left) == getRegexinBrakets(right)) {
-              return left;
-            }
-          }
-          return '${BaseSymplify(left)}|${BaseSymplify(right)}';
+        if (nextItem == 'ε') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
         }
-        if (op == '#') {
-          if (left == '(∅)' ||
-              right == '(∅)' ||
-              left == '((∅))' ||
-              right == '((∅))' ||
-              left == '∅' ||
-              right == '∅') {
-            return '∅';
-          }
-
-          if (left == '(ε)' || left == '((ε))' || left == 'ε') {
-            return '$right';
-          }
-          if (right == '(ε)' || right == '((ε))' || right == 'ε') {
-            return '$left';
-          }
-
-          return '${BaseSymplify(left)}#${BaseSymplify(right)}';
+        if (nextItem == '∅') {
+          items[i] = '';
         }
-      }
-    } else {
-      if (left == '(∅)*') {
-        return '∅';
-      }
-
-      if (left == '(ε)*') {
-        return 'ε';
-      }
-
-      if (left.startsWith('(') && left.endsWith(')')) {
-        left = left.substring(1, left.length - 1);
-        return BaseSymplify(left);
-      }
-      if (left.endsWith('*')) {
-        var no_klini = left.substring(0, left.length - 1);
-        return "(${BaseSymplify(no_klini)}*)";
       }
     }
-  }
-  return BaseSymplify(regex);
-}
 
-int countCharacters(String input, String characterToCount) {
-  int count = 0;
-  for (int i = 0; i < input.length; i++) {
-    if (input[i] == characterToCount) {
-      count++;
-    }
-  }
-  return count;
-}
+    for (int i = 0; i < items.length - 1; i++) {
+      var item = items[i];
+      if (item.endsWith('#')) {
+        var rightOperand = '';
+        item = item.substring(0, item.length - 1);
+        var nextItem = items[i + 1];
+        if (nextItem.endsWith('+') ||
+            nextItem.endsWith('|') ||
+            nextItem.endsWith('#')) {
+          rightOperand = nextItem[nextItem.length - 1];
+          nextItem = nextItem.substring(0, nextItem.length - 1);
+        }
 
-String simplifyBrackets(String regex) {
-  int i = 0;
-  int back_couter = 0;
-  int j = regex.length - 1;
+        var itemIn = getRegexinBrakets(item);
+        nextItem = getRegexinBrakets(nextItem);
 
-  if (regex.length == 0) {
-    return '';
-  }
-  while (regex[i] == '(') {
-    i++;
-  }
-
-  if (i == 0) {
-    return regex;
-  } else {
-    while (regex[j] == ')') {
-      j--;
-
-      if (back_couter == i) {
-        break;
+        if (itemIn == 'ε') {
+          items[i] = '';
+        }
+        if (itemIn == '∅') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+        if (nextItem == 'ε') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+        if (nextItem == '∅') {
+          items[i] = '';
+        }
       }
-      back_couter++;
     }
-  }
 
-  if (i != back_couter) {
-    i = back_couter;
-  }
+    for (int i = 0; i < items.length - 1; i++) {
+      var item = items[i];
+      if (item.endsWith('|')) {
+        var rightOperand = '';
+        item = item.substring(0, item.length - 1);
+        var nextItem = items[i + 1];
+        if (nextItem.endsWith('+') ||
+            nextItem.endsWith('|') ||
+            nextItem.endsWith('#')) {
+          rightOperand = nextItem[nextItem.length - 1];
+          nextItem = nextItem.substring(0, nextItem.length - 1);
+        }
 
-  //print('$i $back_couter');
-  if (i == 1 && back_couter == 1) {
-    return regex;
-  }
+        var itemIn = getRegexinBrakets(item);
+        nextItem = getRegexinBrakets(nextItem);
 
-  if (i == 0 && back_couter == 0) {
-    return regex;
-  }
+        if (itemIn == '∅') {
+          items[i] = '';
+        }
 
-  return regex.substring(i, regex.length - back_couter);
+        if (nextItem == '∅') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+        print('CMP $itemIn $nextItem');
+        if (itemIn == nextItem) {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+      }
+    }
+    prevItems = items.toList();
+    items.removeWhere((element) => element == '');
+    stdin.readLineSync();
+  }
+  items = items.map((e) => e.replaceAll('+', '')).toList();
+
+  return items.join();
 }
 
 String derivative(String regex, String char) {
@@ -412,9 +294,6 @@ String derivative(String regex, String char) {
   }
 
   if (regex.isEmpty) {
-    return 'ε';
-  }
-  if (regex == 'ε') {
     return 'ε';
   }
   if (regex.length == 1) {
@@ -478,7 +357,7 @@ String derivative(String regex, String char) {
           if (isEpsilonInRegex(left)) {
             return "(((${derivative(left, char)})((${right}))|(${derivative(right, char)})))";
           } else {
-            return "(${derivative(left, char)}${right})";
+            return "((${derivative(left, char)})(${right}))";
           }
         }
         if (op == '|') {
@@ -497,131 +376,67 @@ String derivative(String regex, String char) {
       } else if (left.endsWith('*')) {
         var no_klini = left.substring(0, left.length - 1);
         //print('LEFT ' + left);
-
-        return "(${derivative(no_klini, char)})(${left})";
+        if (no_klini.length == 1) {
+          // return '${no_klini}*';
+        }
+        return "(${derivative(no_klini, char)})[${no_klini}]*";
       }
     }
   }
   return derivative(regex, char);
 }
 
-Set<String> getRegexAlf(String regex) {
-  Set<String> alf = {};
-  for (var i = 0; i < regex.length; i++) {
-    if (regex[i] != '*' &&
-        regex[i] != '|' &&
-        regex[i] != '#' &&
-        regex[i] != '+' &&
-        regex[i] != '(' &&
-        regex[i] != ')' &&
-        regex[i] != 'ε' &&
-        regex[i] != '∅') {
-      alf.add(regex[i]);
-    }
-  }
-  return alf;
-}
-
-String prepareRegex(String regex) {
-  var r = parseRegex(regex);
-
-  if (r.length != 0) {
-    regex = buildRegex(r[0], r);
-  }
-
-  return regex;
-}
-
-String InitRegex(String regex) {
-  var r = SimpifyRepetedKlini(regex);
-  print(r);
-  if (r.length != 0) {
-    regex = buildRegex(r[0], r);
-  }
-
-  return regex;
-}
-
-List<String> SimpifyRepetedKlini(String regex) {
-  var r = parseRegex(regex);
-  print(r);
-  List<String> newR = [];
-
-  for (var i = 0; i < r.length; i++) {
-    var item = r[i];
-
-    if (item.endsWith('+') || item.endsWith('|') || item.endsWith('#')) {
-      item = item.substring(0, item.length - 1);
-    }
-    if (item.endsWith('*') || getRegexinBrakets(item).endsWith('*')) {
-      for (int j = i + 1; j < r.length; j++) {
-        var anotherItem = r[j];
-
-        if (anotherItem.endsWith('+') ||
-            anotherItem.endsWith('|') ||
-            anotherItem.endsWith('#')) {
-          anotherItem = anotherItem.substring(0, anotherItem.length - 1);
-        }
-        if (item == anotherItem) {
-          r[j] = '';
-        } else {
-          break;
-        }
-      }
-    }
-  }
-  for (var i = 0; i < r.length; i++) {
-    if (r[i] != '') {
-      newR.add(r[i]);
-    }
-  }
-  if (newR.length != 0) {
-    if (newR[newR.length - 1].endsWith('+') ||
-        newR[newR.length - 1].endsWith('#') ||
-        newR[newR.length - 1].endsWith('|')) {
-      newR[newR.length - 1] =
-          newR[newR.length - 1].substring(0, newR[newR.length - 1].length - 1);
-    }
-  }
-  print(newR);
-  return newR;
-}
-
 void main() {
-  //'(a|b|c|d)*#d'
-  String regex = '(c*)';
+  
+  // Регулярное выражение в виде строки для поиска и замены
 
+  // Заменяем строки
+
+
+  // String regex = '(a*#a)|a*|a*|a*';
+  String regex = '((a))*#(a)|(a*)';
+  // print(parseRegex(regex));
   regex = InitRegex(regex);
- regex = MainSymplify(regex);
-  print("распознано как: " + regex);
-  //var dc = derivative(regex, 'a');
-
-  // print('sc:' + MainSymplify(dc));
-  //
-  //String regex = '((((ca*|a*|c*(c)*#b*)|(b)*)*)#c)|a|(a)*';
+  print(regex);
+  var da = derivative(regex, 'a');
+  print(da);
+  // var db = derivative(regex, 'b');
+  // print('DERIVATIVE ' + da);
+  // print('DERIVATIVE ' + db);
+  // var s = BaseSymplify(da);
+  //print(s);
+  var s = BaseSymplify(da);
+  print(s);
+  //print('SIMPILIFY ' + s);
+  //s = BaseSymplify(db);
+  //print('SIMPILIFY ' + s);
 
   /*
   print('Input shuffle regex:');
-  //regex = stdin.readLineSync() ?? 'null';
+  regex = stdin.readLineSync() ?? 'null';
 
   if (regex == 'null') {
     throw 'Incorrect input!';
+    
   }
   if (regex != '') {}
   //SimpifyRepetedKlini(regex);
-  regex = InitRegex(regex);
-  regex = MainSymplify(regex);
- var da = derivative(regex, 'a');
-  var db = derivative(regex, 'b');
- 
-
-
-  print('sb:' + MainSymplify(db));
-  print('sc:' + MainSymplify(dc));
-
+  
+  regex=MainSymplify(regex);
   // var s = MainSymplify(regex);
+  print("распознано: " + regex);
 
-*/
+  var da = derivative(regex, 'a');
+  var db = derivative(regex, 'b');
+  var dc = derivative(regex, 'c');
+
+  print('a: $da');
+  print('s:' + MainSymplify(da));
+
+   print('b: $db');
+   print('s:' + MainSymplify(db));
+
+
 
   var fms = TestingFms(regex);
   fms.build(regex);
@@ -633,6 +448,5 @@ void main() {
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
   //print(fms.validity);
-  /*
-   */
+*/
 }

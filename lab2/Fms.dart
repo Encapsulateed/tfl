@@ -1,7 +1,7 @@
 
 import 'lab2.dart';
 import 'dart:io';
-
+import 'functions.dart';
 class FMS {
   Set<String> alphabet = {};
   Set<State> States = {};

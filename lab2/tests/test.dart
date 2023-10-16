@@ -1,7 +1,7 @@
 // fuzz module
 
 import 'dart:math';
-
+import '../functions.dart';
 import '../Fms.dart';
 import '../lab2.dart';
 import '../src/fms/TestingFms.dart';
