@@ -59,12 +59,21 @@ List<String> parseRegex(String regex) {
             }
           }
           subRegex = srCopy;
+
+          if (subRegex.endsWith('*')) {
+            var tmp = getRegexinBrakets(subRegex);
+            if (tmp.length == 1) {
+              subRegex = '($tmp*)';
+            }
+          }
         }
         if (subRegex != '(' &&
             subRegex != ')' &&
             subRegex != '*' &&
             subRegex != '**') {
-          if (regex[i + 1] == '|' || regex[i + 1] == '#') {
+          if (regex[i + 1] == '|' ||
+              regex[i + 1] == '#' ||
+              regex[i + 1] == '+') {
             subRegex = '$subRegex';
 
             subRegex += regex[i + 1];
@@ -87,7 +96,7 @@ List<String> parseRegex(String regex) {
             subRegex != ')' &&
             subRegex != '*' &&
             subRegex != '**') {
-          if (regex[i + 1] == '|' || regex[i + 1] == '#') {
+          if (regex[i + 1] == '|' || regex[i + 1] == '#' ||regex[i+1]=='+') {
             subRegex = '$subRegex';
             subRegex += regex[i + 1];
 
@@ -145,30 +154,22 @@ String MainSymplify(String regex) {
 }
 
 String BaseSymplify(String regex) {
- 
-
-  regex = regex.replaceAll('(', '');
-  regex = regex.replaceAll(')', '');
-
-  regex = regex.replaceAll('[', '(');
-  regex = regex.replaceAll(']*', ')*');
-
+  regex = removeBR(regex);
   var items = parseRegex(regex);
   var prevItems = [];
-   regex = regex.replaceAllMapped(RegExp( r'\((.)\)\*'), (match) {
-    String x = match.group(1) ?? ''; // Захваченный символ x
-    return '($x*)';
-  });
+
   print(regex);
   // 1) Конкатенации
   // 2) Шафлы
   // 3) Альтернативы
-  while (!areListsEqual(items, prevItems)) {
-    print(items);
-
+  var items_beforeALL = [];
+  while (!areListsEqual(items_beforeALL, items)) {
+    // Работа с пустыми строками и одинаковыми альтернативами
+    items_beforeALL = items.toList();
+    print('BEFORE ALL ' + items.toString());
     for (int i = 0; i < items.length - 1; i++) {
       var item = items[i];
-      if (item.endsWith('+')) {
+      if (item.endsWith('+') || item.endsWith('#')) {
         var rightOperand = '';
         item = item.substring(0, item.length - 1);
 
@@ -185,29 +186,26 @@ String BaseSymplify(String regex) {
         if (itemIn == 'ε') {
           items[i] = '';
         }
-        if (itemIn == '∅') {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
         if (nextItem == 'ε') {
           items[i + 1] = '';
           items[i] = items[i]
               .replaceRange(items[i].length - 1, items[i].length, rightOperand);
           i++;
         }
-        if (nextItem == '∅') {
-          items[i] = '';
-        }
       }
     }
+    items.removeWhere((element) => element == '');
+
+    print('EMPTY + # ' + items.toString());
+
+    // Работа с пустыми множествами
 
     for (int i = 0; i < items.length - 1; i++) {
       var item = items[i];
-      if (item.endsWith('#')) {
+      if (item.endsWith('+') || item.endsWith('#')) {
         var rightOperand = '';
         item = item.substring(0, item.length - 1);
+
         var nextItem = items[i + 1];
         if (nextItem.endsWith('+') ||
             nextItem.endsWith('|') ||
@@ -219,55 +217,47 @@ String BaseSymplify(String regex) {
         var itemIn = getRegexinBrakets(item);
         nextItem = getRegexinBrakets(nextItem);
 
-        if (itemIn == 'ε') {
+        if (nextItem == '∅') {
           items[i] = '';
         }
+
         if (itemIn == '∅') {
           items[i + 1] = '';
           items[i] = items[i]
               .replaceRange(items[i].length - 1, items[i].length, rightOperand);
           i++;
         }
-        if (nextItem == 'ε') {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-        if (nextItem == '∅') {
-          items[i] = '';
-        }
       }
     }
+    print('∅ + # ' + items.toString());
 
     for (int i = 0; i < items.length - 1; i++) {
       var item = items[i];
       if (item.endsWith('|')) {
         var rightOperand = '';
         item = item.substring(0, item.length - 1);
-        var nextItem = items[i + 1];
-        if (nextItem.endsWith('+') ||
-            nextItem.endsWith('|') ||
-            nextItem.endsWith('#')) {
-          rightOperand = nextItem[nextItem.length - 1];
-          nextItem = nextItem.substring(0, nextItem.length - 1);
+        var rightInBrakets = items[i + 1];
+        if (rightInBrakets.endsWith('+') ||
+            rightInBrakets.endsWith('|') ||
+            rightInBrakets.endsWith('#')) {
+          rightOperand = rightInBrakets[rightInBrakets.length - 1];
+          rightInBrakets =
+              rightInBrakets.substring(0, rightInBrakets.length - 1);
         }
 
-        var itemIn = getRegexinBrakets(item);
-        nextItem = getRegexinBrakets(nextItem);
+        var leftInBrakets = getRegexinBrakets(item);
+        rightInBrakets = getRegexinBrakets(rightInBrakets);
 
-        if (itemIn == '∅') {
+        if (leftInBrakets == '∅') {
+          //Стриаем лево
           items[i] = '';
-        }
-
-        if (nextItem == '∅') {
+        } else if (rightInBrakets == '∅') {
+          //стриаем
           items[i + 1] = '';
           items[i] = items[i]
               .replaceRange(items[i].length - 1, items[i].length, rightOperand);
           i++;
-        }
-        print('CMP $itemIn $nextItem');
-        if (itemIn == nextItem) {
+        } else if (leftInBrakets == rightInBrakets) {
           items[i + 1] = '';
           items[i] = items[i]
               .replaceRange(items[i].length - 1, items[i].length, rightOperand);
@@ -275,9 +265,12 @@ String BaseSymplify(String regex) {
         }
       }
     }
+    items.removeWhere((element) => element == '');
+    print('ALTERS  ' + items.toString());
+
     prevItems = items.toList();
     items.removeWhere((element) => element == '');
-    stdin.readLineSync();
+    //  stdin.readLineSync();
   }
   items = items.map((e) => e.replaceAll('+', '')).toList();
 
@@ -293,8 +286,11 @@ String derivative(String regex, String char) {
     regex = buildRegex(regexes[0], regexes);
   }
 
-  if (regex.isEmpty) {
+  if (regex.isEmpty || regex == 'ε') {
     return 'ε';
+  }
+  if (regex == '∅') {
+    return '∅';
   }
   if (regex.length == 1) {
     if (regex == char) {
@@ -355,9 +351,9 @@ String derivative(String regex, String char) {
       if (op == '+' || op == '#' || op == '|') {
         if (op == '+') {
           if (isEpsilonInRegex(left)) {
-            return "(((${derivative(left, char)})((${right}))|(${derivative(right, char)})))";
+            return "(((${derivative(left, char)})+((${right}))|(${derivative(right, char)})))";
           } else {
-            return "((${derivative(left, char)})(${right}))";
+            return "((${derivative(left, char)})+(${right}))";
           }
         }
         if (op == '|') {
@@ -377,9 +373,14 @@ String derivative(String regex, String char) {
         var no_klini = left.substring(0, left.length - 1);
         //print('LEFT ' + left);
         if (no_klini.length == 1) {
-          // return '${no_klini}*';
+          if (no_klini == char) {
+            return '${no_klini}*';
+          }
+
+          return '∅';
         }
-        return "(${derivative(no_klini, char)})[${no_klini}]*";
+
+        return "{(${derivative(no_klini, char)})}+[${no_klini}]*";
       }
     }
   }
@@ -387,26 +388,32 @@ String derivative(String regex, String char) {
 }
 
 void main() {
-  
   // Регулярное выражение в виде строки для поиска и замены
 
   // Заменяем строки
+  //  String regex = '∅+b*';
+  // String regex = '(∅+a|ε)+(c*a)*';
+  //String regex = '(c*a)*';
+  String regex = '((ab)|(ba))';
+  //String regex = '((ab)|(ba))*';
 
-
-  // String regex = '(a*#a)|a*|a*|a*';
-  String regex = '((a))*#(a)|(a*)';
-  // print(parseRegex(regex));
   regex = InitRegex(regex);
-  print(regex);
+
   var da = derivative(regex, 'a');
-  print(da);
+  // print(da);
+  print(removeBR(da));
+  //print(BaseSymplify(da));
+
+  // var s = BaseSymplify(da);
+  // print(da);
+  //print(s);
+
   // var db = derivative(regex, 'b');
   // print('DERIVATIVE ' + da);
   // print('DERIVATIVE ' + db);
   // var s = BaseSymplify(da);
   //print(s);
-  var s = BaseSymplify(da);
-  print(s);
+
   //print('SIMPILIFY ' + s);
   //s = BaseSymplify(db);
   //print('SIMPILIFY ' + s);

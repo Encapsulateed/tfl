@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'Fms.dart';
 import 'lab2.dart';
 
@@ -132,7 +134,6 @@ String simplifyBrackets(String regex) {
   return regex.substring(i, regex.length - back_couter);
 }
 
-
 String buildRegex(String regex, List<String> SubRegexes) {
   SubRegexes.removeAt(0);
   regex = '${regex}(';
@@ -194,6 +195,7 @@ bool isEpsilonInRegex(String regex) {
 
   return r.hasMatch('');
 }
+
 bool areListsEqual(List<dynamic> list1, List<dynamic> list2) {
   if (list1.length != list2.length) {
     return false; // Если списки разной длины, они точно не равны.
@@ -205,4 +207,192 @@ bool areListsEqual(List<dynamic> list1, List<dynamic> list2) {
 
   // Сравниваем множества, они равны только если элементы одинаковы.
   return set1.containsAll(set2);
+}
+
+String removeBR(String regex) {
+  regex = regex.replaceAll('(', '');
+  regex = regex.replaceAll(')', '');
+  regex = regex.replaceAll('[', '(');
+  regex = regex.replaceAll(']*', ')*');
+  regex = regex.replaceAll('{', '(');
+  regex = regex.replaceAll('}', ')');
+
+  regex = regex.replaceAll('ε#', '');
+  regex = regex.replaceAll('#ε', '');
+
+  regex = regex.replaceAll('ε+', '');
+  regex = regex.replaceAll('#+', '');
+
+  regex = regex.replaceAll('(ε)#', '');
+  regex = regex.replaceAll('#(ε)', '');
+
+  regex = regex.replaceAll('(ε)+', '');
+  regex = regex.replaceAll('+(ε)', '');
+
+  // regex = regex.replaceAll('ε', '');
+  regex = regex.replaceAll('ε|ε', 'ε');
+
+  var r = parseRegex(regex);
+
+  print('REGEX ' + regex);
+  print(r);
+  r = r.map((item) => item = SimpifyItem(item)).toList();
+
+  regex = r.join();
+  //SimpifyItem(regex);
+  print(r);
+  return regex;
+}
+
+String SimpifyItem(String regex) {
+  var groupOperand = '';
+  if (regex.endsWith('|') || regex.endsWith('#') || regex.endsWith('+')) {
+    groupOperand = regex[regex.length - 1];
+  }
+  if (regex[regex.length - 2] == '*') {
+    return regex;
+  }
+  regex = regex.replaceAll('(', '');
+  regex = regex.replaceAll(')', '');
+
+  regex = regex.replaceAllMapped(RegExp(r'\((.)\)\*'), (match) {
+    String x = match.group(1) ?? ''; // Захваченный символ x
+    return '$x*';
+  });
+
+  var items = parseRegex(regex);
+  print(items);
+
+  
+  if(items.length == 1){
+    return items.join() + groupOperand;
+  }
+  var prevItems = [];
+
+  // 1) Конкатенации
+  // 2) Шафлы
+  // 3) Альтернативы
+  while (!areListsEqual(items, prevItems)) {
+    //print(items);
+
+    for (int i = 0; i < items.length - 1; i++) {
+      var item = items[i];
+      if (item.endsWith('+')) {
+        var rightOperand = '';
+        item = item.substring(0, item.length - 1);
+
+        var nextItem = items[i + 1];
+        if (nextItem.endsWith('+') ||
+            nextItem.endsWith('|') ||
+            nextItem.endsWith('#')) {
+          rightOperand = nextItem[nextItem.length - 1];
+          nextItem = nextItem.substring(0, nextItem.length - 1);
+        }
+
+        var itemIn = getRegexinBrakets(item);
+        nextItem = getRegexinBrakets(nextItem);
+        if (itemIn == 'ε') {
+          items[i] = '';
+        }
+        if (itemIn == '∅') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+        if (nextItem == 'ε') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+        if (nextItem == '∅') {
+          items[i] = '';
+        }
+      }
+    }
+
+    for (int i = 0; i < items.length - 1; i++) {
+      var item = items[i];
+      if (item.endsWith('#')) {
+        var rightOperand = '';
+        item = item.substring(0, item.length - 1);
+        var nextItem = items[i + 1];
+        if (nextItem.endsWith('+') ||
+            nextItem.endsWith('|') ||
+            nextItem.endsWith('#')) {
+          rightOperand = nextItem[nextItem.length - 1];
+          nextItem = nextItem.substring(0, nextItem.length - 1);
+        }
+
+        var itemIn = getRegexinBrakets(item);
+        nextItem = getRegexinBrakets(nextItem);
+
+        if (itemIn == 'ε') {
+          items[i] = '';
+        }
+        if (itemIn == '∅') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+        if (nextItem == 'ε') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+        if (nextItem == '∅') {
+          items[i] = '';
+        }
+      }
+    }
+
+    for (int i = 0; i < items.length - 1; i++) {
+      var item = items[i];
+      if (item.endsWith('|')) {
+        var rightOperand = '';
+        item = item.substring(0, item.length - 1);
+        var nextItem = items[i + 1];
+        if (nextItem.endsWith('+') ||
+            nextItem.endsWith('|') ||
+            nextItem.endsWith('#')) {
+          rightOperand = nextItem[nextItem.length - 1];
+          nextItem = nextItem.substring(0, nextItem.length - 1);
+        }
+
+        var itemIn = getRegexinBrakets(item);
+        nextItem = getRegexinBrakets(nextItem);
+
+        if (itemIn == '∅') {
+          items[i] = '';
+        }
+
+        if (nextItem == '∅') {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+
+        if (itemIn == nextItem) {
+          items[i + 1] = '';
+          items[i] = items[i]
+              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
+          i++;
+        }
+      }
+    }
+    prevItems = items.toList();
+    items.removeWhere((element) => element == '');
+  }
+  items = items.map((e) => e.replaceAll('+', '')).toList();
+
+
+  return items.join();
+}
+
+bool isBraketsBalanced(String regex) {
+  return countCharacters(regex, '(') == countCharacters(regex, ')');
 }
