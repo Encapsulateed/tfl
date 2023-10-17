@@ -103,5 +103,5 @@ void TestSeedMutate(int seed,
 }
 
 void main(List<String> args) {
-  TestRandomMutate();
+  TestRandomMutate(mutate: true);
 }
