@@ -186,14 +186,14 @@ class FMS {
     }
 
     for (var state in StartStates) {
-      if (transitionsTo[state.name]!.length > 0) {
+      if (true) {
         State newState = State();
         newState.name = state.name + "'";
         transitionsFrom[newState.name] = [
-          Transaction.fromData(state, newState, "")
+          Transaction.fromData(newState, state, "")
         ];
         transitionsTo[state.name]!
-            .add(Transaction.fromData(state, newState, ""));
+            .add(Transaction.fromData(newState, state, ""));
 
         StartStates = Set();
         StartStates.add(newState);
@@ -214,6 +214,7 @@ class FMS {
 
       FinalStates = Set();
       FinalStates.add(newFinalState);
+      States.add(newFinalState);
     }
 
     Set<State> states = States;
@@ -232,6 +233,33 @@ class FMS {
           String to = outTransition.to.name;
           String letter =
               inTransition.letter + loops[state.name]! + outTransition.letter;
+
+          // This block looks awfull but I AM SO PROWD OF IT
+          // cycles one love
+          if (from == to) {
+            letter =
+                "(${loops[state.name]}${inTransition.letter}${outTransition.letter}${loops[from]})*";
+            if (transitionsFrom[to]!.contains(Transaction.fromData(
+                State.fromData(to, ""),
+                State.fromData("finalState", ""),
+                ""))) {
+              letter +=
+                  "|(${loops[state.name]}${inTransition.letter}${loops[from]})*";
+            }
+            if (transitionsFrom[from]!.contains(Transaction.fromData(
+                State.fromData(from, ""),
+                State.fromData("finalState", ""),
+                ""))) {
+              letter +=
+                  "|(${loops[state.name]}${outTransition.letter}${loops[from]})*";
+            }
+            if (loops[from] == "") {
+              loops[from] = letter;
+            } else {
+              loops[from] = "(${loops[from]}|${letter})";
+            }
+            continue;
+          }
 
           transitionsFrom[from]!.remove(inTransition);
           transitionsFrom[from]!.add(Transaction.fromData(
@@ -274,7 +302,6 @@ class State {
 
   @override
   String toString() {
-    // TODO: implement toString
     return "${name}";
   }
 
@@ -284,7 +311,6 @@ class State {
   }
 
   @override
-  // TODO: implement hashCode
   int get hashCode => name.hashCode;
 }
 
@@ -299,7 +325,6 @@ class Transaction {
 
   @override
   String toString() {
-    // TODO: implement toString
     return "${from} -> ${to} [${letter}]";
   }
 
