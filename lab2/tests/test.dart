@@ -3,7 +3,7 @@
 import 'dart:math';
 import '../functions.dart';
 import '../Fms.dart';
-import '../lab2.dart';
+
 import '../src/fms/TestingFms.dart';
 import '../src/generator/regex/gen.dart';
 
@@ -58,7 +58,7 @@ void TestRandomNoMutate() {
   // String regex =  "e";
   print("generated regex: " + regex);
 
-  regex = prepareRegex(regex);
+  regex = MainSymplify(regex);
   print("parsed regex: " + regex);
 
   // I build both fms to ensure tests quality and reliability

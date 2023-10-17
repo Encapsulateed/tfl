@@ -1,4 +1,5 @@
 import 'dart:io';
+
 // import 'Fms.dart';
 import 'src/fms/TestingFms.dart';
 import 'functions.dart';
@@ -16,109 +17,75 @@ List<String> parseRegex(String regex) {
     // Смотрим является ли первый символ началом регулярки в скобках
     bool in_group = regex[i] == '(';
     String subRegex = '';
-    try {
-      if (in_group) {
-        subRegex = '(';
-        int group_balance = 1;
-        //Бежим по группе пока не дойдём до ее конца
-        while (group_balance != 0) {
-          i++;
-          subRegex += regex[i];
 
-          // Любая скобка, очевидно, должна закрыться.
-          if (regex[i] == '(') {
-            group_balance++;
-          }
-          if (regex[i] == ')') {
-            group_balance--;
-          }
+    if (in_group) {
+      subRegex = '(';
+      int group_balance = 1;
+      //Бежим по группе пока не дойдём до ее конца
+      while (group_balance != 0) {
+        i++;
+        subRegex += regex[i];
 
-          if (regex[i + 1] == '*') {
-            subRegex = "$subRegex*";
-            i++;
-          }
+        // Любая скобка, очевидно, должна закрыться.
+        if (regex[i] == '(') {
+          group_balance++;
         }
-        var srCopy = '';
-
-        if (getRegexinBrakets(subRegex).length != 2) {
-          for (var i = 0; i < subRegex.length; i++) {
-            if (getRegexAlf(subRegex).contains(subRegex[i])) {
-              if (i + 1 < subRegex.length && subRegex[i + 1] == '*') {
-                srCopy += '(${subRegex[i]}*)';
-                i++;
-              } else {
-                srCopy += '(${subRegex[i]})';
-              }
-            } else {
-              if (i + 1 < subRegex.length && subRegex[i + 1] == '*') {
-                srCopy += '${subRegex[i]}*';
-                i++;
-              } else {
-                srCopy += subRegex[i];
-              }
-            }
-          }
-          subRegex = srCopy;
-
-          if (subRegex.endsWith('*')) {
-            var tmp = getRegexinBrakets(subRegex);
-            if (tmp.length == 1) {
-              subRegex = '($tmp*)';
-            }
-          }
+        if (regex[i] == ')') {
+          group_balance--;
         }
-        if (subRegex != '(' &&
-            subRegex != ')' &&
-            subRegex != '*' &&
-            subRegex != '**') {
-          if (regex[i + 1] == '|' ||
-              regex[i + 1] == '#' ||
-              regex[i + 1] == '+') {
-            subRegex = '$subRegex';
 
-            subRegex += regex[i + 1];
-            i++;
-          } else {
-            subRegex = '$subRegex';
-
-            subRegex += '+';
-          }
-        }
-      } else {
-        subRegex = "(${regex[i]})";
-
-        if (regex[i + 1] == '*') {
-          subRegex = "(${regex[i]}*)";
+        if (i + 1 < regex.length && regex[i + 1] == '*') {
+          // subRegex = simplifyBrackets(subRegex);
+          subRegex = "$subRegex*";
           i++;
         }
+      }
 
-        if (subRegex != '(' &&
-            subRegex != ')' &&
-            subRegex != '*' &&
-            subRegex != '**') {
-          if (regex[i + 1] == '|' ||
-              regex[i + 1] == '#' ||
-              regex[i + 1] == '+') {
-            subRegex = '$subRegex';
-            subRegex += regex[i + 1];
+      if (subRegex != '(' &&
+          subRegex != ')' &&
+          subRegex != '*' &&
+          subRegex != '**') {
+        subRegexes.add(subRegex);
+        if (i + 1 < regex.length &&
+            (regex[i + 1] == '|' ||
+                regex[i + 1] == '#' ||
+                regex[i + 1] == '+')) {
+          subRegexes.add(regex[i + 1]);
 
-            i++;
-          } else {
-            // + == конкатенация
-            subRegex = '$subRegex';
-            subRegex += '+';
+          i++;
+        } else {
+          if (i + 1 < regex.length) {
+            subRegexes.add('+');
           }
         }
       }
-    } catch (Exeption) {
-      // Здесь значит, что мы вышли за пределы строки
-      // Так легче всего отслеживать
-    }
-    if (subRegex != '(' &&
-        subRegex != ')' &&
-        subRegex != '*' &&
-        subRegex != '**') {
-      subRegexes.add(SimplifyKlini(subRegex));
+    } else {
+      subRegex = "${regex[i]}";
+
+      if (i + 1 < regex.length && regex[i + 1] == '*') {
+        subRegex = "${regex[i]}*";
+        i++;
+      }
+
+      if (subRegex != '(' &&
+          subRegex != ')' &&
+          subRegex != '*' &&
+          subRegex != '**') {
+        subRegexes.add(subRegex);
+
+        if (i + 1 < regex.length &&
+            (regex[i + 1] == '|' ||
+                regex[i + 1] == '#' ||
+                regex[i + 1] == '+')) {
+          subRegexes.add(regex[i + 1]);
+
+          i++;
+        } else {
+          if (i + 1 < regex.length) {
+            subRegexes.add('+');
+          }
+        }
+      }
     }
   }
   if (subRegexes.length != 0) {
@@ -132,9 +99,6 @@ List<String> parseRegex(String regex) {
       subRegexes.map((e) => e = e.replaceAll(RegExp(r'\*+'), '*')).toList();
   subRegexes =
       subRegexes.map((e) => e = e.replaceAll(RegExp(r'\|+'), '|')).toList();
-  subRegexes = subRegexes
-      .map((e) => e = (e[e.length - 1] == '*' ? "(${e})" : e))
-      .toList();
 
   // subRegexes = subRegexes.map((e) => e = e.replaceAll('*))*', '*))')).toList();
 
@@ -143,267 +107,147 @@ List<String> parseRegex(String regex) {
 
 // Функция поиска минимальной конкатенации регулярных выражений, такой что
 // пустая строка НЕ будет содержаться в данной конкатенации
-String MainSymplify(String regex) {
-  var prev = '';
-  var curr = regex;
 
-  while (prev != curr) {
-    prev = curr;
-    curr = BaseSymplify(curr);
-    //print(curr);
-  }
-  return curr;
-}
-
-String BaseSymplify(String regex) {
-  regex = removeBR(regex);
-  var items = parseRegex(regex);
-  var prevItems = [];
-
-  print(regex);
-  // 1) Конкатенации
-  // 2) Шафлы
-  // 3) Альтернативы
-  var items_beforeALL = [];
-  while (!areListsEqual(items_beforeALL, items)) {
-    // Работа с пустыми строками и одинаковыми альтернативами
-    items_beforeALL = items.toList();
-    print('BEFORE ALL ' + items.toString());
-    for (int i = 0; i < items.length - 1; i++) {
-      var item = items[i];
-      if (item.endsWith('+') || item.endsWith('#')) {
-        var rightOperand = '';
-        item = item.substring(0, item.length - 1);
-
-        var nextItem = items[i + 1];
-        if (nextItem.endsWith('+') ||
-            nextItem.endsWith('|') ||
-            nextItem.endsWith('#')) {
-          rightOperand = nextItem[nextItem.length - 1];
-          nextItem = nextItem.substring(0, nextItem.length - 1);
-        }
-
-        var itemIn = getRegexinBrakets(item);
-        nextItem = getRegexinBrakets(nextItem);
-        if (itemIn == 'ε') {
-          items[i] = '';
-        }
-        if (nextItem == 'ε') {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-      }
-    }
-    items.removeWhere((element) => element == '');
-
-    print('EMPTY + # ' + items.toString());
-
-    // Работа с пустыми множествами
-
-    for (int i = 0; i < items.length - 1; i++) {
-      var item = items[i];
-      if (item.endsWith('+') || item.endsWith('#')) {
-        var rightOperand = '';
-        item = item.substring(0, item.length - 1);
-
-        var nextItem = items[i + 1];
-        if (nextItem.endsWith('+') ||
-            nextItem.endsWith('|') ||
-            nextItem.endsWith('#')) {
-          rightOperand = nextItem[nextItem.length - 1];
-          nextItem = nextItem.substring(0, nextItem.length - 1);
-        }
-
-        var itemIn = getRegexinBrakets(item);
-        nextItem = getRegexinBrakets(nextItem);
-
-        if (nextItem == '∅') {
-          items[i] = '';
-        }
-
-        if (itemIn == '∅') {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-      }
-    }
-    print('∅ + # ' + items.toString());
-
-    for (int i = 0; i < items.length - 1; i++) {
-      var item = items[i];
-      if (item.endsWith('|')) {
-        var rightOperand = '';
-        item = item.substring(0, item.length - 1);
-        var rightInBrakets = items[i + 1];
-        if (rightInBrakets.endsWith('+') ||
-            rightInBrakets.endsWith('|') ||
-            rightInBrakets.endsWith('#')) {
-          rightOperand = rightInBrakets[rightInBrakets.length - 1];
-          rightInBrakets =
-              rightInBrakets.substring(0, rightInBrakets.length - 1);
-        }
-
-        var leftInBrakets = getRegexinBrakets(item);
-        rightInBrakets = getRegexinBrakets(rightInBrakets);
-
-        if (leftInBrakets == '∅') {
-          //Стриаем лево
-          items[i] = '';
-        } else if (rightInBrakets == '∅') {
-          //стриаем
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        } else if (leftInBrakets == rightInBrakets) {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-      }
-    }
-    items.removeWhere((element) => element == '');
-    print('ALTERS  ' + items.toString());
-
-    prevItems = items.toList();
-    items.removeWhere((element) => element == '');
-    //  stdin.readLineSync();
-  }
-  items = items.map((e) => e.replaceAll('+', '')).toList();
-
-  return items.join();
-}
-
-String derivative(String regex, String char) {
-  var regexes = parseRegex(regex);
-  regex = buildRegex(regexes[0], regexes);
-
-  if (regexes.length == 0) {
-    regexes = parseRegex(regex);
-    regex = buildRegex(regexes[0], regexes);
-  }
-
-  if (regex.isEmpty || regex == 'ε') {
+String d(String regex, c) {
+  if (regex == 'ε') {
     return 'ε';
   }
   if (regex == '∅') {
     return '∅';
   }
-  if (regex.length == 1) {
-    if (regex == char) {
-      return 'ε';
-    } else {
+
+  if (regex.length == 2) {
+    if (regex == c + '*') {
+      return c + '*';
+    } else if (regex != c && regex.endsWith('*')) {
       return '∅';
     }
-  } else if (regex[0] == char && regex[1] != '*') {
-    return 'ε' + regex.substring(1, regex.length);
-  } else {
-    String left = '';
-    String right = '';
+  }
+  if (regex.length == 1) {
+    if (regex == c) {
+      return 'ε';
+    }
+    return '∅';
+  }
 
-    bool in_group = regex[0] == '(';
-    if (in_group) {
-      left = regex[0];
-      int balance = 1;
-      int i = 1;
+  var parsedItems = parseRegex(regex);
 
-      // Находим первую группу регулярок (левую)
-      // Вторая определиться как исходная регулярка без первой группы
+  // Минимальное число операндов для существования бинарной операвции
+  if (parsedItems.length >= 3) {
+    if (parsedItems.length > 3) {
+      var assambyRegex = AssemblyString(parsedItems);
+      parsedItems = parseRegex(assambyRegex);
+    }
 
-      while (balance != 0) {
-        if (regex[i] == '(') {
-          balance++;
+    var l = parsedItems[0];
+    var operand = parsedItems[1];
+    var r = parsedItems[2];
+
+    var dl = d(l, c);
+    var dr = d(r, c);
+    // print('my regex == $regex');
+    // print('will $operand `$l -> $dl` `$r -> $dr`');
+
+    if (operand == '+' || operand == '#') {
+      if (operand == '+') {
+        if (isEpsilonInRegex(l)) {
+          if (dl == '∅') {
+            return '(${d(r, c)})';
+          }
+          if (dr == '∅') {
+            return '(${d(l, c)}+$r)';
+          }
+          return '((${d(l, c)}+$r)|(${d(r, c)}))';
         }
-        if (regex[i] == ')') {
-          balance--;
+
+        if (dl == '∅') {
+          //return '∅';
+        }
+        return '(${d(l, c)}+$r)';
+      }
+      if (operand == '#') {
+        if (dl == '∅' || dr == '∅') {
+          // return '∅';
         }
 
-        left += regex[i];
-        i++;
+        return '(((${d(l, c)}#$r)|($l#${d(r, c)})))';
       }
-      // print('$left');
-      if (i < regex.length && regex[i] == '*') {
-        left = '$left*';
-        i++;
+    } else if (operand == '|') {
+      if (l == r) {
+        return '(${d(l, c)})';
       }
-      // print('$left');
+      if (dl == dr) {
+        return '(${d(l, c)})';
+      }
 
-      right = regex.substring(i, regex.length);
+      if (dl == '∅') {
+        return '(${d(r, c)})';
+      }
+      if (dr == '∅') {
+        return '(${d(l, c)})';
+      }
+
+      return '((${d(l, c)})|(${d(r, c)}))';
+    }
+  } else if (parsedItems.length == 1) {
+    // Если элемент всего 1, всё либо тривиально, либо это звёзда клини
+
+    if (parsedItems[0].endsWith('*')) {
+      var noStar = parsedItems[0].substring(0, parsedItems[0].length - 1);
+      return '(${(d(noStar, c))})' + '+' + '${parsedItems[0]}';
     } else {
-      left = regex;
-    }
-
-    //  print('LEFT ' + left);
-    // print('RIGHT ' + right);
-
-    if (right != '' && right != '*') {
-      String op = right[0];
-      right = right.substring(1, right.length);
-
-      //print('EXPRESSION $left $op $right');
-
-      //   stdin.readLineSync();
-      //print('EXPRESSION $left $op $right');
-
-      if (op == '+' || op == '#' || op == '|') {
-        if (op == '+') {
-          if (isEpsilonInRegex(left)) {
-            return "(((${derivative(left, char)})+((${right}))|(${derivative(right, char)})))";
-          } else {
-            return "((${derivative(left, char)})+(${right}))";
-          }
-        }
-        if (op == '|') {
-          return '((${derivative(left, char)})|(${derivative(right, char)}))';
-        }
-        if (op == '#') {
-          return '(((${derivative(left, char)})#(${right}))|((${left})#(${derivative(right, char)})))';
-        }
-      }
-    }
-    //Значит это регулярка без бинарной операции
-    else {
-      if (left.startsWith('(') && left.endsWith(')')) {
-        left = left.substring(1, left.length - 1);
-        return derivative(left, char);
-      } else if (left.endsWith('*')) {
-        var no_klini = left.substring(0, left.length - 1);
-        //print('LEFT ' + left);
-        if (no_klini.length == 1) {
-          if (no_klini == char) {
-            return '${no_klini}*';
-          }
-
-          return '∅';
-        }
-
-        return "{(${derivative(no_klini, char)})}+[${no_klini}]*";
-      }
+      // Если нет перед нами группа
+      // спускаемся ниже
+      return d(parsedItems[0].substring(1, parsedItems[0].length - 1), c);
     }
   }
-  return derivative(regex, char);
+  return '';
 }
 
 void main() {
+  String regex = '';
+  print('Input regex: ');
+  regex = stdin.readLineSync() ?? '';
+
+  regex = MainSymplify(regex);
+
+  var fms = TestingFms(regex);
+  fms.build(regex);
+  fms.Print();
+  fms.DumpDotToFile();
+  fms.CalculateTransitionMatrix();
+  fms.CalculateAdjacencyMatrix();
+  fms.CalculateReachabilityMatrix();
+  fms.BuildPossibilityMap();
+  fms.BuildValidityMap();
+
+//  var a = d(regex, 'a');
+  // print('d: $a');
+  // print(MainSymplify(a));
+
+  // print(AssemblyString(parseRegex(regex)));
+
+  //  final regex = "(a|b)*#a";
+  // final parser = RegexParser(regex);
+  // final tokens = parser.parse();
+  // print("Токены регулярного выражения: $tokens");
+
+  //print(parseRegex('(∅)(((a)(b)|(b)(a))*)'));
   // Регулярное выражение в виде строки для поиска и замены
 
-  // Заменяем строки
-  //  String regex = '∅+b*';
-  // String regex = '(∅+a|ε)+(c*a)*';
+  // var r = parseRegex(regex);
+  // print(r);
+
   //String regex = '(c*a)*';
-  String regex = '((ab)|(ba))';
-  //String regex = '((ab)|(ba))*';
+  // String regex = '((ab)|(ba))';
+  // String regex = '((ab)|(ba))*';
 
-  regex = InitRegex(regex);
-
-  var da = derivative(regex, 'a');
+  //regex = InitRegex(regex);
+  //print(regex);
+  // print(removeBR(regex));
+  // var da = derivative(regex, 'c');
   // print(da);
-  print(removeBR(da));
+  //print(LastRemove(removeBR(da)));
   //print(BaseSymplify(da));
 
   // var s = BaseSymplify(da);
@@ -447,15 +291,7 @@ void main() {
 
 
 
-  var fms = TestingFms(regex);
-  fms.build(regex);
-  fms.Print();
-  fms.DumpDotToFile();
-  fms.CalculateTransitionMatrix();
-  fms.CalculateAdjacencyMatrix();
-  fms.CalculateReachabilityMatrix();
-  fms.BuildPossibilityMap();
-  fms.BuildValidityMap();
+
   //print(fms.validity);
 */
 }

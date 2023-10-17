@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'Fms.dart';
 import 'lab2.dart';
 
@@ -18,69 +16,6 @@ Set<String> getRegexAlf(String regex) {
     }
   }
   return alf;
-}
-
-String prepareRegex(String regex) {
-  var r = parseRegex(regex);
-
-  if (r.length != 0) {
-    regex = buildRegex(r[0], r);
-  }
-
-  return regex;
-}
-
-String InitRegex(String regex) {
-  var r = SimpifyRepetedKlini(regex);
-
-  if (r.length != 0) {
-    regex = buildRegex(r[0], r);
-  }
-
-  return regex.replaceAll('+', '');
-}
-
-List<String> SimpifyRepetedKlini(String regex) {
-  var r = parseRegex(regex);
-  List<String> newR = [];
-
-  for (var i = 0; i < r.length; i++) {
-    var item = r[i];
-
-    if (item.endsWith('+') || item.endsWith('|') || item.endsWith('#')) {
-      item = item.substring(0, item.length - 1);
-    }
-    if (item.endsWith('*') || getRegexinBrakets(item).endsWith('*')) {
-      for (int j = i + 1; j < r.length; j++) {
-        var anotherItem = r[j];
-
-        if (anotherItem.endsWith('+') ||
-            anotherItem.endsWith('|') ||
-            anotherItem.endsWith('#')) {
-          anotherItem = anotherItem.substring(0, anotherItem.length - 1);
-        }
-        if (item == anotherItem) {
-          r[j] = '';
-        } else {
-          break;
-        }
-      }
-    }
-  }
-  for (var i = 0; i < r.length; i++) {
-    if (r[i] != '') {
-      newR.add(r[i]);
-    }
-  }
-  if (newR.length != 0) {
-    if (newR[newR.length - 1].endsWith('+') ||
-        newR[newR.length - 1].endsWith('#') ||
-        newR[newR.length - 1].endsWith('|')) {
-      newR[newR.length - 1] =
-          newR[newR.length - 1].substring(0, newR[newR.length - 1].length - 1);
-    }
-  }
-  return newR;
 }
 
 int countCharacters(String input, String characterToCount) {
@@ -134,21 +69,6 @@ String simplifyBrackets(String regex) {
   return regex.substring(i, regex.length - back_couter);
 }
 
-String buildRegex(String regex, List<String> SubRegexes) {
-  SubRegexes.removeAt(0);
-  regex = '${regex}(';
-
-  for (var reg in SubRegexes) {
-    regex += reg;
-  }
-  regex += ')';
-  if (SubRegexes.length == 0) {
-    regex = regex.substring(0, regex.length - 2);
-    regex = regex.substring(1, regex.length - 1);
-  }
-  return regex;
-}
-
 String getRegexinBrakets(String regex) {
   if (regex.endsWith('*')) {
     var noKlini = regex.substring(0, regex.length - 1);
@@ -161,26 +81,6 @@ String getRegexinBrakets(String regex) {
     return getRegexinBrakets(regex.substring(1, regex.length - 1));
   }
   return regex;
-}
-
-String SimplifyKlini(String regex) {
-  String simplify = '';
-
-  //regex = regex.replaceFirst('*)*', '*)');
-  int i = regex.indexOf('*)*');
-  if (i == -1) {
-    return regex;
-  }
-
-  simplify = regex.substring(0, i + 2);
-
-  if (regex.endsWith('*')) {
-    regex = regex.substring(0, regex.length - 1);
-  }
-
-  var regexSub = regex.substring(i + 2, regex.length);
-  regexSub = regexSub.replaceAll('*)', ')');
-  return simplify + regexSub;
 }
 
 //Функция проверки регулярного выражения на содержание пустой строки
@@ -209,188 +109,110 @@ bool areListsEqual(List<dynamic> list1, List<dynamic> list2) {
   return set1.containsAll(set2);
 }
 
-String removeBR(String regex) {
-  regex = regex.replaceAll('(', '');
-  regex = regex.replaceAll(')', '');
-  regex = regex.replaceAll('[', '(');
-  regex = regex.replaceAll(']*', ')*');
-  regex = regex.replaceAll('{', '(');
-  regex = regex.replaceAll('}', ')');
+String AssemblyString(List<String> items) {
+  var first = '(${items[0]}${items[1]}${items[2]})${items[3]}';
+  items.removeRange(0, 4);
+  var second = '(${items.join()})';
 
-  regex = regex.replaceAll('ε#', '');
-  regex = regex.replaceAll('#ε', '');
-
-  regex = regex.replaceAll('ε+', '');
-  regex = regex.replaceAll('#+', '');
-
-  regex = regex.replaceAll('(ε)#', '');
-  regex = regex.replaceAll('#(ε)', '');
-
-  regex = regex.replaceAll('(ε)+', '');
-  regex = regex.replaceAll('+(ε)', '');
-
-  // regex = regex.replaceAll('ε', '');
-  regex = regex.replaceAll('ε|ε', 'ε');
-
-  var r = parseRegex(regex);
-
-  print('REGEX ' + regex);
-  r = r.map((item) => item = SimpifyItem(item)).toList();
-
-  regex = r.join();
-  SimpifyItem(regex);
-  print(r);
-  return regex;
+  return first + second;
 }
 
-String SimpifyItem(String regex) {
-  var groupOperand = '';
-  if (regex.endsWith('|') || regex.endsWith('#') || regex.endsWith('+')) {
-    groupOperand = regex[regex.length - 1];
+String simp(String regex) {
+  //print('input regex is $regex');
+  if (regex == '∅') {
+    return '∅';
   }
-  if (regex[regex.length - 2] == '*') {
+  if (regex == 'ε') {
+    return 'ε';
+  }
+  if (regex.length == 1) {
     return regex;
   }
-  regex = regex.replaceAll('(', '');
-  regex = regex.replaceAll(')', '');
-
-  regex = regex.replaceAllMapped(RegExp(r'\((.)\)\*'), (match) {
-    String x = match.group(1) ?? ''; // Захваченный символ x
-    return '$x*';
-  });
-
-  print(regex);
-  var items = parseRegex(regex);
-  print(items);
-
-  if (items.length == 1) {
+  if (regex.length == 2 && regex.endsWith('*')) {
     return regex;
   }
-  var prevItems = [];
+  var parsedItems = parseRegex(regex);
+  if (parsedItems.length >= 3) {
+    if (parsedItems.length > 3) {
+      var assambyRegex = AssemblyString(parsedItems);
+      parsedItems = parseRegex(assambyRegex);
+    }
+    var l = parsedItems[0];
+    var operand = parsedItems[1];
+    var r = parsedItems[2];
 
-  // 1) Конкатенации
-  // 2) Шафлы
-  // 3) Альтернативы
-  while (!areListsEqual(items, prevItems)) {
-    //print(items);
+    //print('TRY TO SIMPLIFY $l $r WITH $operand');
+    if (operand == '|') {
+      if (l == r) {
+        return simp(l);
+      }
+      if (l == 'ε') {
+        // return simp(r);
+      } else if (r == 'ε') {
+        // return simp(l);
+      }
+      if (l == '∅') {
+        return '${simp(r)}';
+      } else if (r == '∅') {
+        return '${simp(l)}';
+      }
+    } else if (operand == '+') {
+      if (l == '∅') {
+        return '∅';
+      } else if (r == '∅') {
+        return '∅';
+      }
+      if (l == 'ε') {
+        return simp(r);
+      } else if (r == 'ε') {
+        return simp(l);
+      }
+      if (l.endsWith('*') && r.endsWith('*')) {
+        var nkl = l.substring(0, l.length - 1);
+        var nkr = r.substring(0, r.length - 1);
 
-    for (int i = 0; i < items.length - 1; i++) {
-      var item = items[i];
-      if (item.endsWith('+')) {
-        var rightOperand = '';
-        item = item.substring(0, item.length - 1);
-
-        var nextItem = items[i + 1];
-        if (nextItem.endsWith('+') ||
-            nextItem.endsWith('|') ||
-            nextItem.endsWith('#')) {
-          rightOperand = nextItem[nextItem.length - 1];
-          nextItem = nextItem.substring(0, nextItem.length - 1);
-        }
-
-        var itemIn = getRegexinBrakets(item);
-        nextItem = getRegexinBrakets(nextItem);
-        if (itemIn == 'ε') {
-          items[i] = '';
-        }
-        if (itemIn == '∅') {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-        if (nextItem == 'ε') {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-        if (nextItem == '∅') {
-          items[i] = '';
+        if (nkl == nkr || (getRegexinBrakets(nkl) == getRegexinBrakets(nkr))) {
+          return simp(l);
         }
       }
-    }
-
-    for (int i = 0; i < items.length - 1; i++) {
-      var item = items[i];
-      if (item.endsWith('#')) {
-        var rightOperand = '';
-        item = item.substring(0, item.length - 1);
-        var nextItem = items[i + 1];
-        if (nextItem.endsWith('+') ||
-            nextItem.endsWith('|') ||
-            nextItem.endsWith('#')) {
-          rightOperand = nextItem[nextItem.length - 1];
-          nextItem = nextItem.substring(0, nextItem.length - 1);
-        }
-
-        var itemIn = getRegexinBrakets(item);
-        nextItem = getRegexinBrakets(nextItem);
-
-        if (itemIn == 'ε') {
-          items[i] = '';
-        }
-        if (itemIn == '∅') {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-        if (nextItem == 'ε') {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-        if (nextItem == '∅') {
-          items[i] = '';
-        }
+    } else if (operand == '#') {
+      if (l == 'ε') {
+        return '${simp(r)}';
+      } else if (r == 'ε') {
+        return '${simp(l)}';
+      }
+      if (l == '∅') {
+        return '∅';
+      }
+      if (r == '∅') {
+        return '∅';
       }
     }
-
-    for (int i = 0; i < items.length - 1; i++) {
-      var item = items[i];
-      if (item.endsWith('|')) {
-        var rightOperand = '';
-        item = item.substring(0, item.length - 1);
-        var nextItem = items[i + 1];
-        if (nextItem.endsWith('+') ||
-            nextItem.endsWith('|') ||
-            nextItem.endsWith('#')) {
-          rightOperand = nextItem[nextItem.length - 1];
-          nextItem = nextItem.substring(0, nextItem.length - 1);
-        }
-
-        var itemIn = getRegexinBrakets(item);
-        nextItem = getRegexinBrakets(nextItem);
-
-        if (itemIn == '∅') {
-          items[i] = '';
-        }
-
-        if (nextItem == '∅') {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-
-        if (itemIn == nextItem) {
-          items[i + 1] = '';
-          items[i] = items[i]
-              .replaceRange(items[i].length - 1, items[i].length, rightOperand);
-          i++;
-        }
-      }
+    if (operand == '+') {
+      operand = '+';
     }
-    prevItems = items.toList();
-    items.removeWhere((element) => element == '');
+    return '${simp(l)}$operand${simp(r)}';
+  } else {
+    if (parsedItems[0].endsWith('*')) {
+      var noStar = parsedItems[0].substring(0, parsedItems[0].length - 1);
+      return '(${simp(noStar)})*';
+    }
+    if (parsedItems.length == 1) {
+      return simp(parsedItems[0].substring(1, parsedItems[0].length - 1));
+    }
   }
-  items = items.map((e) => e.replaceAll('+', '')).toList();
 
-  return items.join();
+  return '';
 }
 
-bool isBraketsBalanced(String regex) {
-  return countCharacters(regex, '(') == countCharacters(regex, ')');
+String MainSymplify(String regex) {
+  var prev = '';
+  var curr = regex;
+
+  while (prev != curr) {
+    prev = curr;
+    curr = simp(curr);
+    //print(curr);
+  }
+  return curr.replaceAll('+', '');
 }

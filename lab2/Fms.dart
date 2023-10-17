@@ -25,11 +25,7 @@ class FMS {
   }
 
   bool isRegexAlreadyExits(String regex) {
-    return this.States.any((state) =>
-        state.regex == regex ||
-        regex == '(${state.regex})' ||
-        state.regex == '(${regex})' ||
-        state.regex == prepareRegex(regex));
+    return this.States.any((state) => state.regex == regex);
   }
 
   String getCurrentStateTitle() {
@@ -41,11 +37,7 @@ class FMS {
   }
 
   State getStateByRegex(String regex) {
-    return States.where((state) =>
-        state.regex == regex ||
-        regex == '(${state.regex})' ||
-        state.regex == '(${regex})' ||
-        state.regex == prepareRegex(regex)).first;
+    return States.where((state) => state.regex == regex).first;
   }
 
   void build(String prevRegex) {
@@ -53,7 +45,7 @@ class FMS {
 
     for (var term in alf) {
       //  print('Take ${prevRegex} by ${term}');
-      var simpeleDerivative = MainSymplify(derivative(prevRegex, term));
+      var simpeleDerivative = MainSymplify(d(prevRegex, term));
 
       var stateTitle = getCurrentStateTitle();
       var prevState = getStateByRegex(prevRegex);
