@@ -146,25 +146,25 @@ String simp(String regex) {
       if (l == r) {
         return simp(l);
       }
-      if (l == 'ε') {
+      if (l == 'ε' || getRegexinBrakets(l) == 'ε') {
         // return simp(r);
-      } else if (r == 'ε') {
+      } else if (r == 'ε' || getRegexinBrakets(r) == 'ε') {
         // return simp(l);
       }
-      if (l == '∅') {
+      if (l == '∅' || getRegexinBrakets(l) == '∅') {
         return '${simp(r)}';
-      } else if (r == '∅') {
+      } else if (r == '∅' || getRegexinBrakets(r) == '∅') {
         return '${simp(l)}';
       }
     } else if (operand == '+') {
-      if (l == '∅') {
+      if (l == '∅' || getRegexinBrakets(l) == '∅') {
         return '∅';
-      } else if (r == '∅') {
+      } else if (r == '∅' || getRegexinBrakets(r) == '∅') {
         return '∅';
       }
-      if (l == 'ε') {
+      if (l == 'ε' || getRegexinBrakets(l) == 'ε') {
         return simp(r);
-      } else if (r == 'ε') {
+      } else if (r == 'ε' || getRegexinBrakets(r) == 'ε') {
         return simp(l);
       }
       if (l.endsWith('*') && r.endsWith('*')) {
@@ -176,21 +176,19 @@ String simp(String regex) {
         }
       }
     } else if (operand == '#') {
-      if (l == 'ε') {
+      if (l == 'ε' || getRegexinBrakets(l) == 'ε') {
         return '${simp(r)}';
-      } else if (r == 'ε') {
+      } else if (r == 'ε' || getRegexinBrakets(r) == 'ε') {
         return '${simp(l)}';
       }
-      if (l == '∅') {
+      if (l == '∅' || getRegexinBrakets(l) == '∅') {
         return '∅';
       }
-      if (r == '∅') {
+      if (r == '∅' || getRegexinBrakets(r) == '∅') {
         return '∅';
       }
     }
-    if (operand == '+') {
-      operand = '+';
-    }
+
     return '${simp(l)}$operand${simp(r)}';
   } else {
     if (parsedItems[0].endsWith('*')) {
@@ -210,9 +208,72 @@ String MainSymplify(String regex) {
   var curr = regex;
 
   while (prev != curr) {
+    curr = curr.replaceAllMapped(RegExp(r'\((.)\)\*'), (match) {
+      String x = match.group(1) ?? ''; // Захваченный символ x
+      return '$x*';
+    });
+    curr = removeSameOR(curr);
     prev = curr;
+
     curr = simp(curr);
     //print(curr);
   }
   return curr.replaceAll('+', '');
+}
+
+String SimplifyKlini(String regex) {
+  String simplify = '';
+  // (a*)* -> (a)* -> a*
+  // (ab*)* -> (ab*)*
+  // (((a)*)*)* -> (a)* ->a*
+  // ((..((r)*)..)*) -> (r)*
+
+  //regex.replaceFirst('*)*', '*)*');
+  int i = regex.indexOf('*)*');
+  if (i == -1) {
+    return regex;
+  }
+
+  simplify = regex.substring(0, i + 2);
+
+  if (regex.endsWith('*')) {
+    regex = regex.substring(0, regex.length - 1);
+  }
+
+  var regexSub = regex.substring(i + 2, regex.length);
+  regexSub = regexSub.replaceAll(')*', ')');
+  return simplify + regexSub;
+}
+
+String removeSameOR(String regex) {
+  var Regexlst = regex.split('|').toList();
+  for (int i = 0; i < Regexlst.length - 1; i++) {
+    if (Regexlst[i] == Regexlst[i + 1]) {
+      Regexlst.removeAt(i);
+      i--; // Decrement i to recheck the current index
+    }
+  }
+  return Regexlst.join('|');
+  /*
+  var Regexlst = regex.split('|').toList();
+  int count = Regexlst.length;
+
+ int groupSize = 1; // Укажите желаемый размер группы
+
+  List<String> elements = regex.split('|'); 
+
+  List<List<String>> groups = [];
+
+  for (int i = 0; i < elements.length; i += groupSize) {
+    List<String> group = [];
+    for (int j = i; j < i + groupSize && j < elements.length; j++) {
+      group.add(elements[j]);
+    }
+    groups.add(group);
+  }
+
+  print(groups);
+
+  return groups.join('|');
+  */
 }

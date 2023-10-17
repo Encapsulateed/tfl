@@ -24,6 +24,9 @@ List<String> parseRegex(String regex) {
       //Бежим по группе пока не дойдём до ее конца
       while (group_balance != 0) {
         i++;
+        if (i == regex.length) {
+          break;
+        }
         subRegex += regex[i];
 
         // Любая скобка, очевидно, должна закрыться.
@@ -107,6 +110,7 @@ List<String> parseRegex(String regex) {
 
 // Функция поиска минимальной конкатенации регулярных выражений, такой что
 // пустая строка НЕ будет содержаться в данной конкатенации
+
 
 String d(String regex, c) {
   if (regex == 'ε') {
@@ -203,14 +207,27 @@ String d(String regex, c) {
   }
   return '';
 }
-
 void main() {
+  print(removeSameOR('a*b|aa|a*b|a*b|d'));
+
+
+  // (b*|b*)|(f)*#g(f*)
+  // (((((c)*e**)|a**#(b)*)*#f|(f))*a)*|(c)|d|((d)*)*
+  // ((b)*)#(b#f|(f*))|fg
   String regex = '';
   print('Input regex: ');
   regex = stdin.readLineSync() ?? '';
+  regex = MainSymplify(regex);
+//  print(parseRegex('f*#f*|f*#f*|b*|f*#f*'));
+  // print(removeSameOR('f*#f*|f*#f*|b*|f*#f*'));
 
   regex = MainSymplify(regex);
+  print(regex);
+  print(d(regex, 'b'));
+  print('d: ' + MainSymplify(d(regex, 'a')));
 
+
+  /*
   var fms = TestingFms(regex);
   fms.build(regex);
   fms.Print();
@@ -220,78 +237,6 @@ void main() {
   fms.CalculateReachabilityMatrix();
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
-
-//  var a = d(regex, 'a');
-  // print('d: $a');
-  // print(MainSymplify(a));
-
-  // print(AssemblyString(parseRegex(regex)));
-
-  //  final regex = "(a|b)*#a";
-  // final parser = RegexParser(regex);
-  // final tokens = parser.parse();
-  // print("Токены регулярного выражения: $tokens");
-
-  //print(parseRegex('(∅)(((a)(b)|(b)(a))*)'));
-  // Регулярное выражение в виде строки для поиска и замены
-
-  // var r = parseRegex(regex);
-  // print(r);
-
-  //String regex = '(c*a)*';
-  // String regex = '((ab)|(ba))';
-  // String regex = '((ab)|(ba))*';
-
-  //regex = InitRegex(regex);
-  //print(regex);
-  // print(removeBR(regex));
-  // var da = derivative(regex, 'c');
-  // print(da);
-  //print(LastRemove(removeBR(da)));
-  //print(BaseSymplify(da));
-
-  // var s = BaseSymplify(da);
-  // print(da);
-  //print(s);
-
-  // var db = derivative(regex, 'b');
-  // print('DERIVATIVE ' + da);
-  // print('DERIVATIVE ' + db);
-  // var s = BaseSymplify(da);
-  //print(s);
-
-  //print('SIMPILIFY ' + s);
-  //s = BaseSymplify(db);
-  //print('SIMPILIFY ' + s);
-
-  /*
-  print('Input shuffle regex:');
-  regex = stdin.readLineSync() ?? 'null';
-
-  if (regex == 'null') {
-    throw 'Incorrect input!';
-    
-  }
-  if (regex != '') {}
-  //SimpifyRepetedKlini(regex);
   
-  regex=MainSymplify(regex);
-  // var s = MainSymplify(regex);
-  print("распознано: " + regex);
-
-  var da = derivative(regex, 'a');
-  var db = derivative(regex, 'b');
-  var dc = derivative(regex, 'c');
-
-  print('a: $da');
-  print('s:' + MainSymplify(da));
-
-   print('b: $db');
-   print('s:' + MainSymplify(db));
-
-
-
-
-  //print(fms.validity);
 */
 }
