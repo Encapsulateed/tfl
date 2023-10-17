@@ -96,7 +96,9 @@ List<String> parseRegex(String regex) {
             subRegex != ')' &&
             subRegex != '*' &&
             subRegex != '**') {
-          if (regex[i + 1] == '|' || regex[i + 1] == '#' ||regex[i+1]=='+') {
+          if (regex[i + 1] == '|' ||
+              regex[i + 1] == '#' ||
+              regex[i + 1] == '+') {
             subRegex = '$subRegex';
             subRegex += regex[i + 1];
 

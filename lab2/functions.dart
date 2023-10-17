@@ -235,11 +235,10 @@ String removeBR(String regex) {
   var r = parseRegex(regex);
 
   print('REGEX ' + regex);
-  print(r);
   r = r.map((item) => item = SimpifyItem(item)).toList();
 
   regex = r.join();
-  //SimpifyItem(regex);
+  SimpifyItem(regex);
   print(r);
   return regex;
 }
@@ -260,12 +259,12 @@ String SimpifyItem(String regex) {
     return '$x*';
   });
 
+  print(regex);
   var items = parseRegex(regex);
   print(items);
 
-  
-  if(items.length == 1){
-    return items.join() + groupOperand;
+  if (items.length == 1) {
+    return regex;
   }
   var prevItems = [];
 
@@ -388,7 +387,6 @@ String SimpifyItem(String regex) {
     items.removeWhere((element) => element == '');
   }
   items = items.map((e) => e.replaceAll('+', '')).toList();
-
 
   return items.join();
 }

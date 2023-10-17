@@ -1,7 +1,7 @@
-
 import 'lab2.dart';
 import 'dart:io';
 import 'functions.dart';
+
 class FMS {
   Set<String> alphabet = {};
   Set<State> States = {};
@@ -52,7 +52,7 @@ class FMS {
     Set<String> alf = getRegexAlf(prevRegex);
 
     for (var term in alf) {
-    //  print('Take ${prevRegex} by ${term}');
+      //  print('Take ${prevRegex} by ${term}');
       var simpeleDerivative = MainSymplify(derivative(prevRegex, term));
 
       var stateTitle = getCurrentStateTitle();
@@ -67,7 +67,7 @@ class FMS {
       transaction.to = newState;
       transaction.letter = term;
 
-     //  print('Derivative is $simpeleDerivative');
+      //  print('Derivative is $simpeleDerivative');
 
       if (simpeleDerivative == '∅') {
       } else {
@@ -125,7 +125,8 @@ class FMS {
     }
 
     for (var transaction in this.Transactions) {
-      res += "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+      res +=
+          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
     }
 
     res = "digraph {\n"
@@ -154,7 +155,8 @@ class FMS {
     }
 
     for (var transaction in this.Transactions) {
-      res += "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+      res +=
+          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
     }
 
     res = "digraph {\n"
@@ -182,7 +184,8 @@ class FMS {
         if (loops[transition.to.name] == "") {
           loops[transition.to.name] = transition.letter + "*";
         } else {
-          loops[transition.to.name] = "(${loops[transition.to.name]}|${transition.letter}*)";
+          loops[transition.to.name] =
+              "(${loops[transition.to.name]}|${transition.letter}*)";
         }
       } else {
         transitionsFrom[transition.from.name]!.add(transition);
@@ -194,8 +197,11 @@ class FMS {
       if (transitionsTo[state.name]!.length > 0) {
         State newState = State();
         newState.name = state.name + "'";
-        transitionsFrom[newState.name] = [Transaction.fromData(state, newState, "")];
-        transitionsTo[state.name]!.add(Transaction.fromData(state, newState, ""));
+        transitionsFrom[newState.name] = [
+          Transaction.fromData(state, newState, "")
+        ];
+        transitionsTo[state.name]!
+            .add(Transaction.fromData(state, newState, ""));
 
         StartStates = Set();
         StartStates.add(newState);
@@ -208,8 +214,10 @@ class FMS {
       transitionsTo[newFinalState.name] = [];
 
       for (var state in FinalStates) {
-        transitionsTo[newFinalState.name]!.add(Transaction.fromData(state, newFinalState, ""));
-        transitionsFrom[state.name]!.add(Transaction.fromData(state, newFinalState, ""));
+        transitionsTo[newFinalState.name]!
+            .add(Transaction.fromData(state, newFinalState, ""));
+        transitionsFrom[state.name]!
+            .add(Transaction.fromData(state, newFinalState, ""));
       }
 
       FinalStates = Set();
@@ -230,13 +238,16 @@ class FMS {
         for (var outTransition in transOut) {
           String from = inTransition.from.name;
           String to = outTransition.to.name;
-          String letter = inTransition.letter + loops[state.name]! + outTransition.letter;
+          String letter =
+              inTransition.letter + loops[state.name]! + outTransition.letter;
 
           transitionsFrom[from]!.remove(inTransition);
-          transitionsFrom[from]!.add(Transaction.fromData(inTransition.from, outTransition.to, letter));
+          transitionsFrom[from]!.add(Transaction.fromData(
+              inTransition.from, outTransition.to, letter));
 
           transitionsTo[to]!.remove(outTransition);
-          transitionsTo[to]!.add(Transaction.fromData(inTransition.from, outTransition.to, letter));
+          transitionsTo[to]!.add(Transaction.fromData(
+              inTransition.from, outTransition.to, letter));
         }
       }
       transitionsTo[state.name] = [];
@@ -264,7 +275,7 @@ class FMS {
 class State {
   String name = '';
   String regex = '';
-  
+
   State();
 
   State.fromData(this.name, this.regex);
