@@ -5,7 +5,7 @@ import '../functions.dart';
 import '../Fms.dart';
 
 import '../src/fms/TestingFms.dart';
-import '../src/generator/regex/gen.dart';
+import '../src/generator/regex/RegexGenerator.dart';
 
 class Tester {
   late TestingFms fms;
@@ -50,12 +50,16 @@ class Tester {
   }
 }
 
-void TestRandomNoMutate() {
-  String regex = "";
-  while (regex.length < 3) {
-    regex = GenerateRegexInit(7, 2, 10);
+void TestRandomMutate(
+    {Random? destinyWeb = null,
+    bool mutate = false,
+    String regex = "",
+    bool dumpDot = false}) {
+  if (regex == "") {
+    while (regex.length < 3) {
+      regex = GenerateRegexInit(5, 2, 10);
+    }
   }
-  // String regex =  "e";
   print("generated regex: " + regex);
 
   regex = MainSymplify(regex);
@@ -66,24 +70,38 @@ void TestRandomNoMutate() {
   fms.build(regex);
   TestingFms testingFms = TestingFms(regex);
   testingFms.build(regex);
-  // testingFms.Print();
-  // print(testingFms.DumpDot());
+  if (dumpDot) {
+    print(testingFms.DumpDot());
+  }
 
   String solutionRegex = fms.DumpRegex();
   print("solution regex: " + solutionRegex);
   RegExp reg = RegExp(solutionRegex);
 
   Tester tester = Tester(testingFms, reg);
-  tester.PrepareTestingFms();
-  print("testing fms prepared");
+  if (destinyWeb != null) {
+    tester.enigmaOracle = destinyWeb;
+  }
 
-  for (var i = 0; i < 10; i++) {
-    tester.RunRandomTest();
+  tester.PrepareTestingFms();
+  print("testing fms has been prepared");
+
+  for (var i = 0; i < 50; i++) {
+    tester.RunRandomTest(mutate: mutate);
   }
 }
 
-void TestSeedNoMutate() {}
+void TestSeedMutate(int seed,
+    {bool mutate = false, String regex = "", bool dumpDot = false}) {
+  Random prophetOfTheNewDawn = Random(seed);
+
+  TestRandomMutate(
+      destinyWeb: prophetOfTheNewDawn,
+      mutate: mutate,
+      regex: regex,
+      dumpDot: dumpDot);
+}
 
 void main(List<String> args) {
-  TestRandomNoMutate();
+  TestRandomMutate();
 }
