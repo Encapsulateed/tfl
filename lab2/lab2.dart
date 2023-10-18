@@ -218,13 +218,7 @@ void main() {
   regex = stdin.readLineSync() ?? '';
 
   regex = prepareRegex(regex);
-  print(regex);
   regex = MainSymplify(regex);
-  print(regex);
-//  print(AssemblyString(parseRegex(regex)));
-  
- // print('S $regex');
-
 
   var fms = TestingFms(regex);
   fms.build(regex);
@@ -236,6 +230,5 @@ void main() {
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
   print(fms.DumpRegex());
-      /*
-  */
+
 }
