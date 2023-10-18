@@ -4,6 +4,14 @@
 make test
 ```
 
+Вот [тут](https://github.com/Encapsulateed/tfl/blob/main/lab2/tests/test.dart#L60) можно поиграться с параметрами.
+
+# Запуск лабы для ручной эксплуатации
+
+```
+dart lab2.dart
+```
+
 What is this life if, full of care, <br/>
 We have no time to stand and stare.
 
