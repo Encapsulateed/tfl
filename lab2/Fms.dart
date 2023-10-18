@@ -241,15 +241,15 @@ class FMS {
                 State.fromData(to, ""),
                 State.fromData("finalState", ""),
                 ""))) {
-              letter +=
-                  "|(${loops[state.name]}${inTransition.letter}${loops[from]})*";
+              letter =
+                  "(${letter}|(${loops[state.name]}${inTransition.letter}${loops[from]})*)";
             }
             if (transitionsFrom[from]!.contains(Transaction.fromData(
                 State.fromData(from, ""),
                 State.fromData("finalState", ""),
                 ""))) {
-              letter +=
-                  "|(${loops[state.name]}${outTransition.letter}${loops[from]})*";
+              letter =
+                  "(${letter}|(${loops[state.name]}${outTransition.letter}${loops[from]})*)";
             }
             if (loops[from] == "") {
               loops[from] = letter;

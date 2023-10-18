@@ -103,11 +103,14 @@ class TestingFms extends FMS {
   }
 
   String ChooseRandomTransition(int i, int j) {
+    if (transition[i][j].length == 1) {
+      return transition[i][j][0];
+    }
     return transition[i][j][Random().nextInt(transition[i][j].length)];
   }
 
   String Bfs(int startPos, int endPos) {
-    if (startPos == endPos) {
+    if (startPos == endPos && transition[startPos][endPos].length > 0) {
       return ChooseRandomTransition(startPos, endPos); // Yup, it's a hardcode!
     }
 
