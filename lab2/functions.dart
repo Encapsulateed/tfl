@@ -78,10 +78,7 @@ String getRegexinBrakets(String regex) {
   }
   if (regex.startsWith('(') && regex.endsWith(')')) {
     var noBr = regex.substring(1, regex.length - 1);
-    if (countCharacters(noBr, '(') != 1 && countCharacters(noBr, ')') != 1) 
-    {
-      
-    }
+    if (countCharacters(noBr, '(') != 1 && countCharacters(noBr, ')') != 1) {}
   }
   return regex;
 }
@@ -206,6 +203,7 @@ String simp(String regex) {
 
   return '';
 }
+
 String MainSymplify(String regex) {
   var prev = '';
   var curr = regex;
@@ -254,7 +252,6 @@ String SimplifyKlini(String regex) {
 }
 
 String removeSameOR(String regex) {
-
   var Regexlst = regex.split('|').toList();
 
   for (int i = 0; i < Regexlst.length - 1; i++) {

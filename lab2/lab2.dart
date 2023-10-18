@@ -211,8 +211,8 @@ String d(String regex, c) {
   }
   return '';
 }
+
 void main() {
-  
   String regex = '';
   print('Input regex: ');
   regex = stdin.readLineSync() ?? '';
@@ -230,5 +230,4 @@ void main() {
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
   print(fms.DumpRegex());
-
 }
