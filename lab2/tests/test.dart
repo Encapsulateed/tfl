@@ -57,12 +57,14 @@ void TestRandomMutate(
     bool dumpDot = false}) {
   if (regex == "") {
     while (regex.length < 3) {
-      regex = GenerateRegexInit(5, 2, 10);
+      regex = GenerateRegexInit(2, 2, 4);
     }
   }
   print("generated regex: " + regex);
 
+  regex = prepareRegex(regex);
   regex = MainSymplify(regex);
+
   print("parsed regex: " + regex);
 
   // I build both fms to ensure tests quality and reliability

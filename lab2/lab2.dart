@@ -43,7 +43,6 @@ List<String> parseRegex(String regex) {
           i++;
         }
       }
-
       if (subRegex != '(' &&
           subRegex != ')' &&
           subRegex != '*' &&
@@ -212,34 +211,31 @@ String d(String regex, c) {
   }
   return '';
 }
-
 void main() {
-  //print(SimplifyKlini('((((((a*b)*)*)*)*)'));
-  // print(removeSameOR('a*b|aa|a*b|a*b|d'));
-
-  // (b*|b*)|(f)*#g(f*)
-  // (((((c)*e**)|a**#(b)*)*#f|(f))*a)*|(c)|d|((d)*)*
-  // ((b)*)#(b#f|(f*))|fg
-  //e*|d|b*#b*#e*d|g#e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|g#e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|g#e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|g#e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|b*#b*#e*|d|b*#e*(dc|d|b*#e*d|g#e*e*)*|e*|ε|e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|b*#e*(dc|d|b*#e*d|g#e*e*)*|e*|d|e*|d|g|d|(dc|d|b*#e*d|g#e*e*)*|g
+  
   String regex = '';
   print('Input regex: ');
   regex = stdin.readLineSync() ?? '';
-  regex = MainSymplify(regex);
-  print(AssemblyString(parseRegex(regex)));
-  
-  print('S $regex');
-  //print(d(regex, 'b'));
 
+  regex = prepareRegex(regex);
+  print(regex);
+  regex = MainSymplify(regex);
+  print(regex);
+//  print(AssemblyString(parseRegex(regex)));
   
+ // print('S $regex');
+
+
   var fms = TestingFms(regex);
   fms.build(regex);
-  fms.Print();
+  //fms.Print();
   fms.DumpDotToFile();
   fms.CalculateTransitionMatrix();
   fms.CalculateAdjacencyMatrix();
   fms.CalculateReachabilityMatrix();
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
-  /*
+  print(fms.DumpRegex());
+      /*
   */
 }

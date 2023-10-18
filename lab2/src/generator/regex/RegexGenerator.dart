@@ -40,7 +40,7 @@ String GenerateRegex(RegexConfig config) {
       String half2 = GenerateRegex(newConf);
 
       config.length = newConf.length;
-      return "(${half1})${binary}(${half2})";
+      return "${half1}${binary}${half2}";
     case 1:
       RegexConfig newConf = RegexConfig.fromRegexConfig(config);
       newConf.starLevel--;

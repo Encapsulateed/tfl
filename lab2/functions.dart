@@ -77,7 +77,11 @@ String getRegexinBrakets(String regex) {
     return getRegexinBrakets(noKlini);
   }
   if (regex.startsWith('(') && regex.endsWith(')')) {
-    return getRegexinBrakets(regex.substring(1, regex.length - 1));
+    var noBr = regex.substring(1, regex.length - 1);
+    if (countCharacters(noBr, '(') != 1 && countCharacters(noBr, ')') != 1) 
+    {
+      
+    }
   }
   return regex;
 }
@@ -117,7 +121,6 @@ String AssemblyString(List<String> items) {
 }
 
 String simp(String regex) {
-  print('input regex is $regex');
   if (regex == '∅') {
     return '∅';
   }
@@ -203,7 +206,6 @@ String simp(String regex) {
 
   return '';
 }
-
 String MainSymplify(String regex) {
   var prev = '';
   var curr = regex;
@@ -214,7 +216,8 @@ String MainSymplify(String regex) {
       return '$x*';
     });
     curr = removeSameOR(curr);
-
+    prev = curr;
+    curr = simp(curr);
 /*
     curr = parseRegex(curr)
         .map((item) => item = SimplifyKlini(item))
@@ -224,8 +227,7 @@ String MainSymplify(String regex) {
     curr = SimplifyKlini(curr);
    
     */
-    prev = curr;
-    curr = simp(curr);
+
     //print(curr);
   }
   return curr.replaceAll('+', '');
@@ -236,36 +238,23 @@ String SimplifyKlini(String regex) {
   // (ab*)* -> (ab*)*
   // (((a)*)*)* -> (a)* ->a*
   // ((..((r)*)..)*) -> (r)*
-
-  //print('${getRegexinBrakets(regex)} ${regex}');
-  if (getRegexinBrakets(regex).length <= 2) {
-    if (getRegexinBrakets(regex).endsWith('*')) {
-      regex = regex.replaceFirst('*', '!');
-      regex = regex.replaceAll(')*', ')');
-      regex = regex.replaceFirst('!', '*)');
-      return regex;
-    } else {
-      regex = regex.replaceFirst(')*', '!');
-      regex = regex.replaceAll(')*', ')');
-      regex = regex.replaceFirst('!', '*)');
-      return regex;
-    }
-  } else {
-    if (getRegexinBrakets(regex).endsWith('*')) {
-      regex = regex.replaceFirst('*)*', '!');
-      regex = regex.replaceAll(')*', ')');
-      regex = regex.replaceFirst('!', '*)*');
-      return regex;
-    } else {
-      regex = regex.replaceFirst(')*', '!');
-      regex = regex.replaceAll(')*', ')');
-      regex = regex.replaceFirst('!', ')*');
-      return regex;
-    }
+  var regexIN = getRegexinBrakets(regex);
+  var trueKliniCount = countCharacters(regexIN, '*');
+  var allKliniCount = countCharacters(regex, '*');
+  if (allKliniCount == 0) {
+    return regex;
   }
+  if (allKliniCount == trueKliniCount) {
+    return regex;
+  }
+  if (allKliniCount > trueKliniCount) {
+    return '($regexIN)*';
+  }
+  return '($regexIN)';
 }
 
 String removeSameOR(String regex) {
+
   var Regexlst = regex.split('|').toList();
 
   for (int i = 0; i < Regexlst.length - 1; i++) {
@@ -276,4 +265,11 @@ String removeSameOR(String regex) {
   }
 
   return Regexlst.join('|');
+}
+
+String prepareRegex(String regex) {
+  regex = parseRegex(regex).map((e) => e = SimplifyKlini(e)).toList().join();
+  //regex = parseRegex(regex).map((e) => e = removeSameOR(e)).toList().join();
+  //regex = removeSameOR(regex);
+  return regex;
 }

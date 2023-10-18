@@ -44,7 +44,6 @@ class FMS {
     Set<String> alf = getRegexAlf(prevRegex);
 
     for (var term in alf) {
-      //  print('Take ${prevRegex} by ${term}');
       var simpeleDerivative = MainSymplify(d(prevRegex, term));
 
       var stateTitle = getCurrentStateTitle();
@@ -59,7 +58,7 @@ class FMS {
       transaction.to = newState;
       transaction.letter = term;
 
-      print('Derivative is $simpeleDerivative');
+      //print('Derivative is $simpeleDerivative');
 
       if (simpeleDerivative == '∅') {
       } else {
