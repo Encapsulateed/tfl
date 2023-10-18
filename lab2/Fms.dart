@@ -59,11 +59,10 @@ class FMS {
       transaction.to = newState;
       transaction.letter = term;
 
-        print('Derivative is $simpeleDerivative');
+      print('Derivative is $simpeleDerivative');
 
       if (simpeleDerivative == '∅') {
       } else {
-        
         if (isRegexAlreadyExits(simpeleDerivative)) {
           transaction.from = prevState;
           transaction.to = getStateByRegex(simpeleDerivative);

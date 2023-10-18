@@ -201,6 +201,12 @@ String d(String regex, c) {
     } else {
       // Если нет перед нами группа
       // спускаемся ниже
+      if (parsedItems[0].endsWith(')') && parsedItems[0].startsWith('(')) {
+        if (countCharacters(parsedItems[0], '(') != 1 &&
+            countCharacters(parsedItems[0], ')') != 1) {
+          return '(${d(parsedItems[0].substring(1, parsedItems[0].length - 1), c)})';
+        }
+      }
       return d(parsedItems[0].substring(1, parsedItems[0].length - 1), c);
     }
   }
@@ -214,26 +220,17 @@ void main() {
   // (b*|b*)|(f)*#g(f*)
   // (((((c)*e**)|a**#(b)*)*#f|(f))*a)*|(c)|d|((d)*)*
   // ((b)*)#(b#f|(f*))|fg
+  //e*|d|b*#b*#e*d|g#e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|g#e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|g#e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|g#e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|b*#b*#e*|d|b*#e*(dc|d|b*#e*d|g#e*e*)*|e*|ε|e*|d|(dc|d|b*#e*d|g#e*e*)*|g#e*|d|e*|d|g|d|b*#e*(dc|d|b*#e*d|g#e*e*)*|e*|d|e*|d|g|d|(dc|d|b*#e*d|g#e*e*)*|g
   String regex = '';
   print('Input regex: ');
   regex = stdin.readLineSync() ?? '';
   regex = MainSymplify(regex);
-  print(regex);
-//  print(parseRegex('f*#f*|f*#f*|b*|f*#f*'));
-  // print(removeSameOR('f*#f*|f*#f*|b*|f*#f*'));
-
-  //regex ='(a|b)*a*|a*|ε';
-  regex = MainSymplify(regex);
-   /*
-  print('aaaaa');
- 
+  print(AssemblyString(parseRegex(regex)));
+  
   print('S $regex');
-  print(d(regex, 'b'));
+  //print(d(regex, 'b'));
 
-  print('a: ' + MainSymplify(d(regex, 'a')));
-  print('b: ' + MainSymplify(d(regex, 'b')));
-  print('c: ' + MainSymplify(d(regex, 'c')));
-   */
+  
   var fms = TestingFms(regex);
   fms.build(regex);
   fms.Print();
@@ -243,6 +240,6 @@ void main() {
   fms.CalculateReachabilityMatrix();
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
-  
-
+  /*
+  */
 }

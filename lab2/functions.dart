@@ -117,7 +117,7 @@ String AssemblyString(List<String> items) {
 }
 
 String simp(String regex) {
-  //print('input regex is $regex');
+  print('input regex is $regex');
   if (regex == '∅') {
     return '∅';
   }
@@ -144,11 +144,6 @@ String simp(String regex) {
     if (operand == '|') {
       if (l == r) {
         return simp(l);
-      }
-      if (l == 'ε' || getRegexinBrakets(l) == 'ε') {
-        // return simp(r);
-      } else if (r == 'ε' || getRegexinBrakets(r) == 'ε') {
-        // return simp(l);
       }
       if (l == '∅' || getRegexinBrakets(l) == '∅') {
         return '${simp(r)}';
@@ -190,19 +185,19 @@ String simp(String regex) {
 
     return '${simp(l)}$operand${simp(r)}';
   } else {
-    if (parsedItems[0].endsWith('*')) {
-      var noStar = parsedItems[0].substring(0, parsedItems[0].length - 1);
-      return '(${simp(noStar)})*';
-    }
-    if (parsedItems.length == 1) {
-      var parsed = parsedItems[0];
-      if (parsed.endsWith(')') && parsed.startsWith('(')) {
-        if (countCharacters(parsed, '(') != 1 &&
-            countCharacters(parsed, ')') != 1) {
+    if (parsedItems.length > 0) {
+      if (parsedItems[0].endsWith('*')) {
+        var noStar = parsedItems[0].substring(0, parsedItems[0].length - 1);
+        return '(${simp(noStar)})*';
+      }
+      if (parsedItems.length == 1) {
+        var parsed = parsedItems[0];
+        if (parsed.endsWith(')') && parsed.startsWith('(')) {
           return simp(parsed.substring(1, parsed.length - 1));
+        } else {
+          return parsed;
         }
       }
-      return parsed;
     }
   }
 
@@ -218,14 +213,17 @@ String MainSymplify(String regex) {
       String x = match.group(1) ?? ''; // Захваченный символ x
       return '$x*';
     });
+    curr = removeSameOR(curr);
 
+/*
     curr = parseRegex(curr)
         .map((item) => item = SimplifyKlini(item))
         .toList()
         .join();
 
     curr = SimplifyKlini(curr);
-    curr = removeSameOR(curr);
+   
+    */
     prev = curr;
     curr = simp(curr);
     //print(curr);
@@ -268,10 +266,7 @@ String SimplifyKlini(String regex) {
 }
 
 String removeSameOR(String regex) {
-  var Regexlst = parseRegex(regex);
-
-  regex = Regexlst.join();
-  Regexlst = regex.split('|').toList();
+  var Regexlst = regex.split('|').toList();
 
   for (int i = 0; i < Regexlst.length - 1; i++) {
     if (Regexlst[i] == Regexlst[i + 1]) {
