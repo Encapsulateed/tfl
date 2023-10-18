@@ -195,7 +195,14 @@ String simp(String regex) {
       return '(${simp(noStar)})*';
     }
     if (parsedItems.length == 1) {
-      return simp(parsedItems[0].substring(1, parsedItems[0].length - 1));
+      var parsed = parsedItems[0];
+      if (parsed.endsWith(')') && parsed.startsWith('(')) {
+        if (countCharacters(parsed, '(') != 1 &&
+            countCharacters(parsed, ')') != 1) {
+          return simp(parsed.substring(1, parsed.length - 1));
+        }
+      }
+      return parsed;
     }
   }
 
@@ -262,7 +269,6 @@ String SimplifyKlini(String regex) {
 
 String removeSameOR(String regex) {
   var Regexlst = parseRegex(regex);
-  
 
   regex = Regexlst.join();
   Regexlst = regex.split('|').toList();
