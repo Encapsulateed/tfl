@@ -211,8 +211,8 @@ String d(String regex, c) {
   }
   return '';
 }
+
 void main() {
-  
   String regex = '';
   print('Input regex: ');
   regex = stdin.readLineSync() ?? '';
@@ -222,9 +222,8 @@ void main() {
   regex = MainSymplify(regex);
   print(regex);
 //  print(AssemblyString(parseRegex(regex)));
-  
- // print('S $regex');
 
+  // print('S $regex');
 
   var fms = TestingFms(regex);
   fms.build(regex);
@@ -236,6 +235,6 @@ void main() {
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
   print(fms.DumpRegex());
-      /*
+  /*
   */
 }
