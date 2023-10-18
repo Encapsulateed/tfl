@@ -211,9 +211,15 @@ String MainSymplify(String regex) {
       String x = match.group(1) ?? ''; // Захваченный символ x
       return '$x*';
     });
+
+    curr = parseRegex(curr)
+        .map((item) => item = SimplifyKlini(item))
+        .toList()
+        .join();
+
+    curr = SimplifyKlini(curr);
     curr = removeSameOR(curr);
     prev = curr;
-
     curr = simp(curr);
     //print(curr);
   }
@@ -221,58 +227,52 @@ String MainSymplify(String regex) {
 }
 
 String SimplifyKlini(String regex) {
-  String simplify = '';
   // (a*)* -> (a)* -> a*
   // (ab*)* -> (ab*)*
   // (((a)*)*)* -> (a)* ->a*
   // ((..((r)*)..)*) -> (r)*
 
-  //regex.replaceFirst('*)*', '*)*');
-  int i = regex.indexOf('*)*');
-  if (i == -1) {
-    return regex;
+  //print('${getRegexinBrakets(regex)} ${regex}');
+  if (getRegexinBrakets(regex).length <= 2) {
+    if (getRegexinBrakets(regex).endsWith('*')) {
+      regex = regex.replaceFirst('*', '!');
+      regex = regex.replaceAll(')*', ')');
+      regex = regex.replaceFirst('!', '*)');
+      return regex;
+    } else {
+      regex = regex.replaceFirst(')*', '!');
+      regex = regex.replaceAll(')*', ')');
+      regex = regex.replaceFirst('!', '*)');
+      return regex;
+    }
+  } else {
+    if (getRegexinBrakets(regex).endsWith('*')) {
+      regex = regex.replaceFirst('*)*', '!');
+      regex = regex.replaceAll(')*', ')');
+      regex = regex.replaceFirst('!', '*)*');
+      return regex;
+    } else {
+      regex = regex.replaceFirst(')*', '!');
+      regex = regex.replaceAll(')*', ')');
+      regex = regex.replaceFirst('!', ')*');
+      return regex;
+    }
   }
-
-  simplify = regex.substring(0, i + 2);
-
-  if (regex.endsWith('*')) {
-    regex = regex.substring(0, regex.length - 1);
-  }
-
-  var regexSub = regex.substring(i + 2, regex.length);
-  regexSub = regexSub.replaceAll(')*', ')');
-  return simplify + regexSub;
 }
 
 String removeSameOR(String regex) {
-  var Regexlst = regex.split('|').toList();
+  var Regexlst = parseRegex(regex);
+  
+
+  regex = Regexlst.join();
+  Regexlst = regex.split('|').toList();
+
   for (int i = 0; i < Regexlst.length - 1; i++) {
     if (Regexlst[i] == Regexlst[i + 1]) {
       Regexlst.removeAt(i);
       i--; // Decrement i to recheck the current index
     }
   }
+
   return Regexlst.join('|');
-  /*
-  var Regexlst = regex.split('|').toList();
-  int count = Regexlst.length;
-
- int groupSize = 1; // Укажите желаемый размер группы
-
-  List<String> elements = regex.split('|'); 
-
-  List<List<String>> groups = [];
-
-  for (int i = 0; i < elements.length; i += groupSize) {
-    List<String> group = [];
-    for (int j = i; j < i + groupSize && j < elements.length; j++) {
-      group.add(elements[j]);
-    }
-    groups.add(group);
-  }
-
-  print(groups);
-
-  return groups.join('|');
-  */
 }
