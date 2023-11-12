@@ -19,7 +19,7 @@ String GenerateRegex(RegexConfig config) {
     config.forbiddenRegexStates.add(0);
   }
 
-  int round = config.fortuneWheel.nextInt(5);
+  int round = config.regexUnfairFortuneWheel.spin();
   if (config.forbiddenRegexStates.contains(round) ||
       (round == 2 && config.starLevel == 0)) {
     return GenerateRegex(config);
@@ -28,7 +28,6 @@ String GenerateRegex(RegexConfig config) {
   switch (round) {
     case 0:
       RegexConfig newConf = RegexConfig.fromRegexConfig(config);
-      newConf.starLevel--;
       String binary = GenerateBinary(newConf);
       if (binary == "|") {
         newConf.forbiddenRegexStates = [4];
@@ -43,7 +42,6 @@ String GenerateRegex(RegexConfig config) {
       return "${half1}${binary}${half2}";
     case 1:
       RegexConfig newConf = RegexConfig.fromRegexConfig(config);
-      newConf.starLevel--;
       newConf.forbiddenRegexStates = config.forbiddenRegexStates;
       newConf.forbiddenRegexStates.add(1);
 
@@ -64,8 +62,6 @@ String GenerateRegex(RegexConfig config) {
     case 3:
       String symb = GenerateSymbol(config);
       return symb;
-    case 4:
-      return "";
     default:
       throw "Universe order error: generated number out of range";
   }

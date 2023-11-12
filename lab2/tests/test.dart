@@ -56,9 +56,7 @@ void TestRandomMutate(
     String regex = "",
     bool dumpDot = false}) {
   if (regex == "") {
-    while (regex.length < 3) {
-      regex = GenerateRegexInit(2, 2, 4);
-    }
+    regex = GenerateRegexInit(3, 2, 10);
   }
   print("generated regex: " + regex);
 
