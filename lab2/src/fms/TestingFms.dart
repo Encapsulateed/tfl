@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../../Fms.dart';
 import '../matrix/matrix.dart';
+import '../mutator/Mutator.dart';
 
 class TestingFms extends FMS {
   List<List<List<String>>> transition = [];
@@ -93,6 +94,9 @@ class TestingFms extends FMS {
     int pos = getStateNumber(StartStates.elementAt(0).name);
 
     List<int> chain = [];
+    if (possibility[pos]!.length == 0) {
+      return [];
+    }
 
     while (pos != -1) {
       chain.add(pos);
@@ -154,58 +158,15 @@ class TestingFms extends FMS {
   }
 
   String MutateWord(Random wheel, String word) {
-    if (word.length < 2) {
+    int i = wheel.nextInt(2);
+    if (i == 0) {
       return word;
     }
-    int mutation = wheel.nextInt(6);
-    switch (mutation) {
-      case 0:
-        int a = wheel.nextInt(word.length - 1);
-        int b = wheel.nextInt(word.length - 1);
-        if (a > b) {
-          int t = a;
-          a = b;
-          b = t;
-        }
-        if (a == b) {
-          b++;
-        }
-        print(a);
-        print(b);
-        word = word.substring(0, a) +
-            word.substring(b, b + 1) +
-            word.substring(a + 1, b) +
-            word.substring(a, a + 1) +
-            word.substring(b + 1);
-        break;
-      case 1:
-        int a = wheel.nextInt(word.length);
-        int n = wheel.nextInt(word.length); // just because, no sense here
-        word = word.substring(0, a) +
-            word.substring(a, a + 1) * n +
-            word.substring(a + 1);
-        break;
-      case 2:
-        int a = wheel.nextInt(word.length);
-        int b = wheel.nextInt(word.length);
-        if (a > b) {
-          int t = a;
-          a = b;
-          b = t;
-        }
-        int n = wheel.nextInt(word.length); // just because, no sense here
-        word = word.substring(0, a) +
-            word.substring(a, b + 1) * n +
-            word.substring(b + 1);
-        break;
-      case 3:
-        int a = wheel.nextInt(word.length);
-        int b = wheel.nextInt(word.length);
-        word = word.substring(0, a) + word.substring(a + b);
-        break;
-      default:
-        break;
-    }
+
+    Mutator mutator = Mutator(wheel);
+
+    word = mutator.Mutate(word);
+
     return word;
   }
 
