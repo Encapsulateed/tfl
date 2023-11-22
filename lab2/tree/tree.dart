@@ -17,7 +17,7 @@ Node? postfixToTree(String postfix) {
   final stack = <Node>[];
   for (final c in postfix.runes) {
     final char = String.fromCharCode(c);
-    if (char == '|' || char == '·') {
+    if (char == '|' || char == '·' || char == '#') {
       final r = stack.removeLast();
       final l = stack.removeLast();
       stack.add(Node(char, l: l, r: r));
@@ -44,10 +44,8 @@ bool nullable(Node? node) {
     return false;
   } else if (node.c == 'ϵ' || node.c == '*') {
     return true;
-  } else if (node.c == '·') {
+  } else if (node.c == '·' || node.c == '|' || node.c == '#') {
     return nullable(node.l) && nullable(node.r);
-  } else if (node.c == '|') {
-    return nullable(node.l) || nullable(node.r);
   } else {
     return false;
   }
@@ -67,8 +65,8 @@ Node? deriv(Node? root, String c) {
   while (stack.isNotEmpty) {
     final node = stack.removeLast();
     print("CENTRAL: ${node?.c}");
-    print("LEFT: ${node?.l}");
-    print("RIGHT: ${node?.r}");
+    // print("LEFT: ${node?.l}");
+    // print("RIGHT: ${node?.r}");
 
     if (node == null || node.c == '∅') {
       continue;
@@ -90,6 +88,16 @@ Node? deriv(Node? root, String c) {
       } else {
         stack.add(node.l);
       }
+    } else if (node.c == '#') {
+      node.c = '|';
+      final llnode = Node('#', l: node.l, r: node.r);
+      final dnode = Node('#', l: clone(node.l), r: clone(node.r));
+
+      node.l = llnode;
+      node.r = dnode;
+
+      stack.add(node.l?.l);
+      stack.add(node.r?.r);
     } else if (node.c == '*') {
       final starNode = clone(node);
       node.c = '·';

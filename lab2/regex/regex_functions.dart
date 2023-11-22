@@ -1,4 +1,4 @@
-final Map<String, int> prec = {'(': 0, '|': 1, '·': 2, '*': 3};
+final Map<String, int> prec = {'(': 0, '|': 1,'#': 2, '·': 3, '*': 4};
 
 String augment(String src) {
   if (src.isEmpty) {
@@ -10,9 +10,10 @@ String augment(String src) {
     if (i > 0 &&
         !(src[i] == '|' ||
             src[i] == '*' ||
-            src[i] == ')' ||
+            src[i] == '#'||
+            src[i] == ')' || 
             src[i - 1] == '(' ||
-            src[i - 1] == '|')) {
+            src[i - 1] == '|' || src[i-1]=='#')) {
       dst.add('·');
     }
     dst.add(src[i]);
