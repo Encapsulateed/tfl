@@ -46,7 +46,7 @@ class Tester {
     if (testRes != solutionRes) {
       throw "test error: unequal result: got ${testRes} from test and ${solutionRes} from solution";
     }
-    print("ok");
+    print("ok (${testRes})");
   }
 }
 
@@ -60,8 +60,8 @@ void TestRandomMutate(
   }
   print("generated regex: " + regex);
 
-  //regex = prepareRegex(regex);
-  //regex = MainSymplify(regex);
+  regex = prepareRegex(regex);
+  regex = MainSymplify(regex);
 
   print("parsed regex: " + regex);
 
@@ -73,6 +73,8 @@ void TestRandomMutate(
   if (dumpDot) {
     print(testingFms.DumpDot());
   }
+
+  // return;
 
   String solutionRegex = fms.DumpRegex();
   print("solution regex: " + solutionRegex);
@@ -103,5 +105,5 @@ void TestSeedMutate(int seed,
 }
 
 void main(List<String> args) {
-  TestRandomMutate(mutate: true);
+  TestRandomMutate(mutate: true, dumpDot: true);
 }
