@@ -220,7 +220,6 @@ Node? removeInvalidNodes(Node? root) {
   return root;
 }
 
-Map<int, Node?> subtreesMap = {};
 Node? removeDuplicateSubtrees(Node? root) {
   if (root == null) {
     return null;
@@ -232,32 +231,27 @@ Node? removeDuplicateSubtrees(Node? root) {
 
   // Проверка операции "|"
   if (root.c == '|') {
-    // Вычисляем хэш-код поддерева
-    int subtreeHashCode = getSubtreeHashCode(root);
-
-    // Проверяем, есть ли уже такое поддерево в хэш-таблице
-    if (subtreesMap.containsKey(subtreeHashCode)) {
-      // Если поддерево уже было встречено, удаляем текущую вершину
-      return null;
-    } else {
-      // Если поддерево встречается впервые, добавляем его в хэш-таблицу
-      subtreesMap[subtreeHashCode] = root;
+    // Проверяем, равны ли левое и правое поддеревья
+    if (areSubtreesEqual(root.l, root.r)) {
+      // Если поддеревья равны, удаляем правое поддерево
+      return root.l;
     }
   }
 
   return root;
 }
 
-// Вспомогательная функция для вычисления хэш-кода поддерева
-int getSubtreeHashCode(Node? root) {
-  if (root == null) {
-    return 0;
+// Вспомогательная функция для проверки эквивалентности поддеревьев
+bool areSubtreesEqual(Node? subtree1, Node? subtree2) {
+  if (subtree1 == null && subtree2 == null) {
+    return true;
   }
 
-  // Рекурсивный вызов для левого и правого поддерева
-  int leftHashCode = getSubtreeHashCode(root.l);
-  int rightHashCode = getSubtreeHashCode(root.r);
+  if (subtree1 != null && subtree2 != null) {
+    return subtree1.c == subtree2.c &&
+        areSubtreesEqual(subtree1.l, subtree2.l) &&
+        areSubtreesEqual(subtree1.r, subtree2.r);
+  }
 
-  // Составляем комбинированный хэш-код для текущей вершины
-  return root.c.hashCode ^ leftHashCode ^ rightHashCode;
+  return false;
 }
