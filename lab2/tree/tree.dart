@@ -53,10 +53,23 @@ bool nullable(Node? node) {
   }
 }
 
+void printTree(Node? root, [String indent = '', bool last = true]) {
+  if (root != null) {
+    print(indent + (last ? '└── ' : '├── ') + root.c);
+    var newIndent = indent + (last ? '    ' : '│   ');
+    printTree(root.l, newIndent, false);
+    printTree(root.r, newIndent, true);
+  }
+}
+
 Node? deriv(Node? root, String c) {
   final stack = [root];
   while (stack.isNotEmpty) {
     final node = stack.removeLast();
+    print("CENTRAL: ${node?.c}");
+    print("LEFT: ${node?.l}");
+    print("RIGHT: ${node?.r}");
+
     if (node == null || node.c == '∅') {
       continue;
     } else if (node.c == 'ϵ') {

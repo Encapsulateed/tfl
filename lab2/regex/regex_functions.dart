@@ -4,10 +4,12 @@ String augment(String src) {
   if (src.isEmpty) {
     return 'ϵ';
   }
-  final List<String> dst = [];
+
+  final dst = <String>[];
   for (int i = 0; i < src.length; i++) {
     if (i > 0 &&
         !(src[i] == '|' ||
+            src[i] == '*' ||
             src[i] == ')' ||
             src[i - 1] == '(' ||
             src[i - 1] == '|')) {
