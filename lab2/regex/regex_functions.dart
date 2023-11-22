@@ -1,4 +1,16 @@
-final Map<String, int> prec = {'(': 0, '|': 1,'#': 2, '·': 3, '*': 4};
+import '../tree/tree.dart';
+
+final Map<String, int> prec = {'(': 0, '|': 1, '#': 2, '·': 3, '*': 4};
+String inorder(Node? root) {
+  if (root == null) {
+    return '';
+  }
+  final out = inorder(root.l) + root.c + inorder(root.r);
+  if (root.c == '|' || root.c == '·' || root.c == '*' || root.c == '#') {
+    return '(${out})';
+  }
+  return out;
+}
 
 String augment(String src) {
   if (src.isEmpty) {
@@ -10,10 +22,11 @@ String augment(String src) {
     if (i > 0 &&
         !(src[i] == '|' ||
             src[i] == '*' ||
-            src[i] == '#'||
-            src[i] == ')' || 
+            src[i] == '#' ||
+            src[i] == ')' ||
             src[i - 1] == '(' ||
-            src[i - 1] == '|' || src[i-1]=='#')) {
+            src[i - 1] == '|' ||
+            src[i - 1] == '#')) {
       dst.add('·');
     }
     dst.add(src[i]);

@@ -64,7 +64,6 @@ Node? deriv(Node? root, String c) {
   final stack = [root];
   while (stack.isNotEmpty) {
     final node = stack.removeLast();
-    print("CENTRAL: ${node?.c}");
     // print("LEFT: ${node?.l}");
     // print("RIGHT: ${node?.r}");
 
@@ -111,28 +110,154 @@ Node? deriv(Node? root, String c) {
   return root;
 }
 
-bool match(String regex, String string, {bool showInference = false}) {
-  final node = postfixToTree(infixToPostfix(augment(regex)));
+Node? removeNodeByReference(Node? root, Node? targetNode) {
+  if (root == null) {
+    return null;
+  }
 
-  if (showInference) {
-    print(inorder(node));
+  if (root == targetNode) {
+    return null;
   }
-  for (final c in string.runes) {
-    deriv(node, String.fromCharCode(c));
-    if (showInference) {
-      print(inorder(node));
-    }
-  }
-  return nullable(node);
+
+  root.l = removeNodeByReference(root.l, targetNode);
+  root.r = removeNodeByReference(root.r, targetNode);
+
+  return root;
 }
 
-String inorder(Node? root) {
+bool containsEmptyLeaf(Node? root) {
   if (root == null) {
-    return '';
+    return false;
   }
-  final out = inorder(root.l) + root.c + inorder(root.r);
-  if (root.c == '|' || root.c == '·' || root.c == '*') {
-    return '(${out})';
+
+  if (root.l == null && root.r == null) {
+    // Если это листовая вершина, проверяем содержится ли "∅"
+    return root.c == '∅';
   }
-  return out;
+
+  // Рекурсивный вызов для левого и правого поддерева
+  return containsEmptyLeaf(root.l) || containsEmptyLeaf(root.r);
+}
+
+bool containsEps(Node? root) {
+  if (root == null) {
+    return false;
+  }
+
+  if (root.l == null && root.r == null) {
+    // Если это листовая вершина, проверяем содержится ли "ϵ"
+    return root.c == 'ϵ';
+  }
+
+  // Рекурсивный вызов для левого и правого поддерева
+  return containsEps(root.l) || containsEps(root.r);
+}
+
+Node? processEmptyLeaves(Node? root) {
+  if (root == null) {
+    return null;
+  }
+
+  // Рекурсивный вызов для левого и правого поддерева
+  root.l = processEmptyLeaves(root.l);
+  root.r = processEmptyLeaves(root.r);
+
+  // Проверка листовых вершин бинарных операций "·" и "#"
+  if ((root.c == '·' || root.c == '#') && root.l == null || root.r == null) {
+    // Если листовая вершина содержит "ϵ"
+    if (containsEps(root)) {
+      if (root.l == 'ϵ') {
+        return root.r;
+      }
+      return root.l;
+    }
+  }
+
+  return root;
+}
+
+Node? removeNodesWithEmptyLeaf(Node? root) {
+  if (root == null) {
+    return null;
+  }
+
+  // Рекурсивный вызов для левого и правого поддерева
+  root.l = removeNodesWithEmptyLeaf(root.l);
+  root.r = removeNodesWithEmptyLeaf(root.r);
+
+  // Проверяем условия удаления вершины
+  if ((root.c == '·' || root.c == '#') && containsEmptyLeaf(root)) {
+    // Если операция - "·" или "#", и в листовой вершине содержится "∅", удаляем вершину
+    return null;
+  }
+
+  return root;
+}
+
+Node? removeInvalidNodes(Node? root) {
+  if (root == null) {
+    return null;
+  }
+
+  // Рекурсивный вызов для левого и правого поддерева
+  root.l = removeInvalidNodes(root.l);
+  root.r = removeInvalidNodes(root.r);
+
+  // Проверка наличия поддеревьев и удаление некорректных узлов
+  if (root.c == '·' || root.c == '#' || root.c == '|') {
+    if (root.l == null && root.r != null) {
+      // Если левое поддерево отсутствует, делаем верхнюю ноду корнем правого поддерева
+      return root.r;
+    } else if (root.l != null && root.r == null) {
+      // Если правое поддерево отсутствует, делаем верхнюю ноду корнем левого поддерева
+      return root.l;
+    } else if (root.l == null && root.r == null) {
+      // Если и левое, и правое поддеревья отсутствуют, удаляем текущую ноду
+      return null;
+    }
+  }
+
+  return root;
+}
+
+Map<int, Node?> subtreesMap = {};
+Node? removeDuplicateSubtrees(Node? root) {
+  if (root == null) {
+    return null;
+  }
+
+  // Рекурсивный вызов для левого и правого поддерева
+  root.l = removeDuplicateSubtrees(root.l);
+  root.r = removeDuplicateSubtrees(root.r);
+
+  // Проверка операции "|"
+  if (root.c == '|') {
+    // Вычисляем хэш-код поддерева
+    int subtreeHashCode = getSubtreeHashCode(root);
+
+    // Проверяем, есть ли уже такое поддерево в хэш-таблице
+    if (subtreesMap.containsKey(subtreeHashCode)) {
+      // Если поддерево уже было встречено, удаляем текущую вершину
+      return null;
+    } else {
+      // Если поддерево встречается впервые, добавляем его в хэш-таблицу
+      subtreesMap[subtreeHashCode] = root;
+    }
+  }
+
+  return root;
+}
+
+// Вспомогательная функция для вычисления хэш-кода поддерева
+int getSubtreeHashCode(Node? root) {
+  if (root == null) {
+    return 0;
+  }
+
+  // Рекурсивный вызов для левого и правого поддерева
+  int leftHashCode = getSubtreeHashCode(root.l);
+  int rightHashCode = getSubtreeHashCode(root.r);
+
+  // Составляем комбинированный хэш-код для текущей вершины
+  return root.c.hashCode ^ leftHashCode ^ rightHashCode;
 }
