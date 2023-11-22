@@ -60,8 +60,8 @@ void TestRandomMutate(
   }
   print("generated regex: " + regex);
 
-  regex = prepareRegex(regex);
-  regex = MainSymplify(regex);
+  //regex = prepareRegex(regex);
+  //regex = MainSymplify(regex);
 
   print("parsed regex: " + regex);
 
