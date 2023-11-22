@@ -1,9 +1,10 @@
 import 'dart:io';
 import '../regex/regex_functions.dart';
+
 class Node {
   String c;
-  Node ?l;
-  Node ?r;
+  Node? l;
+  Node? r;
 
   Node(this.c, {this.l, this.r});
 }

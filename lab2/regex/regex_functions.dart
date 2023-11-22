@@ -6,7 +6,11 @@ String augment(String src) {
   }
   final List<String> dst = [];
   for (int i = 0; i < src.length; i++) {
-    if (i > 0 && !(src[i] == '|' || src[i] == ')' || src[i - 1] == '(' || src[i - 1] == '|')) {
+    if (i > 0 &&
+        !(src[i] == '|' ||
+            src[i] == ')' ||
+            src[i - 1] == '(' ||
+            src[i - 1] == '|')) {
       dst.add('·');
     }
     dst.add(src[i]);
@@ -14,7 +18,6 @@ String augment(String src) {
 
   return dst.join();
 }
-
 
 String infixToPostfix(String exp) {
   final stack = <String>[];
