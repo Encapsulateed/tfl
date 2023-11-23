@@ -62,6 +62,7 @@ void printTree(Node? root, [String indent = '', bool last = true]) {
 
 Node? deriv(Node? root, String c) {
   final stack = [root];
+ 
   while (stack.isNotEmpty) {
     final node = stack.removeLast();
     // print("LEFT: ${node?.l}");
@@ -254,4 +255,30 @@ bool areSubtreesEqual(Node? subtree1, Node? subtree2) {
   }
 
   return false;
+}
+
+Node? leftRotate(Node? root) {
+  if (root == null || root.r == null) {
+    return root;
+  }
+
+  var newRoot = root.r;
+  root.r = newRoot!.l;
+  newRoot.l = root;
+  return newRoot;
+}
+
+Node? makeLeft(Node? node) {
+  if (node == null) {
+    return null;
+  }
+
+  if (node.c == '|' && node.r?.c == '|') {
+    node = leftRotate(node);
+  }
+
+  node?.l = makeLeft(node.l);
+  node?.r = makeLeft(node.r);
+
+  return node;
 }

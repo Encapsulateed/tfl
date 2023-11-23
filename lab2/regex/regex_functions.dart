@@ -1,6 +1,6 @@
 import '../tree/tree.dart';
-
 final Map<String, int> prec = {'(': 0, '|': 1, '#': 2, '·': 3, '*': 4};
+
 String inorder(Node? root) {
   if (root == null) {
     return '';
