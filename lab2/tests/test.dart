@@ -60,13 +60,11 @@ void TestRandomMutate(
   }
   print("generated regex: " + regex);
 
-  regex = prepareRegex(regex);
-  regex = MainSymplify(regex);
 
   print("parsed regex: " + regex);
 
   // I build both fms to ensure tests quality and reliability
-  FMS fms = FMS(regex);
+  FSM fms = FSM(regex);
   fms.build(regex);
   TestingFms testingFms = TestingFms(regex);
   testingFms.build(regex);

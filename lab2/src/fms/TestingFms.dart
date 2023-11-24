@@ -4,7 +4,7 @@ import '../../Fms.dart';
 import '../matrix/matrix.dart';
 import '../mutator/Mutator.dart';
 
-class TestingFms extends FMS {
+class TestingFms extends FSM {
   List<List<List<String>>> transition = [];
   Matrix adjacency = Matrix(0, 0);
   Matrix reachability = Matrix(0, 0);

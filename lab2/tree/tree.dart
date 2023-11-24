@@ -15,8 +15,8 @@ Node? postfixToTree(String postfix) {
   }
 
   final stack = <Node>[];
-  for (final c in postfix.runes) {
-    final char = String.fromCharCode(c);
+  for (int i = 0; i < postfix.length; i++) {
+    final char = postfix[i];
     if (char == '|' || char == '·' || char == '#') {
       final r = stack.removeLast();
       final l = stack.removeLast();
@@ -44,7 +44,9 @@ bool nullable(Node? node) {
     return false;
   } else if (node.c == 'ϵ' || node.c == '*') {
     return true;
-  } else if (node.c == '·' || node.c == '|' || node.c == '#') {
+  } else if (node.c == '|') {
+    return nullable(node.l) || nullable(node.r);
+  } else if (node.c == '·' || node.c == '#') {
     return nullable(node.l) && nullable(node.r);
   } else {
     return false;
@@ -61,7 +63,6 @@ void printTree(Node? root, [String indent = '', bool last = true]) {
 }
 
 Node? deriv(Node? root, String c) {
-  root = makeLeft(root);
   final stack = [root];
 
   while (stack.isNotEmpty) {
@@ -109,7 +110,7 @@ Node? deriv(Node? root, String c) {
     }
   }
 
-  return makeLeft(root);
+  return simplifyRegex(root);
 }
 
 Node? removeNodeByReference(Node? root, Node? targetNode) {
@@ -165,10 +166,10 @@ Node? processEmptyLeaves(Node? root) {
   root.r = processEmptyLeaves(root.r);
 
   // Проверка листовых вершин бинарных операций "·" и "#"
-  if ((root.c == '·' || root.c == '#') && root.l == null || root.r == null) {
+  if (root.c == '·' || root.c == '#') {
     // Если листовая вершина содержит "ϵ"
     if (containsEps(root)) {
-      if (root.l == 'ϵ') {
+      if (root.l?.c == 'ϵ') {
         return root.r;
       }
       return root.l;
@@ -187,10 +188,20 @@ Node? removeNodesWithEmptyLeaf(Node? root) {
   root.l = removeNodesWithEmptyLeaf(root.l);
   root.r = removeNodesWithEmptyLeaf(root.r);
 
-  // Проверяем условия удаления вершины
-  if ((root.c == '·' || root.c == '#') && containsEmptyLeaf(root)) {
-    // Если операция - "·" или "#", и в листовой вершине содержится "∅", удаляем вершину
-    return null;
+  // Проверка листовых вершин бинарных операций "·" и "#"
+
+  if ((root.c == '·' || root.c == '#')) {
+    // Если листовая вершина содержит "∅"
+    if (containsEmptyLeaf(root)) {
+      return Node('∅');
+    }
+  } else if (root.c == '|') {
+    if (containsEmptyLeaf(root)) {
+      if (root.l?.c == '∅') {
+        return root.r;
+      }
+      return root.l;
+    }
   }
 
   return root;
@@ -242,17 +253,22 @@ Node? removeSameOr(Node? root) {
   }
   if (root.l?.c == '|') {
     if ((areSubtreesEqual(root.r, root.l?.l) ||
-            areSubtreesEqual(root.r, root.l?.r)) ||
-        (areSubtreesEqual(root.r, root.l))) {
+        areSubtreesEqual(root.r, root.l?.r))) {
       var t = clone(root.l)!;
-      root.c = t.c;
-      root.l = t.l;
-      root.r = t.r;
+      root = t;
 
       return root;
     }
   }
+  if (root.r?.c == '|') {
+    if ((areSubtreesEqual(root.r?.r, root.l) ||
+        areSubtreesEqual(root.r?.l, root.l))) {
+      var t = clone(root.r)!;
+      root = t;
 
+      return root;
+    }
+  }
   return root;
 }
 
@@ -281,28 +297,45 @@ bool areSubtreesEqual(Node? subtree1, Node? subtree2) {
           areSubtreesEqual(subtree1.r, subtree2.l));
 }
 
-Node? makeLeft(Node? node) {
-  if (node == null) {
+Node? ssnf(Node? root) {
+  if (root == null) {
     return null;
   }
 
-  if (node.c == '|' && node.r?.c == '|') {
-    node = leftRotate(node);
+  // Рекурсивный вызов для левого и правого поддерева
+  root.l = removeNodesWithEmptyLeaf(root.l);
+  root.r = removeNodesWithEmptyLeaf(root.r);
+
+  // Проверяем условия удаления вершины
+  if ((root.c == '*' && root.l?.c == '*')) {
+    var t = clone(root.l?.l)!;
+
+    root.l = t;
+
+    return root;
   }
+  if ((root.c == '*' && root.r?.c == '*')) {
+    var t = clone(root.r?.l)!;
+    root.r = t;
 
-  node?.l = makeLeft(node.l);
-  node?.r = makeLeft(node.r);
-
-  return node;
-}
-
-Node? leftRotate(Node? root) {
-  if (root == null || root.r == null) {
     return root;
   }
 
-  var newRoot = root.r;
-  root.r = newRoot!.l;
-  newRoot.l = root;
-  return newRoot;
+  return root;
+}
+
+Node? simplifyRegex(Node? root) {
+  //printTree(root);
+  root = removeInvalidNodes(ssnf(root));
+  root = removeInvalidNodes(removeSameOr(root));
+  root = removeInvalidNodes(processEmptyLeaves(root));
+  root = removeInvalidNodes(removeNodesWithEmptyLeaf(root));
+
+  /* 
+
+ 
+
+
+*/
+  return root;
 }

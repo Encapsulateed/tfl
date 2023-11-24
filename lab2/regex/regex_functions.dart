@@ -7,9 +7,9 @@ String inorder(Node? root) {
   }
   final out = inorder(root.l) + root.c + inorder(root.r);
   if (root.c == '|' || root.c == '·' || root.c == '*' || root.c == '#') {
-    return '(${out})';
+    return '(${out})'.replaceAll('·', '');
   }
-  return out;
+  return out.replaceAll('·', '');
 }
 
 String augment(String src) {
@@ -41,7 +41,7 @@ String infixToPostfix(String exp) {
 
   for (final c in exp.runes) {
     final char = String.fromCharCode(c);
-    if (RegExp(r'[a-zA-Z]').hasMatch(char)) {
+    if (RegExp(r'[a-zA-Z]|ϵ|∅').hasMatch(char)) {
       output.add(char);
     } else if (char == '(') {
       stack.add(char);
@@ -63,4 +63,20 @@ String infixToPostfix(String exp) {
   }
 
   return output.join();
+}
+Set<String> getRegexAlf(String regex) {
+  Set<String> alf = {};
+  for (var i = 0; i < regex.length; i++) {
+    if (regex[i] != '*' &&
+        regex[i] != '|' &&
+        regex[i] != '#' &&
+        regex[i] != '+' &&
+        regex[i] != '(' &&
+        regex[i] != ')' &&
+        regex[i] != 'ϵ' &&
+        regex[i] != '∅') {
+      alf.add(regex[i]);
+    }
+  }
+  return alf;
 }
