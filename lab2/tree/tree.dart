@@ -61,8 +61,9 @@ void printTree(Node? root, [String indent = '', bool last = true]) {
 }
 
 Node? deriv(Node? root, String c) {
+  root = makeLeft(root);
   final stack = [root];
- 
+
   while (stack.isNotEmpty) {
     final node = stack.removeLast();
     // print("LEFT: ${node?.l}");
@@ -108,7 +109,7 @@ Node? deriv(Node? root, String c) {
     }
   }
 
-  return root;
+  return makeLeft(root);
 }
 
 Node? removeNodeByReference(Node? root, Node? targetNode) {
@@ -221,51 +222,63 @@ Node? removeInvalidNodes(Node? root) {
   return root;
 }
 
-Node? removeDuplicateSubtrees(Node? root) {
+Node? removeSameOr(Node? root) {
   if (root == null) {
     return null;
   }
 
   // Рекурсивный вызов для левого и правого поддерева
-  root.l = removeDuplicateSubtrees(root.l);
-  root.r = removeDuplicateSubtrees(root.r);
+  root.l = removeSameOr(root.l);
+  root.r = removeSameOr(root.r);
 
-  // Проверка операции "|"
-  if (root.c == '|') {
-    // Проверяем, равны ли левое и правое поддеревья
-    if (areSubtreesEqual(root.l, root.r)) {
-      // Если поддеревья равны, удаляем правое поддерево
-      return root.l;
+  // Проверяем условия удаления вершины
+  if (root.c == '|' && areSubtreesEqual(root.l, root.r)) {
+    var t = clone(root.l)!;
+    root.c = t.c;
+    root.l = t.l;
+    root.r = t.r;
+
+    return root;
+  }
+  if (root.l?.c == '|') {
+    if ((areSubtreesEqual(root.r, root.l?.l) ||
+            areSubtreesEqual(root.r, root.l?.r)) ||
+        (areSubtreesEqual(root.r, root.l))) {
+      var t = clone(root.l)!;
+      root.c = t.c;
+      root.l = t.l;
+      root.r = t.r;
+
+      return root;
     }
   }
 
   return root;
 }
 
-// Вспомогательная функция для проверки эквивалентности поддеревьев
 bool areSubtreesEqual(Node? subtree1, Node? subtree2) {
   if (subtree1 == null && subtree2 == null) {
     return true;
   }
 
-  if (subtree1 != null && subtree2 != null) {
-    return subtree1.c == subtree2.c &&
-        areSubtreesEqual(subtree1.l, subtree2.l) &&
-        areSubtreesEqual(subtree1.r, subtree2.r);
+  if (subtree1 == null || subtree2 == null) {
+    return false;
   }
 
-  return false;
-}
-
-Node? leftRotate(Node? root) {
-  if (root == null || root.r == null) {
-    return root;
+  if (subtree1.c != subtree2.c) {
+    return false;
   }
 
-  var newRoot = root.r;
-  root.r = newRoot!.l;
-  newRoot.l = root;
-  return newRoot;
+  if ((subtree1.c == '·' || subtree2.c == '·') ||
+      (subtree1.c == '#' || subtree2.c == '#')) {
+    return (areSubtreesEqual(subtree1.l, subtree2.l) &&
+        areSubtreesEqual(subtree1.r, subtree2.r));
+  }
+
+  return (areSubtreesEqual(subtree1.l, subtree2.l) &&
+          areSubtreesEqual(subtree1.r, subtree2.r)) ||
+      (areSubtreesEqual(subtree1.l, subtree2.r) &&
+          areSubtreesEqual(subtree1.r, subtree2.l));
 }
 
 Node? makeLeft(Node? node) {
@@ -281,4 +294,15 @@ Node? makeLeft(Node? node) {
   node?.r = makeLeft(node.r);
 
   return node;
+}
+
+Node? leftRotate(Node? root) {
+  if (root == null || root.r == null) {
+    return root;
+  }
+
+  var newRoot = root.r;
+  root.r = newRoot!.l;
+  newRoot.l = root;
+  return newRoot;
 }
