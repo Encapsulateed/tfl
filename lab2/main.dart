@@ -4,7 +4,7 @@ import 'regex/regex_functions.dart';
 
 void main(List<String> arguments) {
   String regex = "a*#(aa)*";
- // 
+  //
   var root = (postfixToTree(infixToPostfix(augment(regex))));
   root = simplifyRegex(root);
 
