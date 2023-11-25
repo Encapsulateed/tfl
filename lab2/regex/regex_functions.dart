@@ -14,10 +14,11 @@ String inorder(Node? root) {
 }
 
 String augment(String src) {
+
   if (src.isEmpty) {
     return 'ϵ';
   }
-
+  src = src.replaceAll(RegExp(r'\*+'), '*');
   final dst = <String>[];
   for (int i = 0; i < src.length; i++) {
     if (i > 0 &&
@@ -42,7 +43,7 @@ String infixToPostfix(String exp) {
 
   for (final c in exp.runes) {
     final char = String.fromCharCode(c);
-    if (RegExp(r'[a-zA-Z]|ϵ|∅').hasMatch(char)) {
+    if (RegExp(r'[a-zA-Z]|ϵ|∅').hasMatch(char)|| RegExp(r'[а-яА-Я]|ϵ|∅').hasMatch(char)) {
       output.add(char);
     } else if (char == '(') {
       stack.add(char);

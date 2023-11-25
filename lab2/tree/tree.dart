@@ -173,6 +173,16 @@ Node? processEmptyLeaves(Node? root) {
       }
       return root.l;
     }
+  } else if (root.c == '|') {
+    // a*|ϵ == a*
+    // ϵ|a* == a*
+    if (containsEps(root)) {
+      if (root.l?.c == '*') {
+        return root.l;
+      } else if (root.r?.c == '*') {
+        return root.r;
+      }
+    }
   }
 
   return root;
@@ -241,8 +251,10 @@ Node? removeSameOr(Node? root) {
 
   for (int i = 0; i < treeMap.length; i++) {
     var curr_lst = treeMap[keys[i]];
-
-    if (curr_lst!.length != 2) {
+    if (curr_lst == null) {
+      continue;
+    }
+    if (curr_lst.length != 2) {
       continue;
     }
 
@@ -258,7 +270,10 @@ Node? removeSameOr(Node? root) {
     }
 
     for (int j = i + 1; j < treeMap.length; j++) {
-      var cmp_lst = treeMap[keys[j]]!;
+      var cmp_lst = treeMap[keys[j]];
+      if (cmp_lst == null) {
+        break;
+      }
       bool rm_flag = false;
 
       if (curr_lst[0] == cmp_lst[0]) {
@@ -316,13 +331,16 @@ Node? ssnf(Node? root) {
 
 Node? simplifyRegex(Node? root) {
   //printTree(root);
+  treeMap = Map<Node, List<String>>();
 
-  root = removeInvalidNodes(removeSameOr(root));
-
+  makeMap(root); 
   root = removeInvalidNodes(ssnf(root));
   root = removeInvalidNodes(processEmptyLeaves(root));
 
   root = removeInvalidNodes(removeNodesWithEmptyLeaf(root));
+  root = removeInvalidNodes(removeSameOr(root));
+
+
   /*
 */
   return root;
@@ -343,8 +361,8 @@ Node? makeMap(Node? root) {
   if (root.c == '|') {
     treeMap[root] = [inorder(makeMap(root.l)), inorder(makeMap(root.r))];
   } else {
-    makeMap(root.l);
-    makeMap(root.r);
+   root.l = makeMap(root.l);
+   root.r=  makeMap(root.r);
   }
 
   return root;

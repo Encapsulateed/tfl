@@ -9,7 +9,7 @@ make test
 # Запуск лабы для ручной эксплуатации
 
 ```
-dart lab2.dart
+dart main.dart
 ```
 
 What is this life if, full of care, <br/>
