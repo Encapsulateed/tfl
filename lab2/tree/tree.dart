@@ -333,13 +333,12 @@ Node? simplifyRegex(Node? root) {
   //printTree(root);
   treeMap = Map<Node, List<String>>();
 
-  makeMap(root); 
+  makeMap(root);
   root = removeInvalidNodes(ssnf(root));
   root = removeInvalidNodes(processEmptyLeaves(root));
 
   root = removeInvalidNodes(removeNodesWithEmptyLeaf(root));
   root = removeInvalidNodes(removeSameOr(root));
-
 
   /*
 */
@@ -361,8 +360,8 @@ Node? makeMap(Node? root) {
   if (root.c == '|') {
     treeMap[root] = [inorder(makeMap(root.l)), inorder(makeMap(root.r))];
   } else {
-   root.l = makeMap(root.l);
-   root.r=  makeMap(root.r);
+    root.l = makeMap(root.l);
+    root.r = makeMap(root.r);
   }
 
   return root;

@@ -14,7 +14,6 @@ String inorder(Node? root) {
 }
 
 String augment(String src) {
-
   if (src.isEmpty) {
     return 'ϵ';
   }
@@ -43,7 +42,8 @@ String infixToPostfix(String exp) {
 
   for (final c in exp.runes) {
     final char = String.fromCharCode(c);
-    if (RegExp(r'[a-zA-Z]|ϵ|∅').hasMatch(char)|| RegExp(r'[а-яА-Я]|ϵ|∅').hasMatch(char)) {
+    if (RegExp(r'[a-zA-Z]|ϵ|∅').hasMatch(char) ||
+        RegExp(r'[а-яА-Я]|ϵ|∅').hasMatch(char)) {
       output.add(char);
     } else if (char == '(') {
       stack.add(char);

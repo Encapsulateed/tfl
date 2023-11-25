@@ -5,10 +5,8 @@ import 'regex/regex_functions.dart';
 void main(List<String> arguments) {
   String regex = "(a***********)*";
 
-    var root = (postfixToTree(infixToPostfix(augment(regex))));
-    root = simplifyRegex(root);
-
-
+  var root = (postfixToTree(infixToPostfix(augment(regex))));
+  root = simplifyRegex(root);
 
   regex = inorder(root);
   var fms = TestingFms(regex);
@@ -23,6 +21,6 @@ void main(List<String> arguments) {
   fms.BuildPossibilityMap();
   fms.BuildValidityMap();
   print(fms.DumpRegex());
-   /*
+  /*
 */
 }

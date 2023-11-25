@@ -51,10 +51,9 @@ class FSM {
     (prevRegex);
 
     for (var term in alf) {
-      
-
-     // print('I WILL TAKE ${inorder(simplifyRegex(postfixToTree(infixToPostfix(augment(prev_regex)))))} BY ${term}');
-      var simpeleDerivative = inorder(simplifyRegex(deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term)));
+      // print('I WILL TAKE ${inorder(simplifyRegex(postfixToTree(infixToPostfix(augment(prev_regex)))))} BY ${term}');
+      var simpeleDerivative = inorder(simplifyRegex(
+          deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term)));
 
       var stateTitle = getCurrentStateTitle();
       var prevState = getStateByRegex(
