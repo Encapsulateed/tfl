@@ -39,22 +39,24 @@ class FSM {
   }
 
   State getStateByRegex(String regex) {
-    States.forEach((element) {print('STATE ${element.name} -- ${element.regex} cmp with ${regex}' );});
+    //States.forEach((element) {print('STATE ${element.name} -- ${element.regex} cmp with ${regex}' );});
     return States.where((state) => state.regex == regex).first;
   }
 
   void build(String prevRegex) {
-    var prev_regex  = inorder(postfixToTree(infixToPostfix(augment(prevRegex))));
+    var prev_regex = inorder(postfixToTree(infixToPostfix(augment(prevRegex))));
     ;
 
     Set<String> alf = getRegexAlf(prevRegex);
     (prevRegex);
 
     for (var term in alf) {
-      var simpeleDerivative = inorder(simplifyRegex(deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term)));
+      var simpeleDerivative = inorder(simplifyRegex(
+          deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term)));
 
       var stateTitle = getCurrentStateTitle();
-      var prevState = getStateByRegex(inorder(postfixToTree(infixToPostfix(augment(prev_regex)))));
+      var prevState = getStateByRegex(
+          inorder(postfixToTree(infixToPostfix(augment(prev_regex)))));
       var newState = State();
 
       newState.name = stateTitle;
@@ -64,8 +66,6 @@ class FSM {
       transaction.from = prevState;
       transaction.to = newState;
       transaction.letter = term;
-
-
 
       if (simpeleDerivative == '∅') {
       } else {
@@ -77,7 +77,8 @@ class FSM {
         } else {
           this.States.add(newState);
 
-          if (nullable(postfixToTree(infixToPostfix(augment(simpeleDerivative))))) {
+          if (nullable(
+              postfixToTree(infixToPostfix(augment(simpeleDerivative))))) {
             FinalStates.add(newState);
           }
 

@@ -1,11 +1,10 @@
-import 'dart:io';
 import '../regex/regex_functions.dart';
 
 class Node {
   String c;
   Node? l;
   Node? r;
-
+  List<String> regexes = [];
   Node(this.c, {this.l, this.r});
 }
 
@@ -238,63 +237,54 @@ Node? removeSameOr(Node? root) {
     return null;
   }
 
-  // Рекурсивный вызов для левого и правого поддерева
-  root.l = removeSameOr(root.l);
-  root.r = removeSameOr(root.r);
+  List<Node> keys = treeMap.keys.toList();
 
-  // Проверяем условия удаления вершины
-  if (root.c == '|' && areSubtreesEqual(root.l, root.r)) {
-    var t = clone(root.l)!;
-    root.c = t.c;
-    root.l = t.l;
-    root.r = t.r;
+  for (int i = 0; i < treeMap.length; i++) {
+    var curr_lst = treeMap[keys[i]];
 
-    return root;
-  }
-  if (root.l?.c == '|') {
-    if ((areSubtreesEqual(root.r, root.l?.l) ||
-        areSubtreesEqual(root.r, root.l?.r))) {
-      var t = clone(root.l)!;
-      root = t;
-
-      return root;
+    if (curr_lst!.length != 2) {
+      continue;
     }
-  }
-  if (root.r?.c == '|') {
-    if ((areSubtreesEqual(root.r?.r, root.l) ||
-        areSubtreesEqual(root.r?.l, root.l))) {
-      var t = clone(root.r)!;
-      root = t;
 
-      return root;
+    // В альтернативе просто 2 одинаковых значения | [a,a] -> [a]
+    if (curr_lst[0] == curr_lst[1]) {
+      // удаляю правое, потому что могу себе позволить
+      root = removeNodeByReference(root, keys[i].r);
+      root = removeInvalidNodes(root);
+      //перестариваем карту после каждого удаления
+      treeMap = Map<Node, List<String>>();
+      makeMap(root);
+      root = removeSameOr(root);
+    }
+
+    for (int j = i + 1; j < treeMap.length; j++) {
+      var cmp_lst = treeMap[keys[j]]!;
+      bool rm_flag = false;
+
+      if (curr_lst[0] == cmp_lst[0]) {
+        root = removeNodeByReference(root, keys[j].l);
+        rm_flag = true;
+      } else if (curr_lst[0] == cmp_lst[1]) {
+        root = removeNodeByReference(root, keys[j].r);
+        rm_flag = true;
+      } else if (curr_lst[1] == cmp_lst[0]) {
+        root = removeNodeByReference(root, keys[j].l);
+        rm_flag = true;
+      } else if (curr_lst[1] == cmp_lst[1]) {
+        root = removeNodeByReference(root, keys[j].r);
+        rm_flag = true;
+      }
+
+      if (rm_flag) {
+        rm_flag = false;
+        root = removeInvalidNodes(root);
+        treeMap = Map<Node, List<String>>();
+        makeMap(root);
+        root = removeSameOr(root);
+      }
     }
   }
   return root;
-}
-
-bool areSubtreesEqual(Node? subtree1, Node? subtree2) {
-  if (subtree1 == null && subtree2 == null) {
-    return true;
-  }
-
-  if (subtree1 == null || subtree2 == null) {
-    return false;
-  }
-
-  if (subtree1.c != subtree2.c) {
-    return false;
-  }
-
-  if ((subtree1.c == '·' || subtree2.c == '·') ||
-      (subtree1.c == '#' || subtree2.c == '#')) {
-    return (areSubtreesEqual(subtree1.l, subtree2.l) &&
-        areSubtreesEqual(subtree1.r, subtree2.r));
-  }
-
-  return (areSubtreesEqual(subtree1.l, subtree2.l) &&
-          areSubtreesEqual(subtree1.r, subtree2.r)) ||
-      (areSubtreesEqual(subtree1.l, subtree2.r) &&
-          areSubtreesEqual(subtree1.r, subtree2.l));
 }
 
 Node? ssnf(Node? root) {
@@ -326,16 +316,36 @@ Node? ssnf(Node? root) {
 
 Node? simplifyRegex(Node? root) {
   //printTree(root);
-  root = removeInvalidNodes(ssnf(root));
+
   root = removeInvalidNodes(removeSameOr(root));
+
+  root = removeInvalidNodes(ssnf(root));
   root = removeInvalidNodes(processEmptyLeaves(root));
+
   root = removeInvalidNodes(removeNodesWithEmptyLeaf(root));
-
-  /* 
-
- 
-
-
+  /*
 */
+  return root;
+}
+
+Map<Node, List<String>> treeMap = Map<Node, List<String>>();
+void printMap() {
+  treeMap.forEach((key, value) {
+    print('$key [${inorder(key)}] (${key.c}): $value');
+  });
+}
+
+Node? makeMap(Node? root) {
+  if (root == null) {
+    return null;
+  }
+
+  if (root.c == '|') {
+    treeMap[root] = [inorder(makeMap(root.l)), inorder(makeMap(root.r))];
+  } else {
+    makeMap(root.l);
+    makeMap(root.r);
+  }
+
   return root;
 }

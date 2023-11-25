@@ -1,7 +1,6 @@
 // fuzz module
 
 import 'dart:math';
-import '../functions.dart';
 import '../Fms.dart';
 
 import '../src/fms/TestingFms.dart';
@@ -59,7 +58,6 @@ void TestRandomMutate(
     regex = GenerateRegexInit(3, 2, 10);
   }
   print("generated regex: " + regex);
-
 
   print("parsed regex: " + regex);
 

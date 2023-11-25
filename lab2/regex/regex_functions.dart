@@ -1,4 +1,5 @@
 import '../tree/tree.dart';
+
 final Map<String, int> prec = {'(': 0, '|': 1, '#': 2, '·': 3, '*': 4};
 
 String inorder(Node? root) {
@@ -64,6 +65,7 @@ String infixToPostfix(String exp) {
 
   return output.join();
 }
+
 Set<String> getRegexAlf(String regex) {
   Set<String> alf = {};
   for (var i = 0; i < regex.length; i++) {
