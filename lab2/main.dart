@@ -1,10 +1,13 @@
 import 'src/fms/TestingFms.dart';
 import 'tree/tree.dart';
 import 'regex/regex_functions.dart';
+import 'dart:io';
 
 void main(List<String> arguments) {
-  String regex = "a*#(aa)*";
-  //
+  String regex = "";
+
+  print('Input regex');
+  regex = stdin.readLineSync() ?? 'null';
   var root = (postfixToTree(infixToPostfix(augment(regex))));
   root = simplifyRegex(root);
 
