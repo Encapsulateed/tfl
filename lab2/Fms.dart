@@ -52,11 +52,13 @@ class FSM {
 
     for (var term in alf) {
       Map<Node, List<String>> treeMap = {};
-      var simpeleDerivative =
-          inorder(simplifyRegex(deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term), treeMap));
+      var simpeleDerivative = inorder(simplifyRegex(
+          deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term),
+          treeMap));
 
       var stateTitle = getCurrentStateTitle();
-      var prevState = getStateByRegex(inorder(postfixToTree(infixToPostfix(augment(prev_regex)))));
+      var prevState = getStateByRegex(
+          inorder(postfixToTree(infixToPostfix(augment(prev_regex)))));
       var newState = State();
 
       newState.name = stateTitle;
@@ -77,7 +79,8 @@ class FSM {
         } else {
           this.States.add(newState);
 
-          if (nullable(postfixToTree(infixToPostfix(augment(simpeleDerivative))))) {
+          if (nullable(
+              postfixToTree(infixToPostfix(augment(simpeleDerivative))))) {
             FinalStates.add(newState);
           }
 
@@ -122,7 +125,8 @@ class FSM {
     }
 
     for (var transaction in this.Transactions) {
-      res += "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+      res +=
+          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
     }
 
     res = "digraph {\n"
@@ -151,7 +155,8 @@ class FSM {
     }
 
     for (var transaction in this.Transactions) {
-      res += "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+      res +=
+          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
     }
 
     res = "digraph {\n"
@@ -188,8 +193,11 @@ class FSM {
       if (true) {
         State newState = State();
         newState.name = state.name + "'";
-        transitionsFrom[newState.name] = [Transaction.fromData(newState, state, "")];
-        transitionsTo[state.name]!.add(Transaction.fromData(newState, state, ""));
+        transitionsFrom[newState.name] = [
+          Transaction.fromData(newState, state, "")
+        ];
+        transitionsTo[state.name]!
+            .add(Transaction.fromData(newState, state, ""));
 
         StartStates = Set();
         StartStates.add(newState);
@@ -202,8 +210,10 @@ class FSM {
       transitionsTo[newFinalState.name] = [];
 
       for (var state in FinalStates) {
-        transitionsTo[newFinalState.name]!.add(Transaction.fromData(state, newFinalState, ""));
-        transitionsFrom[state.name]!.add(Transaction.fromData(state, newFinalState, ""));
+        transitionsTo[newFinalState.name]!
+            .add(Transaction.fromData(state, newFinalState, ""));
+        transitionsFrom[state.name]!
+            .add(Transaction.fromData(state, newFinalState, ""));
       }
 
       FinalStates = Set();
@@ -248,7 +258,8 @@ class FSM {
               if (loop.length == 0) {
                 loop = trans.letter;
               } else {
-                loop = "${SanitizeStarString(trans.letter)}|${SanitizeStarString(loop)}";
+                loop =
+                    "${SanitizeStarString(trans.letter)}|${SanitizeStarString(loop)}";
               }
             }
           }
@@ -264,15 +275,16 @@ class FSM {
           transitionsTo[to]!.remove(outTransition);
           transitionsFrom[state.name]!.remove(inTransition);
 
-          transitionsFrom[from]!.add(Transaction.fromData(inTransition.from, outTransition.to, letter));
+          transitionsFrom[from]!.add(Transaction.fromData(
+              inTransition.from, outTransition.to, letter));
 
-          transitionsTo[to]!.add(Transaction.fromData(inTransition.from, outTransition.to, letter));
+          transitionsTo[to]!.add(Transaction.fromData(
+              inTransition.from, outTransition.to, letter));
         }
       }
       transitionsTo[state.name] = [];
       transitionsFrom[state.name] = [];
     }
-
 
     String res = "";
     for (var transition in transitionsFrom[StartStates.elementAt(0).name]!) {

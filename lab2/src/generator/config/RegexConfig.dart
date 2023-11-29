@@ -19,7 +19,8 @@ class RegexConfig {
       new UnfairFortuneWheel([40, 20, 20, 10, 10]);
   Random fortuneWheel = new Random();
 
-  RegexConfig(this.alphabetSize, this.starLevel, this.maxLength, this.generateShuffles);
+  RegexConfig(
+      this.alphabetSize, this.starLevel, this.maxLength, this.generateShuffles);
   RegexConfig.fromRegexConfig(RegexConfig conf) {
     this.alphabetSize = conf.alphabetSize;
     this.starLevel = conf.starLevel;

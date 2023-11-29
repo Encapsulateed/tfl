@@ -7,8 +7,10 @@ import '../config/RegexConfig.dart';
 /// <binary> ::= | | # | eps
 /// <unary> ::= *
 
-String GenerateRegexInit(int alphabetSize, int starLevel, int maxLength, {bool generateShuffles = true}) {
-  return GenerateRegex(RegexConfig(alphabetSize, starLevel, maxLength, generateShuffles));
+String GenerateRegexInit(int alphabetSize, int starLevel, int maxLength,
+    {bool generateShuffles = true}) {
+  return GenerateRegex(
+      RegexConfig(alphabetSize, starLevel, maxLength, generateShuffles));
 }
 
 String GenerateRegex(RegexConfig config) {

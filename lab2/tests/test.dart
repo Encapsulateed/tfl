@@ -85,7 +85,8 @@ void TestRandomMutate(
 
   String solutionRegex = fms.DumpRegex();
   if (!generateShuffles) {
-    print("shuffle generation is turned off, so we use input regex as solution");
+    print(
+        "shuffle generation is turned off, so we use input regex as solution");
     solutionRegex = regex;
   }
   print("solution regex: " + solutionRegex);
