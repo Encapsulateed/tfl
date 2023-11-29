@@ -12,13 +12,11 @@ make test
 dart main.dart
 ```
 ```
-DOT сохраняется в файл *solution.txt*
+DOT сохраняется в файл solution.txt
 ```
-```
-Для его анализа нужно поместить содержимое *solution.txt* [сюда](https://dreampuf.github.io/GraphvizOnline)
-```
+Для его анализа нужно поместить содержимое *solution.txt [сюда](https://dreampuf.github.io/GraphvizOnline)
 
-
+<br/>
 
 What is this life if, full of care, <br/>
 We have no time to stand and stare.
