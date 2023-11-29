@@ -94,6 +94,10 @@ void TestRandomMutate(
   // return;
 
   String solutionRegex = fms.DumpRegex();
+  if (!generateShuffles && !useInitialRegexForTest) {
+    solutionRegex = regex;
+    print("using initial regex as solution");
+  }
   print("solution regex: " + solutionRegex);
   RegExp reg = RegExp(solutionRegex);
 
