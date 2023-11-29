@@ -2,9 +2,6 @@ String SanitizeString(String word) {
   if (word.length < 2) {
     return word;
   }
-  if (word.length > 1 && word.startsWith("(")) {
-    return word;
-  }
   return "(${word})";
 }
 
