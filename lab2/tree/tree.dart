@@ -246,7 +246,7 @@ Node? removeSameOr(Node? root) {
   if (root == null) {
     return null;
   }
-
+  root = removeInvalidNodes(root);
   List<Node> keys = treeMap.keys.toList();
 
   for (int i = 0; i < treeMap.length; i++) {
@@ -262,7 +262,7 @@ Node? removeSameOr(Node? root) {
     if (curr_lst[0] == curr_lst[1]) {
       // удаляю правое, потому что могу себе позволить
       root = removeNodeByReference(root, keys[i].r);
-      root = removeInvalidNodes(root);
+      //    root = removeInvalidNodes(root);
       //перестариваем карту после каждого удаления
       treeMap = Map<Node, List<String>>();
       makeMap(root);
@@ -292,7 +292,7 @@ Node? removeSameOr(Node? root) {
 
       if (rm_flag) {
         rm_flag = false;
-        root = removeInvalidNodes(root);
+        //   root = removeInvalidNodes(root);
         treeMap = Map<Node, List<String>>();
         makeMap(root);
         root = removeSameOr(root);
