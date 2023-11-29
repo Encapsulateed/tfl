@@ -14,11 +14,3 @@ String SanitizeStarString(String word) {
   }
   return "(${word})*";
 }
-
-void main(List<String> args) {
-  print(SanitizeStarString("word"));
-  print(SanitizeStarString(""));
-  print(SanitizeStarString("a"));
-  print(SanitizeStarString("(word)"));
-  print(SanitizeStarString("(word)*"));
-}

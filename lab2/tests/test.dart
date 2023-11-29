@@ -11,12 +11,15 @@ import '../regex/regex_functions.dart';
 class Tester {
   late TestingFms fms;
   late RegExp solutionRegex;
+  late RegExp? initialRegex;
+  bool useInitialRegexForTest = false;
   Random enigmaOracle = Random();
 
   /// Store previous generations so we don't test on same words
   Set<String> previousWords = {};
 
-  Tester(this.fms, this.solutionRegex);
+  Tester(this.fms, this.solutionRegex,
+      {this.useInitialRegexForTest = false, this.initialRegex = null});
 
   void PrepareTestingFms() {
     fms.CalculateTransitionMatrix();
@@ -41,7 +44,13 @@ class Tester {
 
   void RunTest(String word) {
     print("comparing results on word: " + word);
-    bool testRes = fms.ValidateWord(word);
+    bool testRes = false;
+    if (useInitialRegexForTest) {
+      print("using initial regex for testing");
+      testRes = initialRegex!.stringMatch(word) == word;
+    } else {
+      testRes = fms.ValidateWord(word);
+    }
     bool solutionRes = solutionRegex.stringMatch(word) == word;
 
     if (testRes != solutionRes) {
@@ -56,7 +65,8 @@ void TestRandomMutate(
     bool mutate = false,
     String regex = "",
     bool dumpDot = false,
-    bool generateShuffles = true}) {
+    bool generateShuffles = true,
+    bool useInitialRegexForTest = false}) {
   if (regex == "") {
     regex = GenerateRegexInit(3, 2, 5, generateShuffles: generateShuffles);
   }
@@ -84,15 +94,12 @@ void TestRandomMutate(
   // return;
 
   String solutionRegex = fms.DumpRegex();
-  if (!generateShuffles) {
-    print(
-        "shuffle generation is turned off, so we use input regex as solution");
-    solutionRegex = regex;
-  }
   print("solution regex: " + solutionRegex);
   RegExp reg = RegExp(solutionRegex);
 
-  Tester tester = Tester(testingFms, reg);
+  Tester tester = Tester(testingFms, reg,
+      useInitialRegexForTest: useInitialRegexForTest,
+      initialRegex: RegExp("^(${regex})\$"));
   if (destinyWeb != null) {
     tester.enigmaOracle = destinyWeb;
   }
@@ -117,5 +124,9 @@ void TestSeedMutate(int seed,
 }
 
 void main(List<String> args) {
-  TestRandomMutate(mutate: true, dumpDot: true, generateShuffles: false);
+  TestRandomMutate(
+      mutate: true,
+      dumpDot: true,
+      generateShuffles: false,
+      useInitialRegexForTest: false);
 }
