@@ -78,15 +78,15 @@ void TestRandomMutate(
   makeMap(root, treeMap);
 
   root = simplifyRegex(root, treeMap);
-  regex = inorder(root);
+  String parsed_regex = inorder(root);
 
-  print("parsed regex: " + regex);
+  print("parsed regex: " + parsed_regex);
 
   // I build both fms to ensure tests quality and reliability
-  FSM fms = FSM(regex);
-  fms.build(regex);
-  TestingFms testingFms = TestingFms(regex);
-  testingFms.build(regex);
+  FSM fms = FSM(parsed_regex);
+  fms.build(parsed_regex);
+  TestingFms testingFms = TestingFms(parsed_regex);
+  testingFms.build(parsed_regex);
   if (dumpDot) {
     print(testingFms.DumpDot());
   }
