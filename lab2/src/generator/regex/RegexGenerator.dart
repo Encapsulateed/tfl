@@ -7,8 +7,8 @@ import '../config/RegexConfig.dart';
 /// <binary> ::= | | # | eps
 /// <unary> ::= *
 
-String GenerateRegexInit(int alphabetSize, int starLevel, int maxLength) {
-  return GenerateRegex(RegexConfig(alphabetSize, starLevel, maxLength));
+String GenerateRegexInit(int alphabetSize, int starLevel, int maxLength, {bool generateShuffles = true}) {
+  return GenerateRegex(RegexConfig(alphabetSize, starLevel, maxLength, generateShuffles));
 }
 
 String GenerateRegex(RegexConfig config) {
@@ -68,6 +68,9 @@ String GenerateRegex(RegexConfig config) {
 }
 
 String GenerateBinary(RegexConfig config) {
+  if (!config.generateShuffles) {
+    return GenerateBinaryNoShuffle(config);
+  }
   if (config.length == config.maxLength) {
     return "";
   }
@@ -78,6 +81,21 @@ String GenerateBinary(RegexConfig config) {
     case 1:
       return "#";
     case 2:
+      return "";
+    default:
+      throw "Universe order error: generated number out of range";
+  }
+}
+
+String GenerateBinaryNoShuffle(RegexConfig config) {
+  if (config.length == config.maxLength) {
+    return "";
+  }
+  int round = config.fortuneWheel.nextInt(2);
+  switch (round) {
+    case 0:
+      return "|";
+    case 1:
       return "";
     default:
       throw "Universe order error: generated number out of range";

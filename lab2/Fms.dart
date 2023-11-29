@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'src/util/util.dart';
 import 'tree/tree.dart';
 import 'regex/regex_functions.dart';
 
@@ -51,13 +52,11 @@ class FSM {
 
     for (var term in alf) {
       Map<Node, List<String>> treeMap = {};
-      var simpeleDerivative = inorder(simplifyRegex(
-          deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term),
-          treeMap));
+      var simpeleDerivative =
+          inorder(simplifyRegex(deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term), treeMap));
 
       var stateTitle = getCurrentStateTitle();
-      var prevState = getStateByRegex(
-          inorder(postfixToTree(infixToPostfix(augment(prev_regex)))));
+      var prevState = getStateByRegex(inorder(postfixToTree(infixToPostfix(augment(prev_regex)))));
       var newState = State();
 
       newState.name = stateTitle;
@@ -78,8 +77,7 @@ class FSM {
         } else {
           this.States.add(newState);
 
-          if (nullable(
-              postfixToTree(infixToPostfix(augment(simpeleDerivative))))) {
+          if (nullable(postfixToTree(infixToPostfix(augment(simpeleDerivative))))) {
             FinalStates.add(newState);
           }
 
@@ -124,8 +122,7 @@ class FSM {
     }
 
     for (var transaction in this.Transactions) {
-      res +=
-          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+      res += "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
     }
 
     res = "digraph {\n"
@@ -154,8 +151,7 @@ class FSM {
     }
 
     for (var transaction in this.Transactions) {
-      res +=
-          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+      res += "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
     }
 
     res = "digraph {\n"
@@ -179,28 +175,21 @@ class FSM {
     }
 
     for (var transition in Transactions) {
-      if (transition.to.name == transition.from.name) {
-        if (loops[transition.to.name] == "") {
-          loops[transition.to.name] = transition.letter + "*";
-        } else {
-          loops[transition.to.name] =
-              "(${loops[transition.to.name]}|${transition.letter}*)";
-        }
-      } else {
-        transitionsFrom[transition.from.name]!.add(transition);
-        transitionsTo[transition.to.name]!.add(transition);
-      }
+      transitionsFrom[transition.from.name]!.add(transition);
+      transitionsTo[transition.to.name]!.add(transition);
+    }
+
+    bool startIsFinal = false;
+    if (StartStates.elementAt(0) == FinalStates.elementAt(0)) {
+      startIsFinal = true;
     }
 
     for (var state in StartStates) {
       if (true) {
         State newState = State();
         newState.name = state.name + "'";
-        transitionsFrom[newState.name] = [
-          Transaction.fromData(newState, state, "")
-        ];
-        transitionsTo[state.name]!
-            .add(Transaction.fromData(newState, state, ""));
+        transitionsFrom[newState.name] = [Transaction.fromData(newState, state, "")];
+        transitionsTo[state.name]!.add(Transaction.fromData(newState, state, ""));
 
         StartStates = Set();
         StartStates.add(newState);
@@ -213,10 +202,8 @@ class FSM {
       transitionsTo[newFinalState.name] = [];
 
       for (var state in FinalStates) {
-        transitionsTo[newFinalState.name]!
-            .add(Transaction.fromData(state, newFinalState, ""));
-        transitionsFrom[state.name]!
-            .add(Transaction.fromData(state, newFinalState, ""));
+        transitionsTo[newFinalState.name]!.add(Transaction.fromData(state, newFinalState, ""));
+        transitionsFrom[state.name]!.add(Transaction.fromData(state, newFinalState, ""));
       }
 
       FinalStates = Set();
@@ -231,55 +218,61 @@ class FSM {
         continue;
       }
 
-      var transOut = new List.from(transitionsFrom[state.name]!);
       var transIn = new List.from(transitionsTo[state.name]!);
+      var transOut = new List.from(transitionsFrom[state.name]!);
 
       for (var inTransition in transIn) {
         for (var outTransition in transOut) {
           String from = inTransition.from.name;
           String to = outTransition.to.name;
-          String letter =
-              inTransition.letter + loops[state.name]! + outTransition.letter;
-
-          // This block looks awfull but I AM SO PROWD OF IT
-          // cycles one love
-          if (from == to) {
-            letter =
-                "(${loops[state.name]}${inTransition.letter}${outTransition.letter}${loops[from]})*";
-            if (transitionsFrom[to]!.contains(Transaction.fromData(
-                State.fromData(to, ""),
-                State.fromData("finalState", ""),
-                ""))) {
-              letter =
-                  "(${letter}|(${loops[state.name]}${inTransition.letter}${loops[from]})*)";
-            }
-            if (transitionsFrom[from]!.contains(Transaction.fromData(
-                State.fromData(from, ""),
-                State.fromData("finalState", ""),
-                ""))) {
-              letter =
-                  "(${letter}|(${loops[state.name]}${outTransition.letter}${loops[from]})*)";
-            }
-            if (loops[from] == "") {
-              loops[from] = letter;
-            } else {
-              loops[from] = "(${loops[from]}|${letter})";
-            }
+          String alternative = "";
+          String loop = "";
+          if (inTransition.isCycle() || outTransition.isCycle()) {
             continue;
+          }
+          var transFromAlt = new List.from(transitionsFrom[from]!);
+          for (var trans in transFromAlt) {
+            if (trans.to.name == to) {
+              transitionsFrom[from]!.remove(trans);
+              transitionsTo[to]!.remove(trans);
+              if (alternative.length == 0) {
+                alternative = trans.letter;
+              } else {
+                alternative = "${trans.letter}|${alternative}";
+              }
+            }
+          }
+          var transFromLoop = transitionsFrom[state.name]!;
+          for (var trans in transFromLoop) {
+            if (trans.to.name == state.name) {
+              if (loop.length == 0) {
+                loop = trans.letter;
+              } else {
+                loop = "${SanitizeStarString(trans.letter)}|${SanitizeStarString(loop)}";
+              }
+            }
+          }
+          String letter =
+              "${SanitizeString(inTransition.letter)}${SanitizeStarString(loop)}${SanitizeString(outTransition.letter)}";
+          if (alternative.length > 0) {
+            letter = "${alternative}|${letter}";
           }
 
           transitionsFrom[from]!.remove(inTransition);
-          transitionsFrom[from]!.add(Transaction.fromData(
-              inTransition.from, outTransition.to, letter));
+          transitionsFrom[state.name]!.remove(outTransition);
 
           transitionsTo[to]!.remove(outTransition);
-          transitionsTo[to]!.add(Transaction.fromData(
-              inTransition.from, outTransition.to, letter));
+          transitionsFrom[state.name]!.remove(inTransition);
+
+          transitionsFrom[from]!.add(Transaction.fromData(inTransition.from, outTransition.to, letter));
+
+          transitionsTo[to]!.add(Transaction.fromData(inTransition.from, outTransition.to, letter));
         }
       }
       transitionsTo[state.name] = [];
       transitionsFrom[state.name] = [];
     }
+
 
     String res = "";
     for (var transition in transitionsFrom[StartStates.elementAt(0).name]!) {
@@ -291,6 +284,9 @@ class FSM {
         letter = "($letter)";
       }
       res += letter;
+    }
+    if (startIsFinal) {
+      res = "|${res}";
     }
     res = "^(${res})\$";
     res = res;
@@ -338,5 +334,9 @@ class Transaction {
   @override
   bool operator ==(covariant Transaction rhs) {
     return (rhs.letter == letter && from == rhs.from && to == rhs.to);
+  }
+
+  bool isCycle() {
+    return from == to;
   }
 }

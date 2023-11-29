@@ -55,9 +55,10 @@ void TestRandomMutate(
     {Random? destinyWeb = null,
     bool mutate = false,
     String regex = "",
-    bool dumpDot = false}) {
+    bool dumpDot = false,
+    bool generateShuffles = true}) {
   if (regex == "") {
-    regex = GenerateRegexInit(3, 2, 5);
+    regex = GenerateRegexInit(3, 2, 5, generateShuffles: generateShuffles);
   }
 
   print("generated regex: " + regex);
@@ -83,6 +84,10 @@ void TestRandomMutate(
   // return;
 
   String solutionRegex = fms.DumpRegex();
+  if (!generateShuffles) {
+    print("shuffle generation is turned off, so we use input regex as solution");
+    solutionRegex = regex;
+  }
   print("solution regex: " + solutionRegex);
   RegExp reg = RegExp(solutionRegex);
 
@@ -111,5 +116,5 @@ void TestSeedMutate(int seed,
 }
 
 void main(List<String> args) {
-  TestRandomMutate(mutate: true, dumpDot: true);
+  TestRandomMutate(mutate: true, dumpDot: true, generateShuffles: false);
 }
