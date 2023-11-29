@@ -9,12 +9,11 @@ void main(List<String> arguments) {
   print('Input regex');
   regex = stdin.readLineSync() ?? 'null';
   var root = (postfixToTree(infixToPostfix(augment(regex))));
-  
-  Map<Node, List<String>> treeMap = {};
-  makeMap(root,treeMap);
-  root = simplifyRegex(root,treeMap);
-  regex = inorder(root);
 
+  Map<Node, List<String>> treeMap = {};
+  makeMap(root, treeMap);
+  root = simplifyRegex(root, treeMap);
+  regex = inorder(root);
 
   var fms = TestingFms(regex);
   fms.build(regex);

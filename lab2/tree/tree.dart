@@ -313,22 +313,17 @@ Node? ssnf(Node? root) {
   }
 
   // Рекурсивный вызов для левого и правого поддерева
-  root.l = removeNodesWithEmptyLeaf(root.l);
-  root.r = removeNodesWithEmptyLeaf(root.r);
+  root.l = ssnf(root.l);
+  root.r = ssnf(root.r);
 
   // Проверяем условия удаления вершины
   if ((root.c == '*' && root.l?.c == '*')) {
-    var t = clone(root.l?.l)!;
-
-    root.l = t;
-
-    return root;
+    return clone(root.l)!;
   }
   if ((root.c == '*' && root.r?.c == '*')) {
-    var t = clone(root.r?.l)!;
-    root.r = t;
-
-    return root;
+// да конечно, у меня не может лечь клини в правую весть дерева
+// но подстраховка ещё никому не мешала
+    return clone(root.r)!;
   }
 
   return root;
@@ -362,8 +357,7 @@ Node? makeMap(Node? root, Map<Node, List<String>> treeMap) {
       inorder(makeMap(root.l, treeMap)),
       inorder(makeMap(root.r, treeMap))
     ];
-  }
-  else if(root.c == '*'){
+  } else if (root.c == '*') {
     Map<Node, List<String>> star_map = {};
     var t_r = root.l;
 
@@ -372,8 +366,7 @@ Node? makeMap(Node? root, Map<Node, List<String>> treeMap) {
       inorder(makeMap(t_r?.r, star_map))
     ];
     t_r = removeSameOr(t_r, star_map);
-  }
-  else {
+  } else {
     root.l = makeMap(root.l, treeMap);
     root.r = makeMap(root.r, treeMap);
   }

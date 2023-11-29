@@ -5,6 +5,8 @@ import '../Fms.dart';
 
 import '../src/fms/TestingFms.dart';
 import '../src/generator/regex/RegexGenerator.dart';
+import '../tree/tree.dart';
+import '../regex/regex_functions.dart';
 
 class Tester {
   late TestingFms fms;
@@ -55,9 +57,17 @@ void TestRandomMutate(
     String regex = "",
     bool dumpDot = false}) {
   if (regex == "") {
-    regex = GenerateRegexInit(3, 2, 10);
+    regex = GenerateRegexInit(2, 2, 3);
   }
+
   print("generated regex: " + regex);
+  var root = (postfixToTree(infixToPostfix(augment(regex))));
+
+  Map<Node, List<String>> treeMap = {};
+  makeMap(root, treeMap);
+
+  root = simplifyRegex(root, treeMap);
+  regex = inorder(root);
 
   print("parsed regex: " + regex);
 
@@ -101,5 +111,5 @@ void TestSeedMutate(int seed,
 }
 
 void main(List<String> args) {
-  TestRandomMutate(mutate: true, dumpDot: true);
+  TestRandomMutate(mutate: true, dumpDot: true, regex: "((b#(a*))#(b*))");
 }

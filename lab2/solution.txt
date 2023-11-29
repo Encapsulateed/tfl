@@ -4,6 +4,8 @@ dummy [shape=none, label="", width=0, height=0]
 q0 [label = "q0", shape = circle]
 q1 [label = "q1", shape = doublecircle]
 dummy -> q0
-q0 -> q1 [label = a]
+q0 -> q1 [label = b]
 q1 -> q1 [label = a]
+q1 -> q1 [label = b]
+q0 -> q0 [label = a]
 }
