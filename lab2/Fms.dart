@@ -39,7 +39,6 @@ class FSM {
   }
 
   State getStateByRegex(String regex) {
-    //States.forEach((element) {print('STATE ${element.name} -- ${element.regex} cmp with ${regex}' );});
     return States.where((state) => state.regex == regex).first;
   }
 
@@ -51,9 +50,9 @@ class FSM {
     (prevRegex);
 
     for (var term in alf) {
-      // print('I WILL TAKE ${inorder(simplifyRegex(postfixToTree(infixToPostfix(augment(prev_regex)))))} BY ${term}');
+      Map<Node, List<String>> treeMap = {};
       var simpeleDerivative = inorder(simplifyRegex(
-          deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term)));
+          deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term),treeMap));
 
       var stateTitle = getCurrentStateTitle();
       var prevState = getStateByRegex(
