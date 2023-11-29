@@ -159,31 +159,29 @@ Node? processEmptyLeaves(Node? root) {
   if (root == null) {
     return null;
   }
-
-  // Рекурсивный вызов для левого и правого поддерева
   root.l = processEmptyLeaves(root.l);
   root.r = processEmptyLeaves(root.r);
-
   // Проверка листовых вершин бинарных операций "·" и "#"
   if (root.c == '·' || root.c == '#') {
-    // Если листовая вершина содержит "ϵ"
     if (containsEps(root)) {
       if (root.l?.c == 'ϵ') {
+        return root.r;
+      } else {
+        return root.l;
+      }
+    } else if (containsEmptyLeaf(root)) {
+      return Node('∅');
+    }
+  } else if (root.c == '|') {
+    if (containsEmptyLeaf(root)) {
+      if (root.l?.c == '∅') {
         return root.r;
       }
       return root.l;
     }
-  } else if (root.c == '|') {
-    // a*|ϵ == a*
-    // ϵ|a* == a*
-    if (containsEps(root)) {
-      if (root.l?.c == '*') {
-        return root.l;
-      } else if (root.r?.c == '*') {
-        return root.r;
-      }
-    }
   }
+
+  // Рекурсивный вызов для левого и правого поддерева
 
   return root;
 }
@@ -330,14 +328,23 @@ Node? ssnf(Node? root) {
 }
 
 Node? simplifyRegex(Node? root, Map<Node, List<String>> treeMap) {
-  root = removeInvalidNodes(ssnf(root));
-  root = removeInvalidNodes(processEmptyLeaves(root));
+  String start_regex = inorder(root);
+  var next = "";
+  while (start_regex != next) {
+    treeMap = {};
+    start_regex = inorder(root);
+    //print('TRY tO S $start_regex');
 
-  root = removeInvalidNodes(removeNodesWithEmptyLeaf(root));
-  makeMap(root, treeMap);
+    root = removeInvalidNodes(ssnf(root));
+    //root = removeInvalidNodes(removeNodesWithEmptyLeaf(root));
+    root = removeInvalidNodes(processEmptyLeaves(root));
+    makeMap(root, treeMap);
+    root = removeInvalidNodes(removeSameOr(root, treeMap));
 
-  root = removeInvalidNodes(removeSameOr(root, treeMap));
-
+    next = inorder(root);
+    // print('S $next');
+    next = start_regex;
+  }
   return removeInvalidNodes(root);
 }
 

@@ -15,6 +15,8 @@ void main(List<String> arguments) {
   root = simplifyRegex(root, treeMap);
   regex = inorder(root);
 
+  print(regex);
+
   var fms = TestingFms(regex);
   fms.build(regex);
   fms.Print();

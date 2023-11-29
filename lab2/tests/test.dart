@@ -57,7 +57,7 @@ void TestRandomMutate(
     String regex = "",
     bool dumpDot = false}) {
   if (regex == "") {
-    regex = GenerateRegexInit(2, 2, 3);
+    regex = GenerateRegexInit(3, 2, 5);
   }
 
   print("generated regex: " + regex);
@@ -111,5 +111,5 @@ void TestSeedMutate(int seed,
 }
 
 void main(List<String> args) {
-  TestRandomMutate(mutate: true, dumpDot: true, regex: "((b#(a*))#(b*))");
+  TestRandomMutate(mutate: true, dumpDot: true);
 }
