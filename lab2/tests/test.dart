@@ -75,7 +75,7 @@ void TestRandomMutate(
   var root = (postfixToTree(infixToPostfix(augment(regex))));
 
   Map<Node, List<String>> treeMap = {};
-  makeMap(root, treeMap);
+  makeMapAlters(root, treeMap);
 
   root = simplifyRegex(root, treeMap);
   String parsed_regex = inorder(root);

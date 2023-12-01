@@ -268,7 +268,7 @@ Node? removeSameOr(Node? root, Map<Node, List<String>> treeMap) {
       root = removeNodeByReference(root, keys[i].r);
       //перестариваем карту после каждого удаления
       treeMap = Map<Node, List<String>>();
-      makeMap(root, treeMap);
+      makeMapAlters(root, treeMap);
       root = removeSameOr(root, treeMap);
     }
 
@@ -297,7 +297,7 @@ Node? removeSameOr(Node? root, Map<Node, List<String>> treeMap) {
         rm_flag = false;
 
         treeMap = Map<Node, List<String>>();
-        makeMap(root, treeMap);
+        makeMapAlters(root, treeMap);
         root = removeSameOr(root, treeMap);
       }
     }
@@ -330,52 +330,57 @@ Node? ssnf(Node? root) {
 Node? simplifyRegex(Node? root, Map<Node, List<String>> treeMap) {
   String start_regex = inorder(root);
   var next = "";
-  while (start_regex != next) {
-    treeMap = {};
-    start_regex = inorder(root);
-    //print('TRY tO S $start_regex');
 
-    root = removeInvalidNodes(ssnf(root));
-    //root = removeInvalidNodes(removeNodesWithEmptyLeaf(root));
-    root = removeInvalidNodes(processEmptyLeaves(root));
-    makeMap(root, treeMap);
-    root = removeInvalidNodes(removeSameOr(root, treeMap));
+  treeMap = {};
+  start_regex = inorder(root);
+  //print('TRY tO S $start_regex');
 
-    next = inorder(root);
-    // print('S $next');
-    next = start_regex;
-  }
+  root = removeInvalidNodes(ssnf(root));
+  //root = removeInvalidNodes(removeNodesWithEmptyLeaf(root));
+  root = removeInvalidNodes(processEmptyLeaves(root));
+  makeMapAlters(root, treeMap);
+
+  root = removeInvalidNodes(removeSameOr(root, treeMap));
+
   return removeInvalidNodes(root);
 }
 
 void printMap(Map<Node, List<String>> treeMap) {
   treeMap.forEach((key, value) {
-    print('[${inorder(key)}] <-> (${key.c}): $value');
+    print('[${inorder(key)}] <-> $value');
   });
+
+  print(treeMap);
 }
 
-Node? makeMap(Node? root, Map<Node, List<String>> treeMap) {
+Node? makeMapAlters(Node? root, Map<Node, List<String>> treeMap) {
   if (root == null) {
     return null;
   }
 
   if (root.c == '|') {
     treeMap[root] = [
-      inorder(makeMap(root.l, treeMap)),
-      inorder(makeMap(root.r, treeMap))
+      inorder(makeMapAlters(root.l, treeMap)),
+      inorder(makeMapAlters(root.r, treeMap))
     ];
-  } else if (root.c == '*') {
-    Map<Node, List<String>> star_map = {};
-    var t_r = root.l;
+  } else if (root.c == '#' || root.c == '·'|| root.c == '*') {
+   // printTree(root);
+    Map<Node, List<String>> map_l = {};
+    makeMapAlters(root.l, map_l);
 
-    star_map[root] = [
-      inorder(makeMap(t_r?.l, star_map)),
-      inorder(makeMap(t_r?.r, star_map))
-    ];
-    t_r = removeSameOr(t_r, star_map);
+    Map<Node, List<String>> map_r = {};
+    makeMapAlters(root.r, map_r);
+
+   // print('LEFT ${map_l}');
+    //print('RIGHT ${map_r}');
+
+    root.l = removeSameOr(root.l, map_l);
+    root.r = removeSameOr(root.r, map_r);
+
+    // map[root] = [inorder(makeMap(root.l, map)), inorder(makeMap(root.r, map))];
   } else {
-    root.l = makeMap(root.l, treeMap);
-    root.r = makeMap(root.r, treeMap);
+    root.l = makeMapAlters(root.l, treeMap);
+    root.r = makeMapAlters(root.r, treeMap);
   }
   return root;
 }
