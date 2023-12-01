@@ -235,20 +235,34 @@ class FSM {
         for (var outTransition in transOut) {
           String from = inTransition.from.name;
           String to = outTransition.to.name;
-          String alternative = "";
+          String leftAlternative = "";
+          String rightAlternative = "";
           String loop = "";
+
           if (inTransition.isCycle() || outTransition.isCycle()) {
             continue;
           }
           var transFromAlt = new List.from(transitionsFrom[from]!);
           for (var trans in transFromAlt) {
             if (trans.to.name == to) {
-              transitionsFrom[from]!.remove(trans);
+              // transitionsFrom[from]!.remove(trans);
               transitionsTo[to]!.remove(trans);
-              if (alternative.length == 0) {
-                alternative = trans.letter;
+              if (leftAlternative.length == 0) {
+                leftAlternative = trans.letter;
               } else {
-                alternative = "${trans.letter}|${alternative}";
+                leftAlternative = "${trans.letter}|${leftAlternative}";
+              }
+            }
+          }
+          var transToAlt = new List.from(transitionsFrom[state.name]!);
+          for (var trans in transFromAlt) {
+            if (trans.to.name == to) {
+              transitionsFrom[state.name]!.remove(trans);
+              transitionsTo[to]!.remove(trans);
+              if (rightAlternative.length == 0) {
+                rightAlternative = trans.letter;
+              } else {
+                rightAlternative = "${trans.letter}|${rightAlternative}";
               }
             }
           }
@@ -263,11 +277,20 @@ class FSM {
               }
             }
           }
+
           String letter =
               "${SanitizeString(inTransition.letter)}${SanitizeStarString(loop)}${SanitizeString(outTransition.letter)}";
-          if (alternative.length > 0) {
-            letter = "${alternative}|${letter}";
+          if (leftAlternative.length > 0) {
+            letter = "${SanitizeString(leftAlternative)}|${letter}";
           }
+          if (rightAlternative.length > 0) {
+            letter = "${letter}|${SanitizeString(rightAlternative)}";
+          }
+          // print(letter);
+          // print(inTransition);
+          // print(outTransition);
+          // print("---------");
+          // stdin.readLineSync();
 
           transitionsFrom[from]!.remove(inTransition);
           transitionsFrom[state.name]!.remove(outTransition);
@@ -282,8 +305,6 @@ class FSM {
               inTransition.from, outTransition.to, letter));
         }
       }
-      transitionsTo[state.name] = [];
-      transitionsFrom[state.name] = [];
     }
 
     String res = "";
