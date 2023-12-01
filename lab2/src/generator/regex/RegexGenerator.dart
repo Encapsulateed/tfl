@@ -8,9 +8,18 @@ import '../config/RegexConfig.dart';
 /// <unary> ::= *
 
 String GenerateRegexInit(int alphabetSize, int starLevel, int maxLength,
-    {bool generateShuffles = true}) {
-  return GenerateRegex(
+    {bool generateShuffles = true, bool deleteExtraStars = true}) {
+  String regex = GenerateRegex(
       RegexConfig(alphabetSize, starLevel, maxLength, generateShuffles));
+  if (deleteExtraStars) {
+    regex = DeleteExtraStarts(regex);
+  }
+  return regex;
+}
+
+String DeleteExtraStarts(String regex) {
+  regex = regex.replaceAll("**", "*");
+  return regex;
 }
 
 String GenerateRegex(RegexConfig config) {

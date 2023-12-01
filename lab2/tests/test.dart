@@ -95,7 +95,7 @@ void TestRandomMutate(
 
   String solutionRegex = fms.DumpRegex();
   if (!generateShuffles && !useInitialRegexForTest) {
-    solutionRegex = regex;
+    solutionRegex = "^(${regex})\$";
     print("using initial regex as solution");
   }
   print("solution regex: " + solutionRegex);
@@ -129,8 +129,9 @@ void TestSeedMutate(int seed,
 
 void main(List<String> args) {
   TestRandomMutate(
-      mutate: true,
-      dumpDot: true,
-      generateShuffles: false,
-      useInitialRegexForTest: false);
+    mutate: true,
+    dumpDot: true,
+    generateShuffles: true,
+    useInitialRegexForTest: false,
+  );
 }
