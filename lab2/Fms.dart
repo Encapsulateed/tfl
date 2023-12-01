@@ -254,18 +254,6 @@ class FSM {
               }
             }
           }
-          var transToAlt = new List.from(transitionsFrom[state.name]!);
-          for (var trans in transFromAlt) {
-            if (trans.to.name == to) {
-              transitionsFrom[state.name]!.remove(trans);
-              transitionsTo[to]!.remove(trans);
-              if (rightAlternative.length == 0) {
-                rightAlternative = trans.letter;
-              } else {
-                rightAlternative = "${trans.letter}|${rightAlternative}";
-              }
-            }
-          }
           var transFromLoop = transitionsFrom[state.name]!;
           for (var trans in transFromLoop) {
             if (trans.to.name == state.name) {
