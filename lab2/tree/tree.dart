@@ -328,16 +328,12 @@ Node? ssnf(Node? root) {
 }
 
 Node? simplifyRegex(Node? root, Map<Node, List<String>> treeMap) {
-  String start_regex = inorder(root);
-  var next = "";
-
   treeMap = {};
-  start_regex = inorder(root);
-  //print('TRY tO S $start_regex');
 
   root = removeInvalidNodes(ssnf(root));
-  //root = removeInvalidNodes(removeNodesWithEmptyLeaf(root));
+
   root = removeInvalidNodes(processEmptyLeaves(root));
+
   makeMapAlters(root, treeMap);
 
   root = removeInvalidNodes(removeSameOr(root, treeMap));
@@ -363,21 +359,15 @@ Node? makeMapAlters(Node? root, Map<Node, List<String>> treeMap) {
       inorder(makeMapAlters(root.l, treeMap)),
       inorder(makeMapAlters(root.r, treeMap))
     ];
-  } else if (root.c == '#' || root.c == '·'|| root.c == '*') {
-   // printTree(root);
+  } else if (root.c == '#' || root.c == '·' || root.c == '*') {
     Map<Node, List<String>> map_l = {};
     makeMapAlters(root.l, map_l);
 
     Map<Node, List<String>> map_r = {};
     makeMapAlters(root.r, map_r);
 
-   // print('LEFT ${map_l}');
-    //print('RIGHT ${map_r}');
-
     root.l = removeSameOr(root.l, map_l);
     root.r = removeSameOr(root.r, map_r);
-
-    // map[root] = [inorder(makeMap(root.l, map)), inorder(makeMap(root.r, map))];
   } else {
     root.l = makeMapAlters(root.l, treeMap);
     root.r = makeMapAlters(root.r, treeMap);
