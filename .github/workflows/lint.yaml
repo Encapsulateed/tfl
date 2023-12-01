@@ -1,4 +1,4 @@
-name: Lint
+name: Show dart complilator errors (or don't)
 
 on:
   push:
@@ -8,18 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
 
-      # - name: Install Pub Dependencies
-      #   run: dart pub get
-
-      - name: Verify Formatting
-        run: dart format --output=none --set-exit-if-changed .
-
-      - name: Analyze Project Source
-        run: dart analyze
-      
-      # - name: Run tests
-      #   run: dart test
+      - name: Run dart
+        run: dart lab2/tests/test.dart

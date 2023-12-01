@@ -236,7 +236,7 @@ class FSM {
           String from = inTransition.from.name;
           String to = outTransition.to.name;
           String leftAlternative = "";
-          String rightAlternative = "";
+          String rightAlternative = """";
           String loop = "";
 
           if (inTransition.isCycle() || outTransition.isCycle()) {
