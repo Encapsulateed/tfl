@@ -51,10 +51,8 @@ class FSM {
     (prevRegex);
 
     for (var term in alf) {
-      Map<Node, List<String>> treeMap = {};
       var simpeleDerivative = inorder(simplifyRegex(
-          deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term),
-          treeMap));
+          deriv(postfixToTree(infixToPostfix(augment(prev_regex))), term)));
 
       var stateTitle = getCurrentStateTitle();
       var prevState = getStateByRegex(

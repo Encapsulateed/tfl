@@ -9,15 +9,13 @@ void main(List<String> arguments) {
   print('Input regex');
   regex = stdin.readLineSync() ?? 'null';
   var root = (postfixToTree(infixToPostfix(augment(regex))));
-  Map<Node, List<String>> treeMap = {};
-  makeMapAlters(root, treeMap);
 
-  root = simplifyRegex(root, treeMap);
+  root = simplifyRegex(root);
   regex = inorder(root);
 
   var fms = TestingFms(regex);
   fms.build(regex);
-  fms.Print();
+ // fms.Print();
 
   fms.DumpDotToFile();
 

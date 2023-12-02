@@ -77,7 +77,7 @@ void TestRandomMutate(
   Map<Node, List<String>> treeMap = {};
   makeMapAlters(root, treeMap);
 
-  root = simplifyRegex(root, treeMap);
+  root = simplifyRegex(root);
   String parsed_regex = inorder(root);
 
   print("parsed regex: " + parsed_regex);

@@ -161,19 +161,20 @@ Node? processEmptyLeaves(Node? root) {
   }
   root.l = processEmptyLeaves(root.l);
   root.r = processEmptyLeaves(root.r);
+
   // Проверка листовых вершин бинарных операций "·" и "#"
   if (root.c == '·' || root.c == '#') {
-    if (containsEps(root)) {
-      if (root.l?.c == 'ϵ') {
-        return root.r;
-      } else {
-        return root.l;
-      }
-    } else if (containsEmptyLeaf(root)) {
+    if (root.l?.c == 'ϵ') {
+      return root.r;
+    }
+    if (root.r?.c == 'ϵ') {
+      return root.l;
+    }
+    if (root.l?.c == '∅' || root.r?.c == '∅') {
       return Node('∅');
     }
   } else if (root.c == '|') {
-    if (containsEmptyLeaf(root)) {
+    if (root.l?.c == '∅' || root.r?.c == '∅') {
       if (root.l?.c == '∅') {
         return root.r;
       }
@@ -327,8 +328,8 @@ Node? ssnf(Node? root) {
   return root;
 }
 
-Node? simplifyRegex(Node? root, Map<Node, List<String>> treeMap) {
-  treeMap = {};
+Node? simplifyRegex(Node? root) {
+  Map<Node, List<String>> treeMap = {};
 
   root = removeInvalidNodes(ssnf(root));
 
