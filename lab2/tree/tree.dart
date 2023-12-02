@@ -52,22 +52,11 @@ bool nullable(Node? node) {
   }
 }
 
-void printTree(Node? root, [String indent = '', bool last = true]) {
-  if (root != null) {
-    print(indent + (last ? '└── ' : '├── ') + root.c);
-    var newIndent = indent + (last ? '    ' : '│   ');
-    printTree(root.l, newIndent, false);
-    printTree(root.r, newIndent, true);
-  }
-}
-
 Node? deriv(Node? root, String c) {
   final stack = [root];
 
   while (stack.isNotEmpty) {
     final node = stack.removeLast();
-    // print("LEFT: ${node?.l}");
-    // print("RIGHT: ${node?.r}");
 
     if (node == null || node.c == '∅') {
       continue;
@@ -127,34 +116,6 @@ Node? removeNodeByReference(Node? root, Node? targetNode) {
   return root;
 }
 
-bool containsEmptyLeaf(Node? root) {
-  if (root == null) {
-    return false;
-  }
-
-  if (root.l == null && root.r == null) {
-    // Если это листовая вершина, проверяем содержится ли "∅"
-    return root.c == '∅';
-  }
-
-  // Рекурсивный вызов для левого и правого поддерева
-  return containsEmptyLeaf(root.l) || containsEmptyLeaf(root.r);
-}
-
-bool containsEps(Node? root) {
-  if (root == null) {
-    return false;
-  }
-
-  if (root.l == null && root.r == null) {
-    // Если это листовая вершина, проверяем содержится ли "ϵ"
-    return root.c == 'ϵ';
-  }
-
-  // Рекурсивный вызов для левого и правого поддерева
-  return containsEps(root.l) || containsEps(root.r);
-}
-
 Node? processEmptyLeaves(Node? root) {
   if (root == null) {
     return null;
@@ -183,34 +144,6 @@ Node? processEmptyLeaves(Node? root) {
   }
 
   // Рекурсивный вызов для левого и правого поддерева
-
-  return root;
-}
-
-Node? removeNodesWithEmptyLeaf(Node? root) {
-  if (root == null) {
-    return null;
-  }
-
-  // Рекурсивный вызов для левого и правого поддерева
-  root.l = removeNodesWithEmptyLeaf(root.l);
-  root.r = removeNodesWithEmptyLeaf(root.r);
-
-  // Проверка листовых вершин бинарных операций "·" и "#"
-
-  if ((root.c == '·' || root.c == '#')) {
-    // Если листовая вершина содержит "∅"
-    if (containsEmptyLeaf(root)) {
-      return Node('∅');
-    }
-  } else if (root.c == '|') {
-    if (containsEmptyLeaf(root)) {
-      if (root.l?.c == '∅') {
-        return root.r;
-      }
-      return root.l;
-    }
-  }
 
   return root;
 }
@@ -342,14 +275,6 @@ Node? simplifyRegex(Node? root) {
   return removeInvalidNodes(root);
 }
 
-void printMap(Map<Node, List<String>> treeMap) {
-  treeMap.forEach((key, value) {
-    print('[${inorder(key)}] <-> $value');
-  });
-
-  print(treeMap);
-}
-
 Node? makeMapAlters(Node? root, Map<Node, List<String>> treeMap) {
   if (root == null) {
     return null;
@@ -374,4 +299,13 @@ Node? makeMapAlters(Node? root, Map<Node, List<String>> treeMap) {
     root.r = makeMapAlters(root.r, treeMap);
   }
   return root;
+}
+
+void printTree(Node? root, [String indent = '', bool last = true]) {
+  if (root != null) {
+    print(indent + (last ? '└── ' : '├── ') + root.c);
+    var newIndent = indent + (last ? '    ' : '│   ');
+    printTree(root.l, newIndent, false);
+    printTree(root.r, newIndent, true);
+  }
 }

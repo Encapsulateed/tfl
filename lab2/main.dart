@@ -15,7 +15,7 @@ void main(List<String> arguments) {
 
   var fms = TestingFms(regex);
   fms.build(regex);
- // fms.Print();
+  // fms.Print();
 
   fms.DumpDotToFile();
 
