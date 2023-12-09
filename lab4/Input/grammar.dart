@@ -8,7 +8,8 @@ Map<String, List<List<String>>> parseGrammarFromFile(String filename) {
     if (line.trim().isNotEmpty) {
       var parts = line.split('->').map((part) => part.trim()).toList();
       var nonTerminal = parts[0];
-      var productions = parts[1].split('|').map((prod) => prod.trim().split(' ')).toList();
+      var productions =
+          parts[1].split('|').map((prod) => prod.trim().split(' ')).toList();
       grammar[nonTerminal] = productions;
     }
   }

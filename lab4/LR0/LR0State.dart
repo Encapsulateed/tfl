@@ -1,5 +1,6 @@
 import 'LR0Item.dart';
 import 'Analyzer.dart';
+
 class LR0State {
   List<LR0Item> items;
 
@@ -26,7 +27,9 @@ void printLR0States(List<LR0State> states) {
     print('State $i:\n${states[i]}\n');
   }
 }
-void printLR0StatesDot(List<LR0State> states, Map<String, List<List<String>>> grammar) {
+
+void printLR0StatesDot(
+    List<LR0State> states, Map<String, List<List<String>>> grammar) {
   print('digraph LR0Automaton {');
   print('  node [shape=circle, style=filled, fillcolor=lightblue];');
 

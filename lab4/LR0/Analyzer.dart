@@ -1,7 +1,8 @@
 import 'LR0Item.dart';
 import 'LR0State.dart';
 
-List<LR0Item> closure(List<LR0Item> items, Map<String, List<List<String>>> grammar) {
+List<LR0Item> closure(
+    List<LR0Item> items, Map<String, List<List<String>>> grammar) {
   var closureItems = Set<LR0Item>.from(items);
   var changed = true;
 
@@ -11,8 +12,10 @@ List<LR0Item> closure(List<LR0Item> items, Map<String, List<List<String>>> gramm
       var dotPosition = item.dotPosition;
       var production = item.production;
 
-      if (dotPosition < production.length && grammar.containsKey(production[dotPosition])) {
-        var newProductions = grammar[production[dotPosition]] ?? <List<String>>[];
+      if (dotPosition < production.length &&
+          grammar.containsKey(production[dotPosition])) {
+        var newProductions =
+            grammar[production[dotPosition]] ?? <List<String>>[];
         for (var newProduction in newProductions) {
           var newItem = LR0Item(newProduction, 0);
           if (!closureItems.contains(newItem)) {
@@ -27,8 +30,8 @@ List<LR0Item> closure(List<LR0Item> items, Map<String, List<List<String>>> gramm
   return List.from(closureItems);
 }
 
-
-List<LR0Item> goto(List<LR0Item> items, String symbol, Map<String, List<List<String>>> grammar) {
+List<LR0Item> goto(List<LR0Item> items, String symbol,
+    Map<String, List<List<String>>> grammar) {
   var newItems = <LR0Item>[];
 
   for (var item in items) {
@@ -70,5 +73,3 @@ List<LR0State> buildLR0States(Map<String, List<List<String>>> grammar) {
 
   return states;
 }
-
-
