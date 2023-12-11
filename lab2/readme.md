@@ -1,4 +1,4 @@
-[Лаба](https://vk.com/video/@encapss?z=video-72495085_456240608%2Fpl_189025553_-2)
+[Видос про лабу ?](https://vk.com/video/@encapss?z=video-72495085_456240608%2Fpl_189025553_-2)
 
 # Запуск тестов
 
