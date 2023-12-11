@@ -1,3 +1,4 @@
+
 # Запуск тестов
 
 ```bash
@@ -6,7 +7,7 @@ make test
 
 Вот [тут](https://github.com/Encapsulateed/tfl/blob/main/lab2/tests/test.dart#L60) можно поиграться с параметрами.
 
-# Запуск лабы для ручной эксплуатации
+# Запуск [лабы]([url](https://vk.com/video-72495085_456240608)) для ручной эксплуатации
 
 ```
 dart main.dart
