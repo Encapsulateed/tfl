@@ -1,5 +1,5 @@
 class State {
   String name = '';
-  dynamic state;
+  dynamic value;
   State();
 }
