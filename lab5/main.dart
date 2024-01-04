@@ -1,10 +1,13 @@
 import './src/utils/grammar.dart';
+import './src/state_machine./FSM.dart';
+import 'src/lr0/base/LR0State.dart';
+import 'src/lr0/base/LR0fms.dart';
 
 void main(List<String> arguments) {
-  String filePath = 'input.txt';
-  Grammar grammar = Grammar.fromFile(filePath);
-
-  // Выводим информацию о считанной грамматике
-  print(grammar.toString());
-  // grammar.rules.forEach((production) => print(production));
+  Grammar g = Grammar.fromFile('input.txt');
+  LR0State state = LR0State(g);
+  //print(state);
+  LR0_FMS fms = LR0_FMS(g);
+  //fms.DumpToDOT();
+  fms.log();
 }

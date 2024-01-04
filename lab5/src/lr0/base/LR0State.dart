@@ -1,55 +1,38 @@
-import 'LR0Item.dart';
-import 'Analyzer.dart';
+import '../../utils/grammar.dart';
+import 'LR0Situation.dart';
 
 class LR0State {
-  List<LR0Item> items;
+  Map<Production, Set<LR0Situation>> states = {};
+  Grammar g = Grammar();
 
-  LR0State(this.items);
+  LR0State(Grammar grammar) {
+    g = grammar;
+    //дополнили грамматику
+    grammar.complete();
 
-  @override
-  String toString() {
-    return 'State(${items.join(', ')})';
-  }
+    // тут делаем closure для всей грамматики
+    for (var rule in grammar.rules) {
+      Set<LR0Situation> rule_possible_situation = {};
+      for (int LR0_pointer = 0;
+          LR0_pointer <= rule.right.length;
+          LR0_pointer++) {
+        var situation = LR0Situation(rule.left, rule.right, LR0_pointer);
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LR0State &&
-          runtimeType == other.runtimeType &&
-          items == other.items;
-
-  @override
-  int get hashCode => items.hashCode;
-}
-
-void printLR0States(List<LR0State> states) {
-  for (var i = 0; i < states.length; i++) {
-    print('State $i:\n${states[i]}\n');
-  }
-}
-
-void printLR0StatesDot(
-    List<LR0State> states, Map<String, List<List<String>>> grammar) {
-  print('digraph LR0Automaton {');
-  print('  node [shape=circle, style=filled, fillcolor=lightblue];');
-
-  for (var i = 0; i < states.length; i++) {
-    var currentState = states[i];
-
-    // Вершина
-    print('  $i [label="${currentState.toString()}"];');
-
-    for (var symbol in grammar.keys) {
-      var nextStateItems = goto(currentState.items, symbol, grammar);
-
-      if (nextStateItems.isNotEmpty) {
-        var nextStateIndex = states.indexOf(LR0State(nextStateItems));
-
-        // Дуга
-        print('  $i -> $nextStateIndex [label="$symbol"];');
+        rule_possible_situation.add(situation);
       }
+
+      states[rule] = rule_possible_situation;
     }
   }
 
-  print('}');
+  @override
+  String toString() {
+    String s = '';
+
+    for (var rule in g.rules) {
+      s += '${rule.toString()} ${states[rule]}';
+      s += '\n';
+    }
+    return s;
+  }
 }

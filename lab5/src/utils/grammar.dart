@@ -12,10 +12,13 @@ class Production {
   }
 }
 
-class Grammar {
+class Grammar<T> {
   Set<String> terminals = {};
   Set<String> nonTerminals = {};
   Set<Production> rules = {};
+  String start_non_terminal = '';
+
+  Grammar();
 
   Grammar.fromFile(String filePath) {
     _readGrammarFromFile(filePath);
@@ -46,6 +49,8 @@ class Grammar {
           rules.add(Production(left, right.split('')));
         }
       }
+
+      start_non_terminal = nonTerminals.toList()[0];
     } catch (e) {
       print('Произошла ошибка при чтении файла: $e');
     }
@@ -53,6 +58,16 @@ class Grammar {
 
   @override
   String toString() {
-    return 'TERMINALS: ${terminals.toString()}\nNON TERMINALS: ${nonTerminals.toString()}\nRULES\n${rules.toString()}';
+    return 'TERMINALS: ${terminals.toString()}\nNON TERMINALS: ${nonTerminals.toString()}\nSTART: ${start_non_terminal}\nRULES\n${rules.toString()}';
+  }
+
+  void complete() {
+    var new_non_terminal = '${start_non_terminal}0';
+    nonTerminals.add(new_non_terminal);
+    var prev_rules = rules;
+    rules = {};
+
+    rules.add(Production(new_non_terminal, start_non_terminal.split('')));
+    rules.addAll(prev_rules);
   }
 }
