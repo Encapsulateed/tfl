@@ -23,10 +23,14 @@ class LR0Situation extends Production {
   }
 
   bool isFinal() {
-    return LR0_pointer == super.right.length - 1;
+    return LR0_pointer == super.right.length;
   }
 
   bool isStart() {
     return LR0_pointer == 0;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || this.toString() == other.toString();
 }

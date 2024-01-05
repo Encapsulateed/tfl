@@ -13,51 +13,6 @@ class FSM {
   FSM.fromData(
       this.states, this.startStates, this.finalStates, this.transactions);
 
-  Set<State> epsilonClosure(State state) {
-    var closure = Set<State>.from([state]);
-    var stack = [state];
-
-    while (stack.isNotEmpty) {
-      var currentState = stack.removeLast();
-
-      var epsilonTransitions = transactions
-          .where((t) => t.from == currentState && t.letter.isEmpty)
-          .map((t) => t.to);
-
-      for (var nextState in epsilonTransitions) {
-        if (!closure.contains(nextState)) {
-          closure.add(nextState);
-          stack.add(nextState);
-        }
-      }
-    }
-
-    return closure;
-  }
-
-  Set<State> epsilonClosureSet(Set<State> states) {
-    var result = Set<State>();
-
-    for (var state in states) {
-      result.addAll(epsilonClosure(state));
-    }
-
-    return result;
-  }
-
-  Set<State> move(Set<State> states, String symbol) {
-    var result = Set<State>();
-
-    for (var state in states) {
-      var symbolTransitions = transactions
-          .where((t) => t.from == state && t.letter == symbol)
-          .map((t) => t.to);
-      result.addAll(symbolTransitions);
-    }
-
-    return result;
-  }
-
   // тут надо сделать детерминиизацию НКА
   FSM determinize() {
     return FSM();
@@ -70,6 +25,10 @@ class FSM {
         .toSet();
   }
 
+  State getState(String name) {
+    return states.toList().where((element) => element.name == name).first;
+  }
+
   void DumpToDOT() {
     String res = "";
 
@@ -78,16 +37,17 @@ class FSM {
       if (finalStates.contains(state)) {
         shape = "doublecircle";
       }
-      res += "${state.name} [label = \"${state.name}\", shape = ${shape}]\n";
+      res +=
+          "\"${state.name}\" [label = \"${state.name}\", shape = ${shape}]\n";
     }
 
     for (var state in this.startStates) {
-      res += "dummy -> ${state.name}\n";
+      res += "dummy -> \"${state.name}\"\n";
     }
 
     for (var transaction in this.transactions) {
       res +=
-          "${transaction.from.name} -> ${transaction.to.name} [label = ${transaction.letter}]\n";
+          "\"${transaction.from.name}\" -> \"${transaction.to.name}\" [label = \"${transaction.letter}\"]\n";
     }
 
     res = "digraph {\n"
@@ -107,7 +67,7 @@ class State {
 
   State();
 
-  State.named(this.name);
+  State.valued(this.name, this.value);
 
   @override
   bool operator ==(Object other) =>
