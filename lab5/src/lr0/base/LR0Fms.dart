@@ -4,7 +4,7 @@ import 'LR0Situation.dart';
 
 class LR0FMS extends FSM {
   Grammar LR_grammar = Grammar();
-
+  LR0FMS.empty();
   LR0FMS(Grammar grammar) {
     Map<Production, List<LR0Situation>> states = {};
     LR_grammar = grammar;

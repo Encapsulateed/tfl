@@ -24,7 +24,12 @@ class FSM {
 
 // метод реализующий получение состояния автомата по маске его имени
   State getState(String name) {
+    //print(name);
     return states.toList().where((element) => element.name == name).first;
+  }
+
+  int getStateIndex(State state) {
+    return states.toList().indexOf(state);
   }
 
 // метод представления автомата в формате DOT

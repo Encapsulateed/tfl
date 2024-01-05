@@ -1,12 +1,12 @@
 import './src/utils/grammar.dart';
-//import './src/state_machine./FSM.dart';
-//import 'src/lr0/base/LR0State.dart';
-// import 'src/lr0/base/LR0Fms.dart';
+import 'src/lr0/base/LR0Table.dart';
+// import 'src/lr0/base/LR0fms.dart';
 
 void main(List<String> arguments) {
   Grammar g = Grammar.fromFile('input.txt');
-  print(g.toString());
   // LR0FMS fms = LR0FMS(g);
   // fms.DumpToDOT();
-  //fms.log();
+  LR0Table t = LR0Table(g);
+  //print(g.toString());
+  t.log();
 }

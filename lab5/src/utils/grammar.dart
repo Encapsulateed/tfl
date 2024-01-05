@@ -10,6 +10,10 @@ class Production {
   String toString() {
     return '\n$left -> ${right.join('')}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || this.toString() == other.toString();
 }
 
 class Grammar<T> {
@@ -66,8 +70,17 @@ class Grammar<T> {
     nonTerminals.add(new_non_terminal);
     var prev_rules = rules;
     rules = {};
-
+    start_non_terminal = new_non_terminal;
     rules.add(Production(new_non_terminal, start_non_terminal.split('')));
     rules.addAll(prev_rules);
+  }
+
+  int getRuleIndex(Production rule) {
+    String tmp_left = rule.left;
+    List<String> tmp_right = [];
+    tmp_right.addAll(rule.right);
+    tmp_right.remove('·');
+
+    return rules.toList().indexOf(Production(tmp_left, tmp_right));
   }
 }
