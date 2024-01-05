@@ -2,10 +2,10 @@ import '../../state_machine/FSM.dart';
 import '../../utils/grammar.dart';
 import 'LR0Situation.dart';
 
-class LR0_FMS extends FSM {
+class LR0FMS extends FSM {
   Grammar LR_grammar = Grammar();
 
-  LR0_FMS(Grammar grammar) {
+  LR0FMS(Grammar grammar) {
     Map<Production, List<LR0Situation>> states = {};
     LR_grammar = grammar;
     //дополнили грамматику

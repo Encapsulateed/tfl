@@ -5,7 +5,7 @@ import 'src/lr0/base/LR0fms.dart';
 
 void main(List<String> arguments) {
   Grammar g = Grammar.fromFile('input.txt');
-  LR0_FMS fms = LR0_FMS(g);
+  LR0FMS fms = LR0FMS(g);
   fms.DumpToDOT();
   //fms.log();
 }
