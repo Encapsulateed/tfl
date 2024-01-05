@@ -1,5 +1,9 @@
 import 'dart:io';
 
+// Класс представляющий собой абстрактный конечный автомат
+// states - множество всех состояний автомата
+// startStates и finalStates - множества начальных и конечных состояний соотвественно
+// transactions - список всех переходов автомата
 class FSM {
   Set<State> states = {};
   Set<State> startStates = {};
@@ -18,17 +22,12 @@ class FSM {
     return FSM();
   }
 
-  Set<String> alphabet() {
-    return transactions
-        .where((t) => t.letter.isNotEmpty)
-        .map((t) => t.letter)
-        .toSet();
-  }
-
+// метод реализующий получение состояния автомата по маске его имени
   State getState(String name) {
     return states.toList().where((element) => element.name == name).first;
   }
 
+// метод представления автомата в формате DOT
   void DumpToDOT() {
     String res = "";
 
@@ -61,8 +60,12 @@ class FSM {
   }
 }
 
+// Класс описывающий состояние автомата
 class State {
+  // имя состояния, выступает в роли идентификатора в множестве состояний автомата
   String name = '';
+  // здесь хранится смысловая часть состояния автомата
+  // в случае 5ЛР - это LR0 ситуация (см. класс LR0Situation)
   dynamic value;
 
   State();
@@ -78,9 +81,15 @@ class State {
   int get hashCode => name.hashCode;
 }
 
+// Класс описывающий переход из одного состояния в другое
 class Transaction {
+  // Состояние из которого идём
   State from = State();
+  // состояние в которое идём
   State to = State();
+
+  // Символ | строка, по которому(ой) осуществляется переход
+  // Если - это эпсилон переход, в переменной letter будет содержатся символ ε
   String letter = '';
 
   Transaction();
