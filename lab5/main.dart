@@ -5,6 +5,7 @@ import './src/utils/grammar.dart';
 
 void main(List<String> arguments) {
   Grammar g = Grammar.fromFile('input.txt');
+  print(g.toString());
   // LR0FMS fms = LR0FMS(g);
   // fms.DumpToDOT();
   //fms.log();
