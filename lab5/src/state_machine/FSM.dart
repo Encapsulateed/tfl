@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:collection';
 
 // Класс представляющий собой абстрактный конечный автомат
 // states - множество всех состояний автомата
@@ -9,6 +10,7 @@ class FSM {
   Set<State> startStates = {};
   Set<State> finalStates = {};
   List<Transaction> transactions = [];
+  List<String> alphabet = []; // Памятка для бездельника: мне нужен алфавит
 
   FSM();
 
@@ -19,7 +21,109 @@ class FSM {
 
   // тут надо сделать детерминиизацию НКА
   FSM determinize() {
-    return FSM();
+
+    Set<Set<State>> dStates = {}; // Множество состояний для ДКА
+    Map<Set<State>, Map<String, Set<State>>> dTransitions = {}; // Таблица переходов для ДКА
+    Set<Set<State>> dFinalStates = {}; // Множество конечных состояний для ДКА
+
+    // Начальная настройка
+    Set<State> startStateSet = eClosure(startStates);
+    dStates.add(startStateSet);
+    Queue<Set<State>> unprocessedStates = Queue()..add(startStateSet);
+
+    while (unprocessedStates.isNotEmpty) {
+      Set<State> currentStateSet = unprocessedStates.removeFirst();
+
+      // Вычисление переходов для каждого символа в алфавите
+      Map<String, Set<State>> transitions = {};
+      for (String symbol in alphabet) {
+        Set<State> newStateSet = eClosure(move(currentStateSet, symbol));
+
+        if (newStateSet.isNotEmpty) {
+          transitions[symbol] = newStateSet;
+
+          if (!dStates.contains(newStateSet)) {
+            dStates.add(newStateSet);
+            unprocessedStates.add(newStateSet);
+          }
+        }
+      }
+
+      dTransitions[currentStateSet] = transitions;
+
+      // Проверка, содержит ли текущий набор состояний какое-либо конечное состояние
+      if (currentStateSet.any((state) => finalStates.contains(state))) {
+        dFinalStates.add(currentStateSet);
+      }
+    }
+
+    // Создание нового ДКА
+    FSM determinizedFSM = FSM();
+
+    for (Set<State> stateSet in dStates) {
+      for (State state in stateSet) {
+        determinizedFSM.states.add(state);
+
+        if (stateSet.containsAll(startStates)) {
+          determinizedFSM.startStates.add(state);
+        }
+
+        if (stateSet.any((state) => finalStates.contains(state))) {
+          determinizedFSM.finalStates.add(state);
+        }
+
+        for (String symbol in alphabet) {
+          if (dTransitions[stateSet] != null && dTransitions[stateSet]![symbol] != null) {
+            determinizedFSM.transactions.add(
+              Transaction.fromData(
+                stateSet,
+                dTransitions[stateSet]![symbol]!,
+                symbol,
+              ),
+            );
+          }
+        }
+      }
+    }
+
+    return determinizedFSM;
+  }
+
+  // Вычисление эпсилон-замыкания для набора состояний
+  Set<State> eClosure(Set<State> states) {
+    Set<State> closure = {};
+    Queue<State> queue = Queue.from(states);
+
+    while (queue.isNotEmpty) {
+      State currentState = queue.removeFirst();
+      closure.add(currentState);
+
+      for (Transaction transaction in transactions) {
+        if (transaction.from == currentState && transaction.letter == 'e') {
+          State toState = transaction.to;
+          if (!closure.contains(toState)) {
+            queue.add(toState);
+          }
+        }
+      }
+    }
+
+    return closure;
+  }
+
+  // Вычисление перехода для набора состояний по символу
+  Set<State> move(Set<State> states, String symbol) {
+    Set<State> result = {};
+
+    for (State currentState in states) {
+      for (Transaction transaction in transactions) {
+        if (transaction.from == currentState && transaction.letter == symbol) {
+          result.add(transaction.to);
+        }
+      }
+    }
+
+    return result;
   }
 
 // метод реализующий получение состояния автомата по маске его имени
