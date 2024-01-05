@@ -1,6 +1,6 @@
 import './src/utils/grammar.dart';
 import 'src/lr0/base/LR0Table.dart';
-// import 'src/lr0/base/LR0fms.dart';
+// import 'src/lr0/base/LR0Fms.dart';
 
 void main(List<String> arguments) {
   Grammar g = Grammar.fromFile('input.txt');

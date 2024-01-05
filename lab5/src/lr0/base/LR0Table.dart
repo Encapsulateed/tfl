@@ -2,7 +2,7 @@ import '../../state_machine/FSM.dart';
 import '../../utils/Action.dart';
 import '../../utils/grammar.dart';
 
-import 'LR0fms.dart';
+import 'LR0Fms.dart';
 
 class LR0Table {
   LR0FMS lrfms = LR0FMS.empty();
