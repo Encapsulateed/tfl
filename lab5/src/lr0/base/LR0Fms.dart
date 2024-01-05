@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import '../../state_machine/FSM.dart';
 import '../../utils/grammar.dart';
 import 'LR0Situation.dart';
