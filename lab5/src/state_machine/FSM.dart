@@ -75,7 +75,7 @@ class FSM {
         for (String symbol in alphabet) {
           if (dTransitions[stateSet] != null &&
               dTransitions[stateSet]![symbol] != null) {
-           /* determinizedFSM.transactions.add(
+            /* determinizedFSM.transactions.add(
               Transaction.fromData(
                 stateSet,
                 dTransitions[stateSet]![symbol]!,
@@ -205,7 +205,4 @@ class Transaction {
   Transaction();
 
   Transaction.ivan(this.from, this.to, this.letter);
-
-
-  }
 }
