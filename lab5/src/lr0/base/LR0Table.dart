@@ -8,6 +8,9 @@ class LR0Table {
   LR0FMS lrfms = LR0FMS.empty();
   Grammar inputGrammar = Grammar();
   Map<State, Map<String, List<Action>>> lr0_table = {};
+
+  LR0Table.empty();
+
   LR0Table(Grammar g) {
     inputGrammar = g;
     lrfms = LR0FMS(inputGrammar);
@@ -43,9 +46,6 @@ class LR0Table {
     }
 
     for (var I in lrfms.finalStates) {
-      if (lr0_table[I] == null) {
-        // lr0_table[I] = {};
-      }
       for (var terminal in inputGrammar.terminals) {
         if (lr0_table[I]![terminal] == null) {
           lr0_table[I]![terminal] = [];
@@ -54,7 +54,6 @@ class LR0Table {
             .add(Action.reduce(inputGrammar.getRuleIndex(I.value)));
       }
     }
-    /**/
   }
 
   void log() {

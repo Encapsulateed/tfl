@@ -21,9 +21,9 @@ class FSM {
 
   // тут надо сделать детерминиизацию НКА
   FSM determinize() {
-
     Set<Set<State>> dStates = {}; // Множество состояний для ДКА
-    Map<Set<State>, Map<String, Set<State>>> dTransitions = {}; // Таблица переходов для ДКА
+    Map<Set<State>, Map<String, Set<State>>> dTransitions =
+        {}; // Таблица переходов для ДКА
     Set<Set<State>> dFinalStates = {}; // Множество конечных состояний для ДКА
 
     // Начальная настройка
@@ -73,14 +73,15 @@ class FSM {
         }
 
         for (String symbol in alphabet) {
-          if (dTransitions[stateSet] != null && dTransitions[stateSet]![symbol] != null) {
-            determinizedFSM.transactions.add(
+          if (dTransitions[stateSet] != null &&
+              dTransitions[stateSet]![symbol] != null) {
+           /* determinizedFSM.transactions.add(
               Transaction.fromData(
                 stateSet,
                 dTransitions[stateSet]![symbol]!,
                 symbol,
               ),
-            );
+            ); */
           }
         }
       }
@@ -203,12 +204,8 @@ class Transaction {
 
   Transaction();
 
-  Transaction.fromData(Set<State> from, Set<State> to, this.letter) {
-    this.from = from.length == 1
-        ? from.first
-        : State(); // Take the first state from the set
-    this.to = to.length == 1
-        ? to.first
-        : State(); // Take the first state from the set
+  Transaction.ivan(this.from, this.to, this.letter);
+
+
   }
 }
