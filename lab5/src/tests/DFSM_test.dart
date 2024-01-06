@@ -12,6 +12,7 @@ void main() {
     fsm.states.addAll([st1, st2, st3, st4]);
     fsm.startStates.add(st1);
     fsm.finalStates.add(st4);
+    fsm.alphabet = ['a', 'c'];
 
     var tr1 = Transaction()
       ..from = st1
@@ -42,15 +43,16 @@ void main() {
 
     // Детерминизация автомата
     FSM determinizedFSM = fsm.determinize();
+    determinizedFSM.DumpToDOT();
 
     expect(determinizedFSM.states.length, greaterThan(0));
-    print('Lucky boy!');
+    print(determinizedFSM.states.length);
     expect(determinizedFSM.startStates.length, greaterThan(0));
-    print('Lucky boy!');
+    print(determinizedFSM.startStates.length);
     expect(determinizedFSM.finalStates.length, greaterThan(0));
-    print('Lucky boy!');
+    print(determinizedFSM.finalStates.length);
     expect(determinizedFSM.transactions.length, greaterThan(0));
+    print(determinizedFSM.transactions.length);
 
-    //тут делаем дамп2дот
   });
 }

@@ -64,24 +64,23 @@ class FSM {
       for (State state in stateSet) {
         determinizedFSM.states.add(state);
 
-        if (stateSet.containsAll(startStates)) {
+        if (startStates.contains(state)) {
           determinizedFSM.startStates.add(state);
         }
 
-        if (stateSet.any((state) => finalStates.contains(state))) {
+        if (finalStates.contains(state)) {
           determinizedFSM.finalStates.add(state);
         }
 
         for (String symbol in alphabet) {
-          if (dTransitions[stateSet] != null &&
-              dTransitions[stateSet]![symbol] != null) {
-            /* determinizedFSM.transactions.add(
-              Transaction.fromData(
-                stateSet,
-                dTransitions[stateSet]![symbol]!,
-                symbol,
-              ),
-            ); */
+          if (dTransitions[stateSet] != null && dTransitions[stateSet]![symbol] != null) {
+
+            determinizedFSM.transactions.add(
+              Transaction.ivan(
+                  state,
+                  dTransitions[stateSet]![symbol]!.first,
+                  symbol)
+            );
           }
         }
       }
@@ -100,7 +99,7 @@ class FSM {
       closure.add(currentState);
 
       for (Transaction transaction in transactions) {
-        if (transaction.from == currentState && transaction.letter == 'e') {
+        if (transaction.from == currentState && transaction.letter == 'ε') {
           State toState = transaction.to;
           if (!closure.contains(toState)) {
             queue.add(toState);
