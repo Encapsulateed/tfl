@@ -126,6 +126,16 @@ class FSM {
     return result;
   }
 
+  void setPrint(Set<State> set) {
+    String res = "Set print is working: ";
+
+    for (State state in set) {
+      res += "${state.name} ";
+    }
+
+    print(res);
+  }
+
 // метод реализующий получение состояния автомата по маске его имени
   State getState(String name) {
     //print(name);
