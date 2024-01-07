@@ -37,7 +37,7 @@ void main() {
     var tr5 = Transaction()
       ..from = st3
       ..to = st4
-      ..letter = 'ε';
+      ..letter = 'a';
 
     fsm.transactions.addAll([tr1, tr2, tr3, tr4, tr5]);
 
