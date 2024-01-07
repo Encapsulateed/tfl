@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:collection';
 
@@ -22,9 +21,10 @@ class FSM {
 
   FSM determinize() {
     Set<Set<State>> dStates = {}; // Множество состояний для ДКА
-    Map<Set<State>, Map<String, Set<State>>> dTransitions = {}; // Таблица переходов для ДКА
+    Map<Set<State>, Map<String, Set<State>>> dTransitions =
+        {}; // Таблица переходов для ДКА
     Set<Set<State>> dFinalStates = {}; // Множество конечных состояний для ДКА
-    Set<Set<State>> dStartStates = {}; // Множество конечных состояний для ДКА
+    Set<Set<State>> dStartStates = {}; // Множество начальных состояний для ДКА
 
     //Строим замыкание по стартовым состояниям
     Set<State> startStateSet = eClosure(startStates);
@@ -32,31 +32,39 @@ class FSM {
     //Помещаем в очередь множество, состоящее из стартовой вершины
     Queue<Set<State>> unprocessedStates = Queue()..add(startStateSet);
 
-    while (unprocessedStates.isNotEmpty) {
+    while (unprocessedStates.isNotEmpty || unprocessedStates.length != 0) {
       //Достаем множество из очереди
       Set<State> currentStateSet = unprocessedStates.removeFirst();
-
       // Посмотрим в какое состояние ведет переход по символу из каждого состояния
       Map<String, Set<State>> transitions = {};
+
       for (String symbol in alphabet) {
         //Строим замыкание по состояниям, в которые можем перейти по символу
-        Set<State> newStateSet = eClosure(move(currentStateSet, symbol));
-        /*print('TEKUSHEE');
-        setPrint(currentStateSet);
-        print('MOVE');
-        setPrint(move(currentStateSet, symbol));
-        print('new');
-        setPrint(newStateSet);
-         */
 
-        if (newStateSet.isNotEmpty) {
+        // Set<State> newStateSet = eClosure(move(currentStateSet, symbol));
+        Set<State> newStateSet = eClosure(move(currentStateSet, symbol));
+        bool equal_flag = true;
+
+        if (newStateSet.length == currentStateSet.length) {
+          for (int i = 0; i < newStateSet.length; i++) {
+            if (newStateSet.toList()[i].name !=
+                currentStateSet.toList()[i].name) {
+              equal_flag = false;
+            }
+          }
+        }
+
+        if (newStateSet.isNotEmpty && newStateSet.length != 0) {
           transitions[symbol] = newStateSet;
 
           //Кладем в очередь только, если оно не лежало уже там раньше
-          if (!unprocessedStates.contains(newStateSet)) {
+          if (unprocessedStates.contains(newStateSet) == false) {
             // Если в множестве newStateSet хотя бы одно из вершин терминально в НКА, то само терминально
-            dStates.add(newStateSet);
-            unprocessedStates.add(newStateSet);
+            if (equal_flag == false) {
+              dStates.add(newStateSet);
+
+              unprocessedStates.add(newStateSet);
+            }
           }
         }
       }
@@ -64,36 +72,22 @@ class FSM {
       dTransitions[currentStateSet] = transitions;
 
       //Проверка, содержит ли текущий набор состояний какое-либо конечное состояние
+      setPrint(finalStates);
       for (State t in finalStates) {
-        if (currentStateSet.contains(t) && (!dFinalStates.contains(currentStateSet))) {
-          dFinalStates.add(currentStateSet);
-        }
+        dFinalStates.add({t});
       }
 
       //Проверка, содержит ли текущий набор состояний какое-либо стартовое состояние
       for (State t in startStates) {
-        if (currentStateSet.contains(t) && (!dStartStates.contains(currentStateSet))) {
+        if (currentStateSet.contains(t) &&
+            (!dStartStates.contains(currentStateSet))) {
           dStartStates.add(currentStateSet);
         }
       }
     }
 
-    /*print("Test Test TTTTEEEEEESSSSSSSSSSTTTT");
-    for (Set<State> t in dFinalStates) {
-      setPrint(t);
-    }
-    print("Test Test TTTTEEEEEESSSSSSSSSSTTTT");
-     */
-
     // Создание нового ДКА
     FSM determinizedFSM = FSM();
-
-    /*print("dStates print");
-    for (Set<State> t in dStates) {
-      setPrint(t);
-    }
-    print("dStates print");
-     */
 
 // Map для хранения объединенных состояний
 
@@ -101,6 +95,10 @@ class FSM {
       State combinedState = State();
       for (State state in stateSet) {
         combinedState.name += "${state.name} ";
+        combinedState.value = <dynamic>[];
+        if (state.value != null) {
+          (combinedState.value as List<dynamic>).add(state.value);
+        }
         //value объединяем здесь
       }
 
@@ -115,21 +113,15 @@ class FSM {
       }
 
       for (String symbol in alphabet) {
-        /*print("Trans");
-          setPrint(stateSet);
-          print(symbol);
-          setPrint(dTransitions[stateSet]![symbol]);
-
-           */
-
-        if (dTransitions[stateSet] != null && dTransitions[stateSet]![symbol] != null) {
+        if (dTransitions[stateSet] != null &&
+            dTransitions[stateSet]![symbol] != null) {
           State toState = State();
 
           for (State s in dTransitions[stateSet]![symbol]!) {
             toState.name += "${s.name} ";
             //тут же собираем value
           }
-
+          // print('BY $symbol');
           determinizedFSM.transactions.add(
             Transaction.ivan(
               combinedState,
@@ -186,7 +178,7 @@ class FSM {
 
     if (set != null) {
       for (State state in set) {
-        res += "${state.name} ";
+        res += "${state.name}\n";
       }
 
       print(res);
@@ -197,7 +189,6 @@ class FSM {
 
 // метод реализующий получение состояния автомата по маске его имени
   State getState(String name) {
-    //print(name);
     return states.toList().where((element) => element.name == name).first;
   }
 

@@ -1,25 +1,11 @@
 import 'dart:io';
-
-class Production {
-  String left;
-  List<String> right;
-
-  Production(this.left, this.right);
-
-  @override
-  String toString() {
-    return '\n$left -> ${right.join('')}';
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || this.toString() == other.toString();
-}
+import 'Production.dart';
 
 class Grammar<T> {
   Set<String> terminals = {};
   Set<String> nonTerminals = {};
-  Set<Production> rules = {};
+  List<Production> rules = [];
+  List<Production> user_rules = [];
   String start_non_terminal = '';
 
   Grammar();
@@ -69,8 +55,8 @@ class Grammar<T> {
     var new_non_terminal = '${start_non_terminal}0';
     nonTerminals.add(new_non_terminal);
     var prev_rules = rules;
-    rules = {};
-    //start_non_terminal = new_non_terminal;
+    user_rules = prev_rules;
+    rules = [];
     rules.add(Production(new_non_terminal, start_non_terminal.split('')));
     rules.addAll(prev_rules);
   }
@@ -81,6 +67,15 @@ class Grammar<T> {
     tmp_right.addAll(rule.right);
     tmp_right.remove('·');
 
-    return rules.toList().indexOf(Production(tmp_left, tmp_right));
+    return rules.indexOf(Production(tmp_left, tmp_right));
+  }
+
+  int getruleIndexInUser(Production rule) {
+    String tmp_left = rule.left;
+    List<String> tmp_right = [];
+    tmp_right.addAll(rule.right);
+    tmp_right.remove('·');
+
+    return user_rules.indexOf(Production(tmp_left, tmp_right));
   }
 }

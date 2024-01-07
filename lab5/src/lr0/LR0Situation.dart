@@ -1,4 +1,4 @@
-import '../../utils/grammar.dart';
+import '../utils/Production.dart';
 
 class LR0Situation extends Production {
   int LR0_pointer = 0;
@@ -33,4 +33,15 @@ class LR0Situation extends Production {
   @override
   bool operator ==(Object other) =>
       identical(this, other) || this.toString() == other.toString();
+
+  List<String> getNextTokens(List<LR0Situation> productions) {
+    List<String> generatedList = [];
+    for (LR0Situation production in productions) {
+      String nextToken = production.next;
+      if (nextToken != 'eps' && !generatedList.contains(nextToken)) {
+        generatedList.add(nextToken);
+      }
+    }
+    return generatedList;
+  }
 }

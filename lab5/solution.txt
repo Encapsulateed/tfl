@@ -1,16 +1,15 @@
 digraph {
 rankdir = LR
 dummy [shape=none, label="", width=0, height=0]
-"S0 -> ·S" [label = "S0 -> ·S", shape = circle]
-"S0 -> S·" [label = "S0 -> S·", shape = doublecircle]
-"S -> ·A" [label = "S -> ·A", shape = circle]
-"S -> A·" [label = "S -> A·", shape = doublecircle]
-"A -> ·a" [label = "A -> ·a", shape = circle]
-"A -> a·" [label = "A -> a·", shape = doublecircle]
-dummy -> "S0 -> ·S"
-"S0 -> ·S" -> "S0 -> S·" [label = "S"]
-"S -> ·A" -> "S -> A·" [label = "A"]
-"A -> ·a" -> "A -> a·" [label = "a"]
-"S0 -> ·S" -> "S -> ·A" [label = "ε"]
-"S -> ·A" -> "A -> ·a" [label = "ε"]
+"S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b" [label = "S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b", shape = circle]
+dummy -> "S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b"
 }
