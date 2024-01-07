@@ -70,7 +70,7 @@ class Grammar<T> {
     nonTerminals.add(new_non_terminal);
     var prev_rules = rules;
     rules = {};
-    start_non_terminal = new_non_terminal;
+    //start_non_terminal = new_non_terminal;
     rules.add(Production(new_non_terminal, start_non_terminal.split('')));
     rules.addAll(prev_rules);
   }

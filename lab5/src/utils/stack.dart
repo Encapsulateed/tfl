@@ -32,4 +32,8 @@ class Stack<T> {
     }
     return _items.last;
   }
+
+  List<T> toList() {
+    return List.from(_items);
+  }
 }
