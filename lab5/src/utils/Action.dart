@@ -4,14 +4,14 @@ class Action {
   int? ruleNumber = null;
 
   Action.reduce(this.ruleNumber) {
-    actionTitle = 'r $ruleNumber';
+    actionTitle = 'r$ruleNumber';
   }
   Action.shift(this.stateNumber) {
-    actionTitle = 's $stateNumber';
+    actionTitle = 's$stateNumber';
   }
 
   Action.goto(this.stateNumber) {
-    actionTitle = 'g $stateNumber';
+    actionTitle = 'g$stateNumber';
   }
 
   @override
