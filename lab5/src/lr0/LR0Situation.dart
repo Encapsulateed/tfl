@@ -32,16 +32,28 @@ class LR0Situation extends Production {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || this.toString() == other.toString();
+      identical(this, other) ||
+      (this.toString() == (other as LR0Situation).toString() &&
+          LR0_pointer == other.LR0_pointer);
 
-  List<String> getNextTokens(List<LR0Situation> productions) {
-    List<String> generatedList = [];
-    for (LR0Situation production in productions) {
-      String nextToken = production.next;
-      if (nextToken != 'eps' && !generatedList.contains(nextToken)) {
-        generatedList.add(nextToken);
-      }
+  void move() {
+    LR0_pointer++;
+    try {
+      next = super.right[LR0_pointer];
+    } catch (e) {
+      next = 'eps';
     }
-    return generatedList;
+  }
+
+  String getNext() {
+    try {
+      return super.right[LR0_pointer];
+    } catch (e) {
+      return 'eps';
+    }
+  }
+
+  LR0Situation clone() {
+    return LR0Situation(left, right, LR0_pointer);
   }
 }

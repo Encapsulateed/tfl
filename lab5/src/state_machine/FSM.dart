@@ -196,6 +196,10 @@ class FSM {
     return states.toList().indexOf(state);
   }
 
+  State getStateByIndex(int index) {
+    return states.toList()[index];
+  }
+
 // метод представления автомата в формате DOT
   void DumpToDOT() {
     String res = "";
@@ -244,7 +248,10 @@ class State {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is State && runtimeType == other.runtimeType && name == other.name;
+      other is State &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          value == other.value;
 
   @override
   int get hashCode => name.hashCode;
@@ -264,4 +271,9 @@ class Transaction {
   Transaction();
 
   Transaction.ivan(this.from, this.to, this.letter);
+
+  @override
+  String toString() {
+    return "[${from.name}] -> [${to.name}] BY ${letter} ";
+  }
 }
