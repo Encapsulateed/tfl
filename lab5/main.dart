@@ -6,7 +6,7 @@ import 'src/state_machine/FSM.dart';
 void main(List<String> arguments) {
   var g = Grammar.fromFile('input.txt');
   g.complete();
-  FSM f = LR0FMS(g);
+  FSM f = LR0FMS.nka(g);
   //f = f.determinize();
   f.DumpToDOT();
 

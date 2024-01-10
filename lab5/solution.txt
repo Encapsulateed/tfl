@@ -1,89 +1,38 @@
 digraph {
 rankdir = LR
 dummy [shape=none, label="", width=0, height=0]
-"E0 -> ·E
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" [label = "E0 -> ·E
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)", shape = circle]
-"E0 -> E·
-E -> E·+T" [label = "E0 -> E·
-E -> E·+T", shape = doublecircle]
+"E0 -> ·E" [label = "E0 -> ·E", shape = circle]
+"E0 -> E·" [label = "E0 -> E·", shape = doublecircle]
+"E -> ·E+T" [label = "E -> ·E+T", shape = circle]
+"E -> E·+T" [label = "E -> E·+T", shape = circle]
 "E -> E+·T" [label = "E -> E+·T", shape = circle]
 "E -> E+T·" [label = "E -> E+T·", shape = doublecircle]
+"E -> ·T" [label = "E -> ·T", shape = circle]
 "E -> T·" [label = "E -> T·", shape = doublecircle]
+"T -> ·n" [label = "T -> ·n", shape = circle]
 "T -> n·" [label = "T -> n·", shape = doublecircle]
-"T -> (·E)
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" [label = "T -> (·E)
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)", shape = circle]
+"T -> ·(E)" [label = "T -> ·(E)", shape = circle]
+"T -> (·E)" [label = "T -> (·E)", shape = circle]
 "T -> (E·)" [label = "T -> (E·)", shape = circle]
 "T -> (E)·" [label = "T -> (E)·", shape = doublecircle]
-dummy -> "E0 -> ·E
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)"
-"E0 -> ·E
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" -> "E0 -> E·
-E -> E·+T" [label = "E"]
-"E0 -> E·
-E -> E·+T" -> "E -> E+·T" [label = "+"]
+dummy -> "E0 -> ·E"
+"E0 -> ·E" -> "E0 -> E·" [label = "E"]
+"E -> ·E+T" -> "E -> E·+T" [label = "E"]
+"E -> E·+T" -> "E -> E+·T" [label = "+"]
 "E -> E+·T" -> "E -> E+T·" [label = "T"]
-"E0 -> ·E
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" -> "E -> T·" [label = "T"]
-"E0 -> ·E
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" -> "T -> n·" [label = "n"]
-"E0 -> ·E
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" -> "T -> (·E)
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" [label = "("]
-"T -> (·E)
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" -> "T -> (E·)" [label = "E"]
+"E -> ·T" -> "E -> T·" [label = "T"]
+"T -> ·n" -> "T -> n·" [label = "n"]
+"T -> ·(E)" -> "T -> (·E)" [label = "("]
+"T -> (·E)" -> "T -> (E·)" [label = "E"]
 "T -> (E·)" -> "T -> (E)·" [label = ")"]
-"T -> (·E)
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" -> "E -> T·" [label = "T"]
-"T -> (·E)
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" -> "T -> n·" [label = "n"]
-"T -> (·E)
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" -> "T -> (·E)
-E -> ·E+T
-E -> ·T
-T -> ·n
-T -> ·(E)" [label = "("]
+"E0 -> ·E" -> "E -> ·E+T" [label = "ε"]
+"E0 -> ·E" -> "E -> ·T" [label = "ε"]
+"E -> ·E+T" -> "E -> ·E+T" [label = "ε"]
+"E -> ·E+T" -> "E -> ·T" [label = "ε"]
+"E -> E+·T" -> "T -> ·n" [label = "ε"]
+"E -> E+·T" -> "T -> ·(E)" [label = "ε"]
+"E -> ·T" -> "T -> ·n" [label = "ε"]
+"E -> ·T" -> "T -> ·(E)" [label = "ε"]
+"T -> (·E)" -> "E -> ·E+T" [label = "ε"]
+"T -> (·E)" -> "E -> ·T" [label = "ε"]
 }
