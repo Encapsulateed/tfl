@@ -210,16 +210,16 @@ class FSM {
         shape = "doublecircle";
       }
       res +=
-          "\"${state.name}\" [label = \"${state.name}\", shape = ${shape}]\n";
+          "\"${getStateIndex(state)} ${state.name}\" [label = \"${getStateIndex(state)} ${state.name}\", shape = ${shape}]\n";
     }
 
     for (var state in this.startStates) {
-      res += "dummy -> \"${state.name}\"\n";
+      res += "dummy -> \"${getStateIndex(state)} ${state.name}\"\n";
     }
 
     for (var transaction in this.transactions) {
       res +=
-          "\"${transaction.from.name}\" -> \"${transaction.to.name}\" [label = \"${transaction.letter}\"]\n";
+          "\"${getStateIndex(transaction.from)} ${transaction.from.name}\" -> \"${getStateIndex(transaction.to)} ${transaction.to.name}\" [label = \"${transaction.letter}\"]\n";
     }
 
     res = "digraph {\n"
@@ -228,7 +228,7 @@ class FSM {
         "$res"
         "}\n";
 
-    File file = File('solution.txt');
+    File file = File('fsm.txt');
     file.writeAsStringSync(res);
   }
 }

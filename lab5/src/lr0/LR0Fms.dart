@@ -112,8 +112,6 @@ class LR0FMS extends FSM {
         var newl = l.clone();
         var beta = newl.next;
 
-        if (l.toString() == "E -> ·E+T") {}
-
         if (beta == "eps") {
           continue;
         }
@@ -156,7 +154,6 @@ class LR0FMS extends FSM {
 
           shift(N0);
         } else {
-          print(state.name);
           if ((transition_set[0].to.value as List<LR0Situation>)
                   .contains(newl) ==
               false) {
