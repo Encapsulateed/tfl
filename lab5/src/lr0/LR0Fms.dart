@@ -113,12 +113,6 @@ class LR0FMS extends FSM {
         break;
       }
     }
-
-    shift(getStateByIndex(1));
-    shift(getStateByIndex(2));
-    shift(getStateByIndex(3));
-    shift(getStateByIndex(4));
-    shift(getStateByIndex(5));
   }
 
   void shift(State state, {bool need_load = true}) {
@@ -150,9 +144,11 @@ class LR0FMS extends FSM {
 
         if (transition_set.length == 0) {
           State N0 = State();
+          bool existed = false;
           // тут логика, есди какое-то состояние уже содержит эту продукцию
           if (statyByLR0[newl.toString()] != null) {
             N0 = statyByLR0[newl.toString()]!;
+            existed = true;
           } else {
             N0 = State.valued(newl.toString(), [newl.clone()]);
 
@@ -166,13 +162,13 @@ class LR0FMS extends FSM {
           Transaction transaction = Transaction.ivan(state, N0, beta);
           super.transactions.add(transaction);
 
-          List<State> first = [];
-          First(N0, first);
-          first.forEach((element) {
-            load_rules(element, N0, X);
-          });
-
-          // shift(N0);
+          if (existed == false) {
+            List<State> first = [];
+            First(N0, first);
+            first.forEach((element) {
+              load_rules(element, N0, X);
+            });
+          }
         } else {
           if ((transition_set[0].to.value as List<LR0Situation>)
                   .contains(newl) ==

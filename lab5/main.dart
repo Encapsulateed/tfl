@@ -1,4 +1,5 @@
 import './src/utils/grammar.dart';
+import 'src/classes/GSStack.dart';
 import 'src/lr0/LR0Fms.dart';
 import 'src/lr0/LR0Table.dart';
 import 'src/lr0/lr0Parser.dart';
@@ -8,8 +9,6 @@ import 'src/state_machine/FSM.dart';
 void main(List<String> arguments) {
   var g = Grammar.fromFile('input.txt');
 
-  LR0FMS f = LR0FMS(g);
-  f.DumpToDOT();
-  //LR0Parser p = LR0Parser(g);
-  // print(p.Parse('n+n'));
+  LR0Parser p = LR0Parser(g);
+  print(p.ParseGss('(n+n)+(n)', 2));
 }
