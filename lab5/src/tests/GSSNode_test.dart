@@ -8,11 +8,13 @@ void main() {
     const level = 0;
 
     test('starts with empty prev', () {
-      expect(GSSLevel(level).push(value, DEFAULT_COMPARATOR).degPrev(), equals(0));
+      expect(
+          GSSLevel(level).push(value, DEFAULT_COMPARATOR).degPrev(), equals(0));
     });
 
     test('starts with empty next', () {
-      expect(GSSLevel(level).push(value, DEFAULT_COMPARATOR).degNext(), equals(0));
+      expect(
+          GSSLevel(level).push(value, DEFAULT_COMPARATOR).degNext(), equals(0));
     });
   });
 

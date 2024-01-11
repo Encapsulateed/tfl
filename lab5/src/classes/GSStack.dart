@@ -32,7 +32,8 @@ class GSStackImpl<T> implements GSStack<T> {
       this._levels.add(GSSLevel(level));
     }
 
-    final node = this._levels[level].find(value, _comparator) ?? this._levels[level].push(value);
+    final node = this._levels[level].find(value, _comparator) ??
+        this._levels[level].push(value);
 
     if (prev != null) {
       node.addPrev(prev);

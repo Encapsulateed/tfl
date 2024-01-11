@@ -12,9 +12,9 @@ class GSSLevel<T> {
 
   // O(n)
   GSSNode<T>? find(T value, [Comparator<T>? comparator]) {
-  comparator ??= DEFAULT_COMPARATOR;
+    comparator ??= DEFAULT_COMPARATOR;
 
-  for (final key in nodes.keys) {
+    for (final key in nodes.keys) {
       final node = nodes[key]!;
 
       if (comparator(node.value, value)) {

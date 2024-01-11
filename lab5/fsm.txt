@@ -1,100 +1,71 @@
 digraph {
 rankdir = LR
 dummy [shape=none, label="", width=0, height=0]
-"0 E0 -> ·E
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" [label = "0 E0 -> ·E
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n", shape = circle]
-"1 E0 -> E·
-E -> E·+E
-E -> E·*E" [label = "1 E0 -> E·
-E -> E·+E
-E -> E·*E", shape = doublecircle]
-"2 E -> E+·E
-E -> ·E+E" [label = "2 E -> E+·E
-E -> ·E+E", shape = circle]
-"3 E -> E+E·" [label = "3 E -> E+E·", shape = doublecircle]
-"4 E -> E*·E
-E -> ·E+E
-E -> ·E*E" [label = "4 E -> E*·E
-E -> ·E+E
-E -> ·E*E", shape = circle]
-"5 E -> E*E·" [label = "5 E -> E*E·", shape = doublecircle]
-"6 E -> (·E)
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" [label = "6 E -> (·E)
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n", shape = circle]
-"7 E -> (E·)" [label = "7 E -> (E·)", shape = circle]
-"8 E -> (E)·" [label = "8 E -> (E)·", shape = doublecircle]
-"9 E -> n·" [label = "9 E -> n·", shape = doublecircle]
-dummy -> "0 E0 -> ·E
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n"
-"0 E0 -> ·E
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" -> "1 E0 -> E·
-E -> E·+E
-E -> E·*E" [label = "E"]
-"1 E0 -> E·
-E -> E·+E
-E -> E·*E" -> "2 E -> E+·E
-E -> ·E+E" [label = "+"]
-"2 E -> E+·E
-E -> ·E+E" -> "3 E -> E+E·" [label = "E"]
-"1 E0 -> E·
-E -> E·+E
-E -> E·*E" -> "4 E -> E*·E
-E -> ·E+E
-E -> ·E*E" [label = "*"]
-"4 E -> E*·E
-E -> ·E+E
-E -> ·E*E" -> "5 E -> E*E·" [label = "E"]
-"0 E0 -> ·E
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" -> "6 E -> (·E)
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" [label = "("]
-"6 E -> (·E)
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" -> "7 E -> (E·)" [label = "E"]
-"7 E -> (E·)" -> "8 E -> (E)·" [label = ")"]
-"6 E -> (·E)
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" -> "6 E -> (·E)
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" [label = "("]
-"6 E -> (·E)
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" -> "9 E -> n·" [label = "n"]
-"0 E0 -> ·E
-E -> ·E+E
-E -> ·E*E
-E -> ·(E)
-E -> ·n" -> "9 E -> n·" [label = "n"]
+"0 S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b" [label = "0 S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b", shape = circle]
+"1 S0 -> S·" [label = "1 S0 -> S·", shape = doublecircle]
+"2 S -> A·A
+A -> ·aA
+A -> ·b" [label = "2 S -> A·A
+A -> ·aA
+A -> ·b", shape = circle]
+"3 S -> AA·" [label = "3 S -> AA·", shape = doublecircle]
+"4 A -> a·A
+A -> ·aA
+A -> ·b" [label = "4 A -> a·A
+A -> ·aA
+A -> ·b", shape = circle]
+"5 A -> aA·" [label = "5 A -> aA·", shape = doublecircle]
+"6 A -> b·" [label = "6 A -> b·", shape = doublecircle]
+dummy -> "0 S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b"
+"0 S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b" -> "1 S0 -> S·" [label = "S"]
+"0 S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b" -> "2 S -> A·A
+A -> ·aA
+A -> ·b" [label = "A"]
+"2 S -> A·A
+A -> ·aA
+A -> ·b" -> "3 S -> AA·" [label = "A"]
+"2 S -> A·A
+A -> ·aA
+A -> ·b" -> "4 A -> a·A
+A -> ·aA
+A -> ·b" [label = "a"]
+"4 A -> a·A
+A -> ·aA
+A -> ·b" -> "5 A -> aA·" [label = "A"]
+"4 A -> a·A
+A -> ·aA
+A -> ·b" -> "4 A -> a·A
+A -> ·aA
+A -> ·b" [label = "a"]
+"4 A -> a·A
+A -> ·aA
+A -> ·b" -> "6 A -> b·" [label = "b"]
+"2 S -> A·A
+A -> ·aA
+A -> ·b" -> "6 A -> b·" [label = "b"]
+"0 S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b" -> "4 A -> a·A
+A -> ·aA
+A -> ·b" [label = "a"]
+"0 S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b" -> "6 A -> b·" [label = "b"]
 }

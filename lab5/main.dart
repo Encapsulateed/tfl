@@ -6,11 +6,10 @@ import 'src/state_machine/FSM.dart';
 
 void main(List<String> arguments) {
   var g = Grammar.fromFile('input.txt');
-  print(g.followSets);
-  print(g.firstSets);
-  // LR0Table t = LR0Table(g);
+
+  LR0Table t = LR0Table(g);
   // t.log();
-//  t.logToFile();
+  t.logToFile();
   //LR0Table t = LR0Table(g);
   //t.logToFile();
 

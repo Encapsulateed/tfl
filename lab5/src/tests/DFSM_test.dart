@@ -53,6 +53,5 @@ void main() {
     print(determinizedFSM.finalStates.length);
     expect(determinizedFSM.transactions.length, greaterThan(0));
     print(determinizedFSM.transactions.length);
-
   });
 }

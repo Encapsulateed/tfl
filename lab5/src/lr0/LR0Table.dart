@@ -15,7 +15,7 @@ class LR0Table {
   LR0Table(Grammar input_grammar) {
     _grammar = input_grammar;
     _fsm = LR0FMS(_grammar);
-
+    _grammar.terminals.add('\$');
     makeTable();
   }
 
@@ -42,10 +42,13 @@ class LR0Table {
       for (int i = 0; i < (I.value as List<LR0Situation>).length; i++) {
         var lr0_situation = I.value[i] as LR0Situation;
         if (lr0_situation.getNext() == 'eps') {
-          for (var terminal in _grammar.terminals) {
-            if (lr0_situation.right.contains(terminal)) {
-              lr0_table[index_I]![terminal]!
-                  .add(Action.reduce(_grammar.getRuleIndex(lr0_situation)));
+          int reduce_id = _grammar.getRuleIndex(lr0_situation);
+          var left = lr0_situation.left;
+          if (reduce_id == 0) {
+            lr0_table[index_I]!['\$']!.add(Action.accept());
+          } else {
+            for (var terminal in _grammar.followSets[left]!) {
+              lr0_table[index_I]![terminal]!.add(Action.reduce(reduce_id));
             }
           }
         }

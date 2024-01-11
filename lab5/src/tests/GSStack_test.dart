@@ -94,7 +94,8 @@ void main() {
 
       while (!stack.empty() && native.isNotEmpty) {
         final value = native.removeLast();
-        final nextPrev = (prev?.prev.values ?? const <GSSNode<int>>[]).firstOrNull as GSSNode<int>?;
+        final nextPrev = (prev?.prev.values ?? const <GSSNode<int>>[])
+            .firstOrNull as GSSNode<int>?;
         stack.pop(prev!);
 
         expect(prev.value, equals(value));

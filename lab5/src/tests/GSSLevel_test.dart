@@ -77,19 +77,19 @@ void main() {
     });
 
     test("fixes others' next, and prev", () {
-    final level0 = GSSLevel<int>(0);
-    final level1 = GSSLevel<int>(1);
-    final nodeA = level0.push(0);
-    final nodeB = level1.push(1);
+      final level0 = GSSLevel<int>(0);
+      final level1 = GSSLevel<int>(1);
+      final nodeA = level0.push(0);
+      final nodeB = level1.push(1);
 
-    // create a 2-cycle
-    nodeB.addPrev(nodeA);
-    nodeB.addNext(nodeA);
+      // create a 2-cycle
+      nodeB.addPrev(nodeA);
+      nodeB.addNext(nodeA);
 
-    level1.remove(nodeB);
+      level1.remove(nodeB);
 
-    expect(nodeA.degNext(), equals(0));
-    expect(nodeA.degPrev(), equals(0));
+      expect(nodeA.degNext(), equals(0));
+      expect(nodeA.degPrev(), equals(0));
     });
   });
 }
