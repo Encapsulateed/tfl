@@ -18,6 +18,7 @@ class LR0Table {
     _grammar.terminals.add('\$');
     makeTable();
     _grammar.terminals.remove('\$');
+    _fsm.DumpToDOT();
   }
 
   void makeTable() {
@@ -85,7 +86,6 @@ class LR0Table {
   }
 
   void logToFile() {
-    _fsm.DumpToDOT();
     var file = File('lr0_table.txt');
 
     // Открываем файл для записи

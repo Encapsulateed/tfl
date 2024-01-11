@@ -67,10 +67,7 @@ class LR0FMS extends FSM {
     super.alphabet.addAll(_grammar.nonTerminals);
     super.alphabet.addAll(_grammar.terminals);
 
-    gaySex();
-
-    // make_symbol_transition();
-    // make_eps_transitions();
+    buildDFA();
   }
 
   List<LR0Situation> closure(Production production) {
@@ -95,7 +92,7 @@ class LR0FMS extends FSM {
     return [];
   }
 
-  void gaySex() {
+  void buildDFA() {
     // Начальное состояние соответвует G+ - пополненной грамматике
     List<LR0Situation> first_state_value = []
       ..addAll(_grammar.rules.map((P) => zeroClosure(P)[0].clone()));
@@ -104,9 +101,36 @@ class LR0FMS extends FSM {
     super.states.add(first_state);
     super.startStates.add(first_state);
     shift(first_state);
+
+    while (true) {
+      int p_l = super.states.length;
+
+      for (int i = 1; i < p_l; i++) {
+        shift(getStateByIndex(i));
+      }
+      int n_l = super.states.length;
+      if (p_l == n_l) {
+        break;
+      }
+    }
+
+    shift(getStateByIndex(1));
+    shift(getStateByIndex(2));
+    shift(getStateByIndex(3));
+    shift(getStateByIndex(4));
+    shift(getStateByIndex(5));
   }
 
   void shift(State state, {bool need_load = true}) {
+    for (var s in super.states) {
+      for (var l in s.value as List<LR0Situation>) {
+        if (l.getNext() == 'eps') {
+          super.finalStates.add(s);
+          break;
+        }
+      }
+    }
+
     for (var l in state.value as List<LR0Situation>) {
       try {
         var newl = l.clone();
@@ -142,29 +166,22 @@ class LR0FMS extends FSM {
           Transaction transaction = Transaction.ivan(state, N0, beta);
           super.transactions.add(transaction);
 
-          if (need_load) {
-            List<State> first = [];
-            First(N0, first);
-            first.forEach((element) {
-              load_rules(element, N0, X);
-            });
-          } else {
-            load_rules(state, N0, X);
-          }
+          List<State> first = [];
+          First(N0, first);
+          first.forEach((element) {
+            load_rules(element, N0, X);
+          });
 
-          shift(N0);
+          // shift(N0);
         } else {
           if ((transition_set[0].to.value as List<LR0Situation>)
                   .contains(newl) ==
               false) {
-            if (statyByLR0[newl.toString()] == null) {
-              transition_set[0].to.name += '\n${newl.toString()}';
-              (transition_set[0].to.value as List<LR0Situation>)
-                  .add(newl.clone());
-              statyByLR0[newl.toString()] = transition_set[0].to;
-            }
+            transition_set[0].to.name += '\n${newl.toString()}';
+            (transition_set[0].to.value as List<LR0Situation>)
+                .add(newl.clone());
+            statyByLR0[newl.toString()] = transition_set[0].to;
           }
-          shift(transition_set[0].to, need_load: false);
         }
       } catch (e) {
         return;
@@ -173,6 +190,10 @@ class LR0FMS extends FSM {
   }
 
   void load_rules(State state, State N0, String X) {
+    if (state == N0) {
+      return;
+    }
+
     if (_grammar.nonTerminals.contains(X)) {
       for (var l_0 in state.value as List<LR0Situation>) {
         if (l_0.left == X) {

@@ -11,7 +11,7 @@ class Action {
   }
 
   Action.goto(this.stateNumber) {
-    actionTitle = 'g($stateNumber)';
+    actionTitle = '$stateNumber';
   }
 
   Action.accept() {
