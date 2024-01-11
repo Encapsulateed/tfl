@@ -8,7 +8,8 @@ void main(List<String> arguments) {
   var g = Grammar.fromFile('input.txt');
 
   LR0Table t = LR0Table(g);
-  // t.log();
+  print(g.followSets);
+  //t.log();
   t.logToFile();
   //LR0Table t = LR0Table(g);
   //t.logToFile();
