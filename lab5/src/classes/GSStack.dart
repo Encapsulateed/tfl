@@ -67,12 +67,16 @@ class GSStackImpl<T> implements GSStack<T> {
   }
 
   void printStack(GSSNode<T> firstNode) {
-    print("Level 0");
+    print("STACK PRINT BEGIN\n"
+        "-------\n"
+        "Level 0");
     print("| ${firstNode.toString()} |");
     print("  Prev: First node");
+    print("-------");
     for (int i = 1; i < _levels.length; i++) {
       print("Level $i:");
       _levels[i].printLevel();
     }
+    print("STACK PRINT END");
   }
 }
