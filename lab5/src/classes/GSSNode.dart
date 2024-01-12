@@ -2,6 +2,7 @@ class _GSSNode<T> {
   T value;
   int level;
   int id;
+  int my_id = -1;
   Map<int, _GSSNode<T>> prev = {};
   Map<int, _GSSNode<T>> next = {};
   int prevLength = 0;

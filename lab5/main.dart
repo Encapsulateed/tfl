@@ -8,19 +8,12 @@ import 'src/state_machine/FSM.dart';
 // import 'src/lr0/base/LR0Fms.dart';
 
 void main(List<String> arguments) {
-  GSStack<String> statusStack = GSStackImpl<String>();
-  Map<String, GSSNode<String>> StatusNodes = {};
+  GSStack<List<String>> tokenStack = GSStackImpl<List<String>>();
+  Map<int, GSSNode<List<String>>> Nodes = {};
 
-  StatusNodes["0"] = statusStack.push("0");
-  StatusNodes["1"] = statusStack.push("1", StatusNodes["0"]);
-  StatusNodes["2"] = statusStack.push("2", StatusNodes["1"]);
-  StatusNodes["3"] = statusStack.push("3", StatusNodes["1"]);
-  StatusNodes["4"] = statusStack.push("4", StatusNodes["2"]);
-  StatusNodes["4"] = statusStack.push("4", StatusNodes["3"]);
-
-  // print(StatusNodes["2"]!.degPrev());
   var g = Grammar.fromFile('input.txt');
 
   LR0Parser p = LR0Parser(g);
-  print(p.Parse('(n+n)'));
+  //print(p.Parse('n'));
+  print(p.ParseGss('(n+n)+n', 0));
 }
