@@ -49,4 +49,15 @@ class GSSLevel<T> {
   int length() {
     return numberOfNodes;
   }
+
+  void printLevel() {
+    for (int i = 0; i < nodes.length; i++) {
+      final node = nodes[i];
+      if (node != null && node.value != null) {
+        print("| ${node.toString()} |");
+        print("  Prev: ${node.prevSet().join(', ')}");
+      }
+    }
+    print("-------");
+  }
 }

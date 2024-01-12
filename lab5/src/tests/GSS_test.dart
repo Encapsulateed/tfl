@@ -30,6 +30,8 @@ void main() {
       // {8,6,2,0}
       nodes[6] = stack.push(6, nodes[2]);
       nodes[8] = stack.push(8, nodes[6]);
+
+      stack.printStack(nodes[0]!);
     });
 
     test('has the right degrees: prev', () {

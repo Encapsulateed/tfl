@@ -8,6 +8,7 @@ abstract class GSStack<T> {
   bool empty();
   Comparator<T> get comparator;
   List<GSSLevel<T>> get levels;
+  void printStack(GSSNode<T> firstNode);
 }
 
 class GSStackImpl<T> implements GSStack<T> {
@@ -63,5 +64,15 @@ class GSStackImpl<T> implements GSStack<T> {
   @override
   bool empty() {
     return this._levels.isEmpty;
+  }
+
+  void printStack(GSSNode<T> firstNode) {
+    print("Level 0");
+    print("| ${firstNode.toString()} |");
+    print("  Prev: First node");
+    for (int i = 1; i < _levels.length; i++) {
+      print("Level $i:");
+      _levels[i].printLevel();
+    }
   }
 }
