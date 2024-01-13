@@ -19,8 +19,7 @@ void main() {
 
       // {7,4,1,0}
       nodes[4] = stack.push(4, nodes[1]);
-      nodes[7] = stack.push(
-          7, nodes[4]); // 7 isn't duplicated, as it ends up in the same layer
+      nodes[7] = stack.push(7, nodes[4]); // 7 isn't duplicated, as it ends up in the same layer
 
       // {7,5,2,0}
       nodes[2] = stack.push(2, nodes[0]);
@@ -31,7 +30,14 @@ void main() {
       nodes[6] = stack.push(6, nodes[2]);
       nodes[8] = stack.push(8, nodes[6]);
 
-      stack.printStack(nodes[0]!);
+      // Получаем все предыдущие узлы для node3
+      List<GSSNode<int>> allPreviousNodes = stack.getPreviousNodesFromNode(nodes[8]!);
+
+      // Выводим информацию о всех предыдущих узлах
+      print("Предыдущие узлы для nodes:");
+      for (final prevNode in allPreviousNodes) {
+        print("| ${prevNode.toString()} |");
+      }
     });
 
     test('has the right degrees: prev', () {

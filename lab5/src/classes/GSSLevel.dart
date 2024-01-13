@@ -59,4 +59,43 @@ class GSSLevel<T> {
     }
     print("-------");
   }
+
+  List<GSSNode<T>> getPreviousNodesFromNode(GSSNode<T> startNode) {
+    List<GSSNode<T>> result = [];
+    getPreviousNodesRecursive(startNode, result);
+
+    return result;
+  }
+
+  void getPreviousNodesRecursive(GSSNode<T> currentNode, List<dynamic> result) {
+    if (!result.contains(currentNode)) {
+      result.add(currentNode);
+      //print("IM currentNode: $currentNode");
+
+      final prevSet = currentNode.prevSet();
+      //print("IM prevset: $prevSet");
+
+      if (prevSet.isNotEmpty) {
+        for (final prevNodeId in prevSet) {
+          final prevNode = findNodeById(prevNodeId);
+          if (prevNode?.value != null) {
+            //print("IM prevnode: ${prevNode}");
+            getPreviousNodesRecursive(prevNode!, result);
+          }
+        }
+      }
+    }
+  }
+
+  GSSNode<T>? findNodeById(dynamic nodeId) {
+    for (final ID in nodes.values) {
+      //print("ID: $ID, nodeId: $nodeId");
+      if (nodeId.toString() == ID.toString()) {
+        //print(nodes[ID]);
+        return ID;
+      }
+    }
+
+    return null;
+  }
 }

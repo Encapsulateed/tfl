@@ -9,6 +9,7 @@ abstract class GSStack<T> {
   Comparator<T> get comparator;
   List<GSSLevel<T>> get levels;
   void printStack(GSSNode<T> firstNode);
+  List<GSSNode<T>> getPreviousNodesFromNode(GSSNode<T> startNode);
 }
 
 class GSStackImpl<T> implements GSStack<T> {
@@ -64,6 +65,36 @@ class GSStackImpl<T> implements GSStack<T> {
   @override
   bool empty() {
     return this._levels.isEmpty;
+  }
+
+  @override
+  List<GSSNode<T>> getPreviousNodesFromNode(GSSNode<T> startNode) {
+    List<GSSNode<T>> result = [];
+
+    var nodeLevel;
+    for (int i = _levels.length - 1; i > 0; i--) {
+      for (final t in _levels[i].nodes.values) {
+        //print("OUR ID: ${startNode.value}, LEVELS ID: ${t.value}");
+        if (t.value == startNode.value) {
+          //print("IM HERE YES");
+          nodeLevel = i;
+          break;
+        }
+      }
+    }
+
+    for (int i = nodeLevel - 1; i > 0; i--) {
+      var prevNodes = _levels[i].getPreviousNodesFromNode(startNode);
+      result.addAll(prevNodes);
+      startNode = prevNodes[1];
+      //print("NEW START NODE: $startNode");
+    }
+
+    if (nodeLevel == 1) {
+      return [startNode];
+    } else {
+      return result.toSet().toList();
+    }
   }
 
   void printStack(GSSNode<T> firstNode) {
