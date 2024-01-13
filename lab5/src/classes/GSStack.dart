@@ -122,7 +122,7 @@ class GSStackImpl<T> implements GSStack<T> {
 
       for (final node in _levels[i].nodes.values) {
         if (node.value != null) {
-          res += "    ${node.value} [label=\"${node.value}\"];\n";
+          res += "    \"${node.value}\" [label=\"${node.value}\"];\n";
         }
       }
       res += "  }\n";
@@ -132,7 +132,7 @@ class GSStackImpl<T> implements GSStack<T> {
       for (final node in _levels[i - 1].nodes.values) {
         for (final nextNode in node.next.values) {
           if (nextNode.value != null) {
-            res += "  ${node.value} -> ${nextNode.value};\n";
+            res += "  \"${node.value}\" -> \"${nextNode.value}\";\n";
           }
         }
       }

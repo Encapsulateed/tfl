@@ -99,7 +99,7 @@ class LR0Table {
     lr0_table.forEach((state, actions) {
       sink.write('$state\t\t\t\t\t\t');
       sink.writeln(actions.values
-          .map((actionList) => actionList.join('\t\t\t'))
+          .map((actionList) => '[${actionList.join('\t\t\t')}]')
           .join('\t\t\t\t\t\t'));
     });
 

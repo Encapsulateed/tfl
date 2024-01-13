@@ -4,112 +4,214 @@ dummy [shape=none, label="", width=0, height=0]
 "0 E0 -> ·E
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" [label = "0 E0 -> ·E
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" [label = "0 E0 -> ·E
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)", shape = circle]
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n", shape = circle]
 "1 E0 -> E·
 E -> E·+T" [label = "1 E0 -> E·
 E -> E·+T", shape = doublecircle]
-"2 E -> T·" [label = "2 E -> T·", shape = doublecircle]
-"3 T -> n·" [label = "3 T -> n·", shape = doublecircle]
-"4 T -> (·E)
+"2 E -> T·
+T -> T·*F" [label = "2 E -> T·
+T -> T·*F", shape = doublecircle]
+"3 T -> F·" [label = "3 T -> F·", shape = doublecircle]
+"4 F -> (·E)
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" [label = "4 T -> (·E)
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" [label = "4 F -> (·E)
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)", shape = circle]
-"5 E -> E+·T
-T -> ·n
-T -> ·(E)" [label = "5 E -> E+·T
-T -> ·n
-T -> ·(E)", shape = circle]
-"6 T -> (E·)
-E -> E·+T" [label = "6 T -> (E·)
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n", shape = circle]
+"5 F -> n·" [label = "5 F -> n·", shape = doublecircle]
+"6 E -> E+·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" [label = "6 E -> E+·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n", shape = circle]
+"7 T -> T*·F
+F -> ·(E)
+F -> ·n" [label = "7 T -> T*·F
+F -> ·(E)
+F -> ·n", shape = circle]
+"8 F -> (E·)
+E -> E·+T" [label = "8 F -> (E·)
 E -> E·+T", shape = circle]
-"7 E -> E+T·" [label = "7 E -> E+T·", shape = doublecircle]
-"8 T -> (E)·" [label = "8 T -> (E)·", shape = doublecircle]
+"9 E -> E+T·
+T -> T·*F" [label = "9 E -> E+T·
+T -> T·*F", shape = doublecircle]
+"10 T -> T*F·" [label = "10 T -> T*F·", shape = doublecircle]
+"11 F -> (E)·" [label = "11 F -> (E)·", shape = doublecircle]
 dummy -> "0 E0 -> ·E
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)"
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n"
 "0 E0 -> ·E
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" -> "1 E0 -> E·
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "1 E0 -> E·
 E -> E·+T" [label = "E"]
 "0 E0 -> ·E
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" -> "2 E -> T·" [label = "T"]
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "2 E -> T·
+T -> T·*F" [label = "T"]
 "0 E0 -> ·E
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" -> "3 T -> n·" [label = "n"]
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "3 T -> F·" [label = "F"]
 "0 E0 -> ·E
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" -> "4 T -> (·E)
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "4 F -> (·E)
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" [label = "("]
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" [label = "("]
+"0 E0 -> ·E
+E -> ·E+T
+E -> ·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "5 F -> n·" [label = "n"]
 "1 E0 -> E·
-E -> E·+T" -> "5 E -> E+·T
-T -> ·n
-T -> ·(E)" [label = "+"]
-"4 T -> (·E)
+E -> E·+T" -> "6 E -> E+·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" [label = "+"]
+"2 E -> T·
+T -> T·*F" -> "7 T -> T*·F
+F -> ·(E)
+F -> ·n" [label = "*"]
+"4 F -> (·E)
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" -> "6 T -> (E·)
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "8 F -> (E·)
 E -> E·+T" [label = "E"]
-"4 T -> (·E)
+"4 F -> (·E)
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" -> "2 E -> T·" [label = "T"]
-"4 T -> (·E)
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "2 E -> T·
+T -> T·*F" [label = "T"]
+"4 F -> (·E)
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" -> "3 T -> n·" [label = "n"]
-"4 T -> (·E)
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "3 T -> F·" [label = "F"]
+"4 F -> (·E)
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" -> "4 T -> (·E)
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "4 F -> (·E)
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" [label = "("]
-"5 E -> E+·T
-T -> ·n
-T -> ·(E)" -> "7 E -> E+T·" [label = "T"]
-"5 E -> E+·T
-T -> ·n
-T -> ·(E)" -> "3 T -> n·" [label = "n"]
-"5 E -> E+·T
-T -> ·n
-T -> ·(E)" -> "4 T -> (·E)
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" [label = "("]
+"4 F -> (·E)
 E -> ·E+T
 E -> ·T
-T -> ·n
-T -> ·(E)" [label = "("]
-"6 T -> (E·)
-E -> E·+T" -> "8 T -> (E)·" [label = ")"]
-"6 T -> (E·)
-E -> E·+T" -> "5 E -> E+·T
-T -> ·n
-T -> ·(E)" [label = "+"]
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "5 F -> n·" [label = "n"]
+"6 E -> E+·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "9 E -> E+T·
+T -> T·*F" [label = "T"]
+"6 E -> E+·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "3 T -> F·" [label = "F"]
+"6 E -> E+·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "4 F -> (·E)
+E -> ·E+T
+E -> ·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" [label = "("]
+"6 E -> E+·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" -> "5 F -> n·" [label = "n"]
+"7 T -> T*·F
+F -> ·(E)
+F -> ·n" -> "10 T -> T*F·" [label = "F"]
+"7 T -> T*·F
+F -> ·(E)
+F -> ·n" -> "4 F -> (·E)
+E -> ·E+T
+E -> ·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" [label = "("]
+"7 T -> T*·F
+F -> ·(E)
+F -> ·n" -> "5 F -> n·" [label = "n"]
+"8 F -> (E·)
+E -> E·+T" -> "11 F -> (E)·" [label = ")"]
+"8 F -> (E·)
+E -> E·+T" -> "6 E -> E+·T
+T -> ·T*F
+T -> ·F
+F -> ·(E)
+F -> ·n" [label = "+"]
+"9 E -> E+T·
+T -> T·*F" -> "7 T -> T*·F
+F -> ·(E)
+F -> ·n" [label = "*"]
 }

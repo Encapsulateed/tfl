@@ -1,6 +1,11 @@
 class Stack<T> {
   List<T> _items = [];
 
+  Stack();
+
+  Stack.fromList(List<T> items) {
+    _items = List.from(items);
+  }
   // Проверка, пуст ли стек
   bool isEmpty() {
     return _items.isEmpty;
@@ -35,5 +40,10 @@ class Stack<T> {
 
   List<T> toList() {
     return List.from(_items);
+  }
+
+  Stack<T> copyStack() {
+    List<T> stackList = List.from(this.toList());
+    return Stack<T>.fromList([...stackList]);
   }
 }

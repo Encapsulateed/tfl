@@ -1,5 +1,4 @@
 import '../classes/GSSNode.dart';
-import '../classes/GSStack.dart';
 import '../utils/Action.dart';
 import '../utils/grammar.dart';
 import '../utils/stack.dart';
@@ -19,6 +18,97 @@ class LR0Parser {
     _table = LR0Table(_grammar);
 
     _table.logToFile();
+  }
+
+  void parseLR0_params(
+      Stack<String> tokenStack,
+      Stack<String> actionStack,
+      Stack<String> inputStack,
+      List<Stack<String>> stacks,
+      List<Stack<String>> action_stacks) {
+    while (true) {
+      int state_id = int.parse(tokenStack.peek());
+
+      List<Action> action = [];
+      try {
+        action =
+            _table.lr0_table[state_id]![inputStack.peek()]!.toSet().toList();
+        if (action.length == 0) {
+          throw Exception();
+        }
+      } catch (e) {
+        print('Ошибка');
+        actionStack.push('[ERR]');
+        stacks.add(tokenStack);
+        action_stacks.add(actionStack);
+        print(
+            '${getStrFromStack(actionStack, reverse: false)} [${inputStack.peek()}]');
+        return;
+      }
+
+      if (action.length > 1) {
+        for (var act in action) {
+          var new_stack = tokenStack.copyStack();
+          var new_input_stack = inputStack.copyStack();
+          var new_action_stack = actionStack.copyStack();
+
+          if (act.actionTitle.startsWith('s')) {
+            shift(new_stack, new_input_stack, act);
+            new_action_stack.push('[${act.actionTitle}]');
+
+            parseLR0_params(new_stack, new_action_stack, new_input_stack,
+                stacks, action_stacks);
+          } else if (act.actionTitle.startsWith('r')) {
+            reduce(new_stack, act);
+            new_action_stack.push('[${act.actionTitle}]');
+
+            parseLR0_params(new_stack, new_action_stack, new_input_stack,
+                stacks, action_stacks);
+          }
+        }
+        return;
+      }
+      var a = action[0];
+
+      if (a.actionTitle.startsWith('ACC')) {
+        print('WORD ACCEPTED!');
+        actionStack.push('[ACC]');
+
+        print(
+            '${getStrFromStack(actionStack, reverse: false)} [${inputStack.peek()}]');
+        stacks.add(tokenStack);
+        action_stacks.add(actionStack);
+
+        return;
+      } else if (a.actionTitle.startsWith('s')) {
+        shift(tokenStack, inputStack, a);
+        actionStack.push('[${a.actionTitle}]');
+      } else if (a.actionTitle.startsWith('r')) {
+        reduce(tokenStack, a);
+        actionStack.push('[${a.actionTitle}]');
+      }
+    }
+  }
+
+  void shift(
+      Stack<String> tokenStack, Stack<String> inputStack, Action action) {
+    tokenStack.push(inputStack.peek());
+    tokenStack.push(action.stateNumber!.toString());
+    inputStack.pop();
+  }
+
+  void reduce(Stack<String> tokenStack, Action action) {
+    var rule = _grammar.rules.toList()[action.ruleNumber!];
+
+    for (int i = rule.right.length - 1; i >= 0; i--) {
+      tokenStack.pop();
+      tokenStack.pop();
+    }
+
+    int state_id = int.parse(tokenStack.peek());
+    tokenStack.push(rule.left);
+
+    tokenStack.push(_table.lr0_table[state_id]![rule.left]![0].toString());
   }
 
   bool Parse(String word) {
@@ -89,6 +179,10 @@ class LR0Parser {
     return nodes_id_sequense;
   }
 
+  int node_id_roll_back() {
+    return nodes_id_sequense--;
+  }
+
   void print_stack(Map<int, GSSNode<List<String>>> Nodes) {
     print('STACK END\n===========================');
     for (var node in Nodes.values) {
@@ -98,109 +192,9 @@ class LR0Parser {
   }
 
   bool ParseGss(String word, int n) {
-    // список id тех, нод, в которых произошла развилка
-    List<int> root_nodes_ids = [];
+    List<Stack<String>> tokenStacks = [];
 
-    Stack<String> inputStack = Stack();
-    GSStack<List<String>> tokenStack = GSStackImpl<List<String>>();
-    Map<int, GSSNode<List<String>>> Nodes = {};
-
-    // В вершинах лежит пара <Value; позиция разбора>
-    Nodes[0] = tokenStack.push(["0", "0"])..my_id = 0;
-    root_nodes_ids.add(0);
-    node_id_next();
-    inputStack.push('\$');
-
-    for (int i = word.length - 1; i >= 0; i--) {
-      inputStack.push(word[i]);
-    }
-
-    while (true) {
-      int nodeId = node_id_curr() - 1;
-      var curr_node = Nodes[nodeId]!;
-      if (curr_node.value[0] == 'null') {
-        return false;
-      }
-      int curr_state = int.parse(curr_node.value[0]);
-      int curr_pos = int.parse(curr_node.value[1]);
-      print_stack(Nodes);
-      print(curr_node.value);
-      Set<GSSNode<List<String>>> s = {};
-      getPrevSets(curr_node, s);
-      print(s);
-
-      String curr_input_token = inputStack.toList().reversed.toList()[curr_pos];
-
-      List<Action> actions = [];
-      //   print_stack(Nodes);
-
-      //  tokenStack.printStack(Nodes[0]!);
-      try {
-        actions = _table.lr0_table[curr_state]![curr_input_token]!;
-        if (actions.length == 0) {
-          throw Exception();
-        }
-      } catch (e) {
-        curr_node.value[0] = "null";
-
-        continue;
-      }
-
-      // Если в ячейке таблицы больше 1 действия => начинаем ветвление
-      if (actions.length > 1) {
-        root_nodes_ids.add(nodeId);
-        for (var act in actions) {
-          if (act.actionTitle.startsWith('r')) {
-            int new_node_id = node_id_next();
-            //  Nodes[new_node_id] = tokenStack.push(curr_node.prev.values,)
-          }
-        }
-      } else {
-        var curr_action = actions[0];
-        if (curr_action.actionTitle.startsWith('ACC')) {
-          print('WORD ACCEPTED!');
-          return true;
-        } else if (curr_action.actionTitle.startsWith('s')) {
-          int f_id = node_id_next();
-          int s_id = node_id_next();
-
-          List<String> pair = ["${curr_input_token}", "${curr_pos++}"];
-          Nodes[f_id] = tokenStack.push([...pair], curr_node)..my_id = f_id;
-
-          pair = ["${curr_action.stateNumber!}", "${curr_pos++}"];
-          Nodes[s_id] = tokenStack.push([...pair], Nodes[f_id])..my_id = s_id;
-        } else if (curr_action.actionTitle.startsWith('r')) {
-          var rule = _grammar.rules.toList()[curr_action.ruleNumber!];
-          var nodeForPop = Nodes[node_id_curr() - 1]!;
-
-          for (int i = (rule.right.length - 1); i >= 0; i--) {
-            var prev =
-                nodeForPop.prev.values.toList()[0] as GSSNode<List<String>>;
-            nodeForPop.value[0] = 'null';
-
-            tokenStack.pop(nodeForPop);
-
-            nodeForPop = prev.prev.values.toList()[0] as GSSNode<List<String>>;
-            prev.value[0] = 'null';
-            tokenStack.pop(prev);
-          }
-          int f_id = node_id_next();
-          int s_id = node_id_next();
-
-          int state_id = int.parse(nodeForPop.value[0]);
-
-          List<String> pair = ["${rule.left}", "${curr_pos}"];
-          Nodes[f_id] = tokenStack.push([...pair], Nodes[nodeForPop.my_id])
-            ..my_id = f_id;
-
-          pair = [
-            "${_table.lr0_table[state_id]![rule.left]![0].toString()}",
-            "${curr_pos}"
-          ];
-          Nodes[s_id] = tokenStack.push(pair, Nodes[f_id])..my_id = s_id;
-        }
-      }
-    }
+    return false;
   }
 
   void getPrevSets(

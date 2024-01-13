@@ -22,4 +22,11 @@ class Action {
   String toString() {
     return actionTitle;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || actionTitle == (other as Action).actionTitle;
+
+  @override
+  int get hashCode => actionTitle.hashCode;
 }
