@@ -11,7 +11,7 @@ abstract class GSStack<T> {
   List<GSSLevel<T>> get levels;
   void printStack(GSSNode<T> firstNode);
   List<GSSNode<T>> getPreviousNodesFromNode(GSSNode<T> startNode);
-  void GSStoDot();
+  void GSStoDot(String f_name);
 }
 
 class GSStackImpl<T> implements GSStack<T> {
@@ -113,7 +113,7 @@ class GSStackImpl<T> implements GSStack<T> {
     print("STACK PRINT END");
   }
 
-  void GSStoDot() {
+  void GSStoDot(String f_name) {
     String res = "";
 
     for (int i = 0; i < _levels.length; i++) {
@@ -129,10 +129,13 @@ class GSStackImpl<T> implements GSStack<T> {
     }
 
     for (int i = 1; i < _levels.length; i++) {
+      Set<List<String>> set = {};
       for (final node in _levels[i - 1].nodes.values) {
         for (final nextNode in node.next.values) {
-          if (nextNode.value != null) {
+          if (nextNode.value != null &&
+              !set.contains([node.value, nextNode.value])) {
             res += "  \"${node.value}\" -> \"${nextNode.value}\";\n";
+            set.add([node.value as String, nextNode.value as String]);
           }
         }
       }
@@ -144,9 +147,7 @@ class GSStackImpl<T> implements GSStack<T> {
         "$res"
         "}\n";
 
-    File file = File('stack.txt');
+    File file = File('values/$f_name.txt');
     file.writeAsStringSync(res);
-
-    print('Stack was dumped to stack.dot');
   }
 }

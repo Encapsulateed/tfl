@@ -228,7 +228,7 @@ class FSM {
         "$res"
         "}\n";
 
-    File file = File('fsm.txt');
+    File file = File('values/fsm.txt');
     file.writeAsStringSync(res);
   }
 }

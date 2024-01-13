@@ -13,6 +13,8 @@ class LR0Parser {
   List<String> inputProcess = [];
   List<String> statusProcess = [];
 
+  List<Stack<String>> stack_screens = [];
+
   LR0Parser(Grammar grammar) {
     _grammar = grammar;
     _table = LR0Table(_grammar);
@@ -38,11 +40,11 @@ class LR0Parser {
         }
       } catch (e) {
         print('Ошибка');
-        actionStack.push('[ERR]');
+        actionStack.push('[ERR because of ${inputStack.peek()}]');
         stacks.add(tokenStack);
+        stack_screens.add(tokenStack.copyStack());
         action_stacks.add(actionStack);
-        print(
-            '${getStrFromStack(actionStack, reverse: false)} [${inputStack.peek()}]');
+        //print( '${getStrFromStack(tokenStack, reverse: false)} [${inputStack.peek()}]');
         return;
       }
 
@@ -54,13 +56,18 @@ class LR0Parser {
 
           if (act.actionTitle.startsWith('s')) {
             shift(new_stack, new_input_stack, act);
-            new_action_stack.push('[${act.actionTitle}]');
+            new_action_stack
+                .push('[${act.actionTitle} sym: ${inputStack.peek()}]');
+            stack_screens.add(new_stack.copyStack());
 
             parseLR0_params(new_stack, new_action_stack, new_input_stack,
                 stacks, action_stacks);
           } else if (act.actionTitle.startsWith('r')) {
             reduce(new_stack, act);
-            new_action_stack.push('[${act.actionTitle}]');
+            stack_screens.add(new_stack.copyStack());
+
+            actionStack.push(
+                '[${act.actionTitle} (${_grammar.rules[act.ruleNumber!].toString().replaceAll('\n', '')}) sym: ${inputStack.peek()} ]');
 
             parseLR0_params(new_stack, new_action_stack, new_input_stack,
                 stacks, action_stacks);
@@ -74,19 +81,23 @@ class LR0Parser {
         print('WORD ACCEPTED!');
         actionStack.push('[ACC]');
 
-        print(
-            '${getStrFromStack(actionStack, reverse: false)} [${inputStack.peek()}]');
+        //print('${getStrFromStack(actionStack, reverse: false)} [${inputStack.peek()}]');
         stacks.add(tokenStack);
+        stack_screens.add(tokenStack.copyStack());
         action_stacks.add(actionStack);
 
         return;
       } else if (a.actionTitle.startsWith('s')) {
         shift(tokenStack, inputStack, a);
-        actionStack.push('[${a.actionTitle}]');
+        actionStack.push(
+            '[${a.actionTitle} sym: ${inputStack.peek()}]'); // stack_screens.add(tokenStack.copyStack());
       } else if (a.actionTitle.startsWith('r')) {
         reduce(tokenStack, a);
-        actionStack.push('[${a.actionTitle}]');
+
+        actionStack.push(
+            '[${a.actionTitle} (${_grammar.rules[a.ruleNumber!].toString().replaceAll('\n', '')}) sym: ${inputStack.peek()}]');
       }
+      stack_screens.add(tokenStack.copyStack());
     }
   }
 

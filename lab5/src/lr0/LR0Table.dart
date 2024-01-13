@@ -86,7 +86,7 @@ class LR0Table {
   }
 
   void logToFile() {
-    var file = File('lr0_table.txt');
+    var file = File('values/table.txt');
 
     // Открываем файл для записи
     var sink = file.openWrite();
