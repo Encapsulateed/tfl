@@ -1,6 +1,3 @@
-import 'dart:ffi';
-import 'dart:io';
-
 import '../classes/GSSNode.dart';
 import '../classes/GSStack.dart';
 import '../utils/Action.dart';
@@ -101,12 +98,16 @@ class LR0Parser {
   }
 
   bool ParseGss(String word, int n) {
+    // список id тех, нод, в которых произошла развилка
+    List<int> root_nodes_ids = [];
+
     Stack<String> inputStack = Stack();
     GSStack<List<String>> tokenStack = GSStackImpl<List<String>>();
     Map<int, GSSNode<List<String>>> Nodes = {};
 
     // В вершинах лежит пара <Value; позиция разбора>
     Nodes[0] = tokenStack.push(["0", "0"])..my_id = 0;
+    root_nodes_ids.add(0);
     node_id_next();
     inputStack.push('\$');
 
@@ -115,25 +116,28 @@ class LR0Parser {
     }
 
     while (true) {
-      //for (var nodeId in getNotNull(Nodes)) {
-
       int nodeId = node_id_curr() - 1;
       var curr_node = Nodes[nodeId]!;
       if (curr_node.value[0] == 'null') {
         return false;
-        break;
       }
       int curr_state = int.parse(curr_node.value[0]);
       int curr_pos = int.parse(curr_node.value[1]);
+      print_stack(Nodes);
       print(curr_node.value);
+      Set<GSSNode<List<String>>> s = {};
+      getPrevSets(curr_node, s);
+      print(s);
+
       String curr_input_token = inputStack.toList().reversed.toList()[curr_pos];
 
-      List<Action> action = [];
-      print(curr_input_token);
-      print_stack(Nodes);
+      List<Action> actions = [];
+      //   print_stack(Nodes);
+
+      //  tokenStack.printStack(Nodes[0]!);
       try {
-        action = _table.lr0_table[curr_state]![curr_input_token]!;
-        if (action.length == 0) {
+        actions = _table.lr0_table[curr_state]![curr_input_token]!;
+        if (actions.length == 0) {
           throw Exception();
         }
       } catch (e) {
@@ -143,9 +147,16 @@ class LR0Parser {
       }
 
       // Если в ячейке таблицы больше 1 действия => начинаем ветвление
-      if (action.length > 1) {
+      if (actions.length > 1) {
+        root_nodes_ids.add(nodeId);
+        for (var act in actions) {
+          if (act.actionTitle.startsWith('r')) {
+            int new_node_id = node_id_next();
+            //  Nodes[new_node_id] = tokenStack.push(curr_node.prev.values,)
+          }
+        }
       } else {
-        var curr_action = action[0];
+        var curr_action = actions[0];
         if (curr_action.actionTitle.startsWith('ACC')) {
           print('WORD ACCEPTED!');
           return true;
@@ -189,35 +200,44 @@ class LR0Parser {
           Nodes[s_id] = tokenStack.push(pair, Nodes[f_id])..my_id = s_id;
         }
       }
-      //}
     }
   }
 
-  List<int> getNotNull(Map<int, GSSNode<List<String>>> nodes) {
-    var for_out = <int>[];
-
-    for (var key in nodes.keys) {
-      if (nodes[key]!.value[0] != 'null') {
-        for_out.add(key);
-      }
+  void getPrevSets(
+      GSSNode<List<String>> node, Set<GSSNode<List<String>>> all_prev) {
+    if (node.my_id == 0) {
+      return;
     }
-    return for_out;
+    all_prev.addAll(node.prevSetValued());
+
+    all_prev.map((e) => getPrevSets(e, all_prev));
+  }
+}
+
+List<int> getNotNull(Map<int, GSSNode<List<String>>> nodes) {
+  var for_out = <int>[];
+
+  for (var key in nodes.keys) {
+    if (nodes[key]!.value[0] != 'null') {
+      for_out.add(key);
+    }
+  }
+  return for_out;
+}
+
+String getStrFromStack(Stack<String> inputStack, {bool reverse = true}) {
+  StringBuffer sb = StringBuffer();
+  List<String> tokens = inputStack.toList();
+
+  if (reverse) {
+    for (int i = tokens.length - 1; i >= 0; i--) {
+      sb.write('${tokens[i]} ');
+    }
+  } else {
+    for (int i = 0; i < tokens.length; i++) {
+      sb.write('${tokens[i]} ');
+    }
   }
 
-  String getStrFromStack(Stack<String> inputStack, {bool reverse = true}) {
-    StringBuffer sb = StringBuffer();
-    List<String> tokens = inputStack.toList();
-
-    if (reverse) {
-      for (int i = tokens.length - 1; i >= 0; i--) {
-        sb.write('${tokens[i]} ');
-      }
-    } else {
-      for (int i = 0; i < tokens.length; i++) {
-        sb.write('${tokens[i]} ');
-      }
-    }
-
-    return sb.toString();
-  }
+  return sb.toString();
 }

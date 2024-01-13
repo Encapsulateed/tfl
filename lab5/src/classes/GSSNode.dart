@@ -90,6 +90,11 @@ class _GSSNode<T> {
     //return this.prev.values.toSet();
     return this.prev.values.map((node) => node.toString()).toSet();
   }
+
+  Set<GSSNode<T>> prevSetValued() {
+    //return this.prev.values.toSet();
+    return this.prev.values.toSet().map((e) => e as GSSNode<T>).toSet();
+  }
 }
 
 class GSSNode<T> extends _GSSNode<T> {

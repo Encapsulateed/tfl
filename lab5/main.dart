@@ -14,6 +14,6 @@ void main(List<String> arguments) {
   var g = Grammar.fromFile('input.txt');
 
   LR0Parser p = LR0Parser(g);
-  //print(p.Parse('n'));
-  print(p.ParseGss('(n+n)+n', 0));
+  // print(p.Parse('abb'));
+  print(p.ParseGss('n+n', 0));
 }
