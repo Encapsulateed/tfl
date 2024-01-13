@@ -1,6 +1,7 @@
 import '../types/Comparator.dart';
 import './GSSNode.dart';
 import './GSSLevel.dart';
+import 'dart:io';
 
 abstract class GSStack<T> {
   GSSNode<T> push(T value, [GSSNode<T>? prev]);
@@ -10,6 +11,7 @@ abstract class GSStack<T> {
   List<GSSLevel<T>> get levels;
   void printStack(GSSNode<T> firstNode);
   List<GSSNode<T>> getPreviousNodesFromNode(GSSNode<T> startNode);
+  void GSStoDot();
 }
 
 class GSStackImpl<T> implements GSStack<T> {
@@ -109,5 +111,42 @@ class GSStackImpl<T> implements GSStack<T> {
       _levels[i].printLevel();
     }
     print("STACK PRINT END");
+  }
+
+  void GSStoDot() {
+    String res = "";
+
+    for (int i = 0; i < _levels.length; i++) {
+      res += "  subgraph cluster_$i {\n";
+      res += "    label=\"Level $i\";\n";
+
+      for (final node in _levels[i].nodes.values) {
+        if (node.value != null) {
+          res += "    ${node.value} [label=\"${node.value}\"];\n";
+        }
+      }
+      res += "  }\n";
+    }
+
+    for (int i = 1; i < _levels.length; i++) {
+      for (final node in _levels[i - 1].nodes.values) {
+        for (final nextNode in node.next.values) {
+          if (nextNode.value != null) {
+            res += "  ${node.value} -> ${nextNode.value};\n";
+          }
+        }
+      }
+    }
+
+    res = "digraph {\n"
+        "rankdir = LR\n"
+        "dummy [shape=none, label=\"\", width=0, height=0]\n"
+        "$res"
+        "}\n";
+
+    File file = File('stack.txt');
+    file.writeAsStringSync(res);
+
+    print('Stack was dumped to stack.dot');
   }
 }

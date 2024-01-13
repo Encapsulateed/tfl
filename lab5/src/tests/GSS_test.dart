@@ -38,6 +38,8 @@ void main() {
       for (final prevNode in allPreviousNodes) {
         print("| ${prevNode.toString()} |");
       }
+
+      stack.GSStoDot();
     });
 
     test('has the right degrees: prev', () {
