@@ -28,5 +28,5 @@
 
 # ООО "Алексей & Ivan Solutions"
 --- 
-😎 [Митрошкин Алексей](https://github.com/Encapsulateed)
-😎 [Токарев Иван](https://github.com/IOANNVOLZHSKIY)
+* 😎 [Митрошкин Алексей](https://github.com/Encapsulateed)
+* 😎 [Токарев Иван](https://github.com/IOANNVOLZHSKIY)
