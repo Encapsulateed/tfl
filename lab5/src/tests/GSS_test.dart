@@ -41,7 +41,7 @@ void main() {
         print("| ${prevNode.toString()} |");
       }
 
-      stack.GSStoDot();
+      //stack.GSStoDot();
     });
 
     test('has the right degrees: prev', () {

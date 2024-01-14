@@ -14,6 +14,7 @@ class LR0Parser {
   List<String> statusProcess = [];
 
   List<Stack<String>> stack_screens = [];
+  Map<int, GSSNode<String>> Nodes = {};
 
   LR0Parser(Grammar grammar) {
     _grammar = grammar;
@@ -44,7 +45,6 @@ class LR0Parser {
         stacks.add(tokenStack);
         stack_screens.add(tokenStack.copyStack());
         action_stacks.add(actionStack);
-        //print( '${getStrFromStack(tokenStack, reverse: false)} [${inputStack.peek()}]');
         return;
       }
 

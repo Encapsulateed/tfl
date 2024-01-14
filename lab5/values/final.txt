@@ -7,27 +7,12 @@ dummy [shape=none, label="", width=0, height=0]
   }
   subgraph cluster_1 {
     label="Level 1";
-    "E" [label="E"];
+    "S" [label="S"];
   }
   subgraph cluster_2 {
     label="Level 2";
     "1" [label="1"];
   }
-  subgraph cluster_3 {
-    label="Level 3";
-    "0" [label="0"];
-  }
-  subgraph cluster_4 {
-    label="Level 4";
-    "E" [label="E"];
-  }
-  subgraph cluster_5 {
-    label="Level 5";
-    "1" [label="1"];
-  }
-  "0" -> "E";
-  "E" -> "1";
-  "1" -> "0";
-  "0" -> "E";
-  "E" -> "1";
+  "0" -> "S";
+  "S" -> "1";
 }

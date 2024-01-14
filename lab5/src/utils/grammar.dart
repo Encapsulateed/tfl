@@ -1,8 +1,7 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'Production.dart';
 
-class Grammar<T> {
+class Grammar {
   Map<String, Set<String>> firstSets = {};
   Map<String, Set<String>> followSets = {};
 
@@ -14,18 +13,25 @@ class Grammar<T> {
 
   Grammar();
 
+  Grammar.make(List<Production> prd, Set<String> NT, Set<String> T) {
+    this.nonTerminals = [...NT.toList()].toSet();
+    this.terminals = [...T.toList()].toSet();
+    this.rules = [...prd];
+  }
+
   Grammar.fromFile(String filePath) {
     _readGrammarFromFile(filePath);
     complete();
-    computeFirstSet();
-    computeFollowSet();
   }
 
   void _readGrammarFromFile(String filePath) {
     try {
+      // Читаем все строки в файле
       var lines = File(filePath).readAsStringSync().split('\n');
 
+      // Идём по всем строкам файла
       for (var line in lines) {
+        // trim - удаляет все проблы из строки, если они там есть
         if (line.trim().isNotEmpty) {
           var parts = line.split('->').map((part) => part.trim()).toList();
 
@@ -105,60 +111,5 @@ class Grammar<T> {
     }
 
     return first;
-  }
-
-  void computeFirstSet() {
-    for (var nt in nonTerminals) {
-      firstSets[nt] = {};
-    }
-
-    bool change = true;
-    while (change) {
-      change = false;
-
-      for (var nt in nonTerminals) {
-        for (var production in rules) {
-          var l = firstSets[production.left]!.length;
-          if (production.left == nt) {
-            firstSets[nt]!.addAll(getFirst(production.right, 0));
-          }
-
-          if (l != firstSets[production.left]!.length) {
-            change = true;
-          }
-        }
-      }
-    }
-  }
-
-  void computeFollowSet() {
-    for (var nt in nonTerminals) {
-      followSets[nt] = {};
-    }
-
-    followSets[start_non_terminal + '0']!.add('\$');
-    bool isChange = true;
-    while (isChange) {
-      isChange = false;
-
-      for (var nt in nonTerminals) {
-        for (var production in rules) {
-          for (int i = 0; i < production.right.length; i++) {
-            var right = production.right;
-            Set<String> set = {};
-            if (nt == right[i]) {
-              set = followSets[nt]!;
-            } else {
-              set = getFirst(right, i + 1);
-            }
-
-            if (followSets[nt]!.containsAll(set) == false) {
-              isChange = true;
-              followSets[nt]!.addAll(set);
-            }
-          }
-        }
-      }
-    }
   }
 }
