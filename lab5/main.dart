@@ -13,6 +13,8 @@ void main(List<String> arguments) {
   List<Grammar> grammars = [];
   var g = Grammar.fromFile('input.txt');
 
+  print("Searching for Conjunctive grammar");
+
   var rules_lst = [];
   for (var rule in g.rules) {
     if (rule.right.contains('&')) {
@@ -36,13 +38,13 @@ void main(List<String> arguments) {
 
   String word = arguments[0];
   List<bool> total = [];
-  print(grammars.length);
+  print("Total amount of grammars after separating the rules: ${grammars.length}\n");
   for (var gg in grammars) {
     LR0Parser pp = LR0Parser(gg);
-    // total.add(pp.Parse(word));
-
-    print(gg.rules);
+    total.add(pp.Parse(word));
+    print("${gg.rules}\n");
   }
+
   bool answer = true;
 
   for (var ans in total) {
@@ -51,6 +53,8 @@ void main(List<String> arguments) {
       break;
     }
   }
+
+  print("\nResult: ");
   print(answer);
 /*
   Stack<String> inputStack = Stack();

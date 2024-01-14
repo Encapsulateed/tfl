@@ -10,3 +10,4 @@
 /dataSources/
 /dataSources.local.xml
 /.vscode
+.dart_tool
