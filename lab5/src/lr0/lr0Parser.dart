@@ -8,10 +8,6 @@ class LR0Parser {
   LR0Table _table = LR0Table.emtpy();
   Grammar _grammar = Grammar();
   int nodes_id_sequense = 0;
-  List<String> ActionProcess = [];
-  List<String> TokenProcess = [];
-  List<String> inputProcess = [];
-  List<String> statusProcess = [];
 
   List<Stack<String>> stack_screens = [];
   Map<int, GSSNode<String>> Nodes = {};
