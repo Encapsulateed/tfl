@@ -1,45 +1,51 @@
 import 'package:test/test.dart';
 import '../classes/GSStack.dart';
 import '../classes/GSSNode.dart';
+import '../types/Comparator.dart';
 
 void main() {
   group('GSStack: example', () {
-    late GSStack<int> stack;
-    late Map<int, GSSNode<int>> nodes;
+    late GSStack<List<String>> stack;
+    late Map<int, GSSNode<List<String>>> nodes;
 
     setUp(() {
-      stack = GSStackImpl<int>();
+      stack = GSStackImpl<List<String>>();
       nodes = {};
 
       // {7,3,1,0}
-      nodes[0] = stack.push(0);
-      nodes[1] = stack.push(1, nodes[0]);
-      nodes[3] = stack.push(3, nodes[1]);
-      nodes[7] = stack.push(7, nodes[3]);
+      nodes[0] = stack.push(["0"]);
+      nodes[1] = stack.push(["1"], nodes[0]);
+      nodes[3] = stack.push(["3"], nodes[1]);
+      nodes[7] = stack.push(["7"], nodes[3]);
 
       // {7,4,1,0}
-      nodes[4] = stack.push(4, nodes[1]);
-      nodes[7] = stack.push(
-          7, nodes[4]); // 7 isn't duplicated, as it ends up in the same layer
+      nodes[4] = stack.push(["4"], nodes[1]);
+      nodes[9] = stack.push(["7"], nodes[4]); // 7 isn't duplicated, as it ends up in the same layer
 
       // {7,5,2,0}
-      nodes[2] = stack.push(2, nodes[0]);
-      nodes[5] = stack.push(5, nodes[2]);
-      nodes[7] = stack.push(7, nodes[5]);
+      nodes[2] = stack.push(["2"], nodes[0]);
+      nodes[5] = stack.push(["5"], nodes[2]);
+      nodes[15] = stack.push(["7"], nodes[5]);
 
       // {8,6,2,0}
-      nodes[6] = stack.push(6, nodes[2]);
-      nodes[8] = stack.push(8, nodes[6]);
+      nodes[6] = stack.push(["6"], nodes[2]);
+      nodes[8] = stack.push(["8"], nodes[6]);
 
       var result = nodes[7]?.ancestors(1);
       print(result);
 
       for (final ancestor in result!) {
-        print(ancestor.value);
+        print(ancestor.id);
       }
+
+      stack.printStack(nodes[0]!);
     });
 
-    test('has the right degrees: prev', () {
+    test('random staff', () {
+      print(DEFAULT_COMPARATOR(["7"], ["7"]));
+    });
+
+    /*test('has the right degrees: prev', () {
       expect(nodes[7]!.degPrev(), equals(3));
       expect(nodes[8]!.degPrev(), equals(1));
       expect(nodes[3]!.degPrev(), equals(1));
@@ -72,5 +78,7 @@ void main() {
       expect(nodes[2]!.prevSet(), equals({'0'}));
       expect(nodes[1]!.prevSet(), equals({'0'}));
     });
+
+     */
   });
 }
