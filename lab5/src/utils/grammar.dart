@@ -33,7 +33,7 @@ class Grammar {
           this.nonTerminals.add(t);
 
           if (nonTerminals.length == 0) {
-            start_non_terminal =t;
+            start_non_terminal = t;
           }
         } else {
           terminals.add(t);

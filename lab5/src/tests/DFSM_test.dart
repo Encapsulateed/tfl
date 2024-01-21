@@ -44,7 +44,6 @@ void main() {
     // Детерминизация автомата
     FSM determinizedFSM = fsm.determinize();
 
-
     expect(determinizedFSM.states.length, greaterThan(0));
     print(determinizedFSM.states.length);
     expect(determinizedFSM.startStates.length, greaterThan(0));
