@@ -18,9 +18,11 @@ class LR0Table {
     _grammar.terminals.add('\$');
     makeTable();
     _grammar.terminals.remove('\$');
-    _fsm.DumpToDOT();
-  }
 
+  }
+  LR0FMS get(){
+    return _fsm;
+  }
   void makeTable() {
     for (var I in _fsm.states) {
       int index = _fsm.getStateIndex(I);
@@ -75,18 +77,9 @@ class LR0Table {
     }
   }
 
-  void log() {
-    _fsm.DumpToDOT();
-    for (var stateId in lr0_table.keys) {
-      for (var colId in lr0_table[stateId]!.keys) {
-        print(
-            'ACTION AT T[$stateId][$colId]  === ${lr0_table[stateId]![colId]}');
-      }
-    }
-  }
 
-  void logToFile() {
-    var file = File('values/table.txt');
+  void logToFile(String path) {
+    var file = File(path);
 
     // Открываем файл для записи
     var sink = file.openWrite();

@@ -1,0 +1,51 @@
+digraph {
+rankdir = LR
+dummy [shape=none, label="", width=0, height=0]
+"0 S0 -> ·S
+S -> ·AA
+A -> ·b
+A -> ·a" [label = "0 S0 -> ·S
+S -> ·AA
+A -> ·b
+A -> ·a", shape = circle]
+"1 S0 -> S·" [label = "1 S0 -> S·", shape = doublecircle]
+"2 S -> A·A
+A -> ·b
+A -> ·a" [label = "2 S -> A·A
+A -> ·b
+A -> ·a", shape = circle]
+"3 A -> b·" [label = "3 A -> b·", shape = doublecircle]
+"4 A -> a·" [label = "4 A -> a·", shape = doublecircle]
+"5 S -> AA·" [label = "5 S -> AA·", shape = doublecircle]
+dummy -> "0 S0 -> ·S
+S -> ·AA
+A -> ·b
+A -> ·a"
+"0 S0 -> ·S
+S -> ·AA
+A -> ·b
+A -> ·a" -> "1 S0 -> S·" [label = "S"]
+"0 S0 -> ·S
+S -> ·AA
+A -> ·b
+A -> ·a" -> "2 S -> A·A
+A -> ·b
+A -> ·a" [label = "A"]
+"0 S0 -> ·S
+S -> ·AA
+A -> ·b
+A -> ·a" -> "3 A -> b·" [label = "b"]
+"0 S0 -> ·S
+S -> ·AA
+A -> ·b
+A -> ·a" -> "4 A -> a·" [label = "a"]
+"2 S -> A·A
+A -> ·b
+A -> ·a" -> "5 S -> AA·" [label = "A"]
+"2 S -> A·A
+A -> ·b
+A -> ·a" -> "3 A -> b·" [label = "b"]
+"2 S -> A·A
+A -> ·b
+A -> ·a" -> "4 A -> a·" [label = "a"]
+}

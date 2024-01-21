@@ -43,7 +43,7 @@ void main() {
 
     // Детерминизация автомата
     FSM determinizedFSM = fsm.determinize();
-    determinizedFSM.DumpToDOT();
+
 
     expect(determinizedFSM.states.length, greaterThan(0));
     print(determinizedFSM.states.length);

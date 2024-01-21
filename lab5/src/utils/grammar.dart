@@ -2,9 +2,6 @@ import 'dart:io';
 import 'Production.dart';
 
 class Grammar {
-  Map<String, Set<String>> firstSets = {};
-  Map<String, Set<String>> followSets = {};
-
   Set<String> terminals = {};
   Set<String> nonTerminals = {};
   List<Production> rules = [];
@@ -21,6 +18,30 @@ class Grammar {
 
   Grammar.fromFile(String filePath) {
     _readGrammarFromFile(filePath);
+    complete();
+  }
+
+  Grammar.fromProductionList(List<Production> prd) {
+    for (var p in prd) {
+      if (nonTerminals.length == 0) {
+        start_non_terminal = p.left;
+      }
+      nonTerminals.add(p.left);
+      for (var t in p.right) {
+        int charCode = t.codeUnitAt(0);
+        if (charCode >= 65 && charCode <= 90) {
+          this.nonTerminals.add(t);
+
+          if (nonTerminals.length == 0) {
+            start_non_terminal =t;
+          }
+        } else {
+          terminals.add(t);
+        }
+      }
+    }
+    this.rules = [...prd];
+
     complete();
   }
 
@@ -90,26 +111,5 @@ class Grammar {
     tmp_right.remove('·');
 
     return rules.indexOf(Production(tmp_left, tmp_right));
-  }
-
-  Set<String> getFirst(List<String> str, int i) {
-    Set<String> first = {};
-
-    if (i == str.length) {
-      return first;
-    }
-
-    if (terminals.contains(str[i])) {
-      first.add(str[i]);
-      return first;
-    }
-
-    if (nonTerminals.contains(str[i])) {
-      for (var key in firstSets.keys) {
-        first.addAll(firstSets[key]!);
-      }
-    }
-
-    return first;
   }
 }

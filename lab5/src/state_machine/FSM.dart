@@ -201,7 +201,7 @@ class FSM {
   }
 
 // метод представления автомата в формате DOT
-  void DumpToDOT() {
+  void DumpToDOT(String path) {
     String res = "";
 
     for (var state in this.states) {
@@ -228,7 +228,7 @@ class FSM {
         "$res"
         "}\n";
 
-    File file = File('values/fsm.txt');
+    File file = File(path);
     file.writeAsStringSync(res);
   }
 }
