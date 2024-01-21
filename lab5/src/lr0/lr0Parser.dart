@@ -3,6 +3,7 @@ import '../utils/Action.dart';
 import '../utils/grammar.dart';
 import '../utils/stack.dart';
 import 'LR0Table.dart';
+import 'dart:io';
 
 class LR0Parser {
   LR0Table _table = LR0Table.emtpy();
@@ -15,8 +16,6 @@ class LR0Parser {
   LR0Parser(Grammar grammar) {
     _grammar = grammar;
     _table = LR0Table(_grammar);
-
-    _table.logToFile();
   }
 
   void parseLR0_params(
@@ -190,55 +189,31 @@ class LR0Parser {
     return nodes_id_sequense--;
   }
 
-  void print_stack(Map<int, GSSNode<List<String>>> Nodes) {
-    print('STACK END\n===========================');
-    for (var node in Nodes.values) {
-      if (node.value[0] != 'null') print('${node.value} ${node.prev}');
+  String getStrFromStack(Stack<String> inputStack, {bool reverse = true}) {
+    StringBuffer sb = StringBuffer();
+    List<String> tokens = inputStack.toList();
+
+    if (reverse) {
+      for (int i = tokens.length - 1; i >= 0; i--) {
+        sb.write('${tokens[i]} ');
+      }
+    } else {
+      for (int i = 0; i < tokens.length; i++) {
+        sb.write('${tokens[i]} ');
+      }
     }
-    print('STACK START\n===========================');
+
+    return sb.toString();
   }
 
-  bool ParseGss(String word, int n) {
-    List<Stack<String>> tokenStacks = [];
+  void Log(int index) {
+    String path = 'values/grammar_$index/';
+  var directory = Directory(path);
 
-    return false;
-  }
-
-  void getPrevSets(
-      GSSNode<List<String>> node, Set<GSSNode<List<String>>> all_prev) {
-    if (node.my_id == 0) {
-      return;
+    if (!directory.existsSync()) {
+      directory.createSync(recursive: true);
     }
-    all_prev.addAll(node.prevSetValued());
-
-    all_prev.map((e) => getPrevSets(e, all_prev));
+    this._table.logToFile('${path}table.txt');
+    this._table.get().DumpToDOT('${path}fsm.txt');
   }
-}
-
-List<int> getNotNull(Map<int, GSSNode<List<String>>> nodes) {
-  var for_out = <int>[];
-
-  for (var key in nodes.keys) {
-    if (nodes[key]!.value[0] != 'null') {
-      for_out.add(key);
-    }
-  }
-  return for_out;
-}
-
-String getStrFromStack(Stack<String> inputStack, {bool reverse = true}) {
-  StringBuffer sb = StringBuffer();
-  List<String> tokens = inputStack.toList();
-
-  if (reverse) {
-    for (int i = tokens.length - 1; i >= 0; i--) {
-      sb.write('${tokens[i]} ');
-    }
-  } else {
-    for (int i = 0; i < tokens.length; i++) {
-      sb.write('${tokens[i]} ');
-    }
-  }
-
-  return sb.toString();
 }

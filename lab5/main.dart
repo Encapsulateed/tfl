@@ -8,16 +8,52 @@ import 'src/state_machine/FSM.dart';
 import 'src/utils/Production.dart';
 import 'src/utils/conjunctiveGrammar.dart';
 import 'src/utils/stack.dart';
+import 'dart:io';
+
 // import 'src/lr0/base/LR0Fms.dart';
 
 void main(List<String> arguments) {
-  List<Grammar> grammars = [];
+  // dart main .dart -w"input your word" -c
+
+  Map<String, String> input_params = {};
+  String word = '';
+  bool conj = false;
+
+  for (var argument in arguments) {
+    var match_word = RegExp(r'-w(\w+)').firstMatch(argument);
+    var match_conj = RegExp(r'-c').firstMatch(argument);
+    if (match_word != null) {
+      word = match_word.group(1)!;
+    }
+
+    if (match_conj != null) {
+      conj = true;
+    }
+  }
 
   var cg = conjunctiveGrammar.fromFile('input.txt');
 
-  for(var grammar in cg.possible_grammars){
-    print(grammar);
-  } 
- 
-}
+  List<bool> results = [];
+  for (var grammar in cg.possible_grammars) {
+    LR0Parser curr_parser = LR0Parser(grammar);
 
+    curr_parser.Log(cg.possible_grammars.indexOf(grammar) + 1);
+
+    results.add(curr_parser.Parse(word));
+  }
+
+  if (conj == false) {
+    if (results.any((element) => element == true)) {
+      print('Существует хотя бы один корректный разбор ');
+    } else {
+      print('слово не принадлежит языку введеёной грамматики');
+    }
+  }
+  else{
+     if (!results.any((element) => element == true)) {
+      print('Существует хотя бы один корректный разбор ');
+    } else {
+      print('слово не принадлежит языку введеёной грамматики');
+    }
+  }
+}
