@@ -19,4 +19,5 @@ jobs:
         run: dart format --output=none --set-exit-if-changed .
 
       - name: Analyze Project Source
-        run: dart analyze
+      - uses: invertase/github-action-dart-analyzer@v1
+
