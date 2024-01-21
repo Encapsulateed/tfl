@@ -2,47 +2,60 @@ digraph {
 rankdir = LR
 dummy [shape=none, label="", width=0, height=0]
 "0 S0 -> ·S
-S -> ·C
-A -> ·a
-B -> ·b
-C -> ·c" [label = "0 S0 -> ·S
-S -> ·C
-A -> ·a
-B -> ·b
-C -> ·c", shape = circle]
+S -> ·AA
+A -> ·AA
+A -> ·aa" [label = "0 S0 -> ·S
+S -> ·AA
+A -> ·AA
+A -> ·aa", shape = circle]
 "1 S0 -> S·" [label = "1 S0 -> S·", shape = doublecircle]
-"2 S -> C·" [label = "2 S -> C·", shape = doublecircle]
-"3 A -> a·" [label = "3 A -> a·", shape = doublecircle]
-"4 B -> b·" [label = "4 B -> b·", shape = doublecircle]
-"5 C -> c·" [label = "5 C -> c·", shape = doublecircle]
+"2 S -> A·A
+A -> ·AA
+A -> ·aa
+A -> A·A" [label = "2 S -> A·A
+A -> ·AA
+A -> ·aa
+A -> A·A", shape = circle]
+"3 A -> a·a" [label = "3 A -> a·a", shape = circle]
+"4 S -> AA·
+A -> A·A
+A -> AA·" [label = "4 S -> AA·
+A -> A·A
+A -> AA·", shape = doublecircle]
+"5 A -> aa·" [label = "5 A -> aa·", shape = doublecircle]
 dummy -> "0 S0 -> ·S
-S -> ·C
-A -> ·a
-B -> ·b
-C -> ·c"
+S -> ·AA
+A -> ·AA
+A -> ·aa"
 "0 S0 -> ·S
-S -> ·C
-A -> ·a
-B -> ·b
-C -> ·c" -> "1 S0 -> S·" [label = "S"]
+S -> ·AA
+A -> ·AA
+A -> ·aa" -> "1 S0 -> S·" [label = "S"]
 "0 S0 -> ·S
-S -> ·C
-A -> ·a
-B -> ·b
-C -> ·c" -> "2 S -> C·" [label = "C"]
+S -> ·AA
+A -> ·AA
+A -> ·aa" -> "2 S -> A·A
+A -> ·AA
+A -> ·aa
+A -> A·A" [label = "A"]
 "0 S0 -> ·S
-S -> ·C
-A -> ·a
-B -> ·b
-C -> ·c" -> "3 A -> a·" [label = "a"]
-"0 S0 -> ·S
-S -> ·C
-A -> ·a
-B -> ·b
-C -> ·c" -> "4 B -> b·" [label = "b"]
-"0 S0 -> ·S
-S -> ·C
-A -> ·a
-B -> ·b
-C -> ·c" -> "5 C -> c·" [label = "c"]
+S -> ·AA
+A -> ·AA
+A -> ·aa" -> "3 A -> a·a" [label = "a"]
+"2 S -> A·A
+A -> ·AA
+A -> ·aa
+A -> A·A" -> "4 S -> AA·
+A -> A·A
+A -> AA·" [label = "A"]
+"2 S -> A·A
+A -> ·AA
+A -> ·aa
+A -> A·A" -> "3 A -> a·a" [label = "a"]
+"3 A -> a·a" -> "5 A -> aa·" [label = "a"]
+"4 S -> AA·
+A -> A·A
+A -> AA·" -> "4 S -> AA·
+A -> A·A
+A -> AA·" [label = "A"]
 }

@@ -1,4 +1,3 @@
-S->A&B&C
-A->a
-B->b
-C->c
+S->AA
+A->AA
+A->aa

@@ -10,11 +10,13 @@ import 'src/utils/stack.dart';
 // import 'src/lr0/base/LR0Fms.dart';
 
 void main(List<String> arguments) {
-
+  List<Grammar> grammars = [];
+  var g = Grammar.fromFile('input.txt');
+  LR0FMS f = LR0FMS(g);
+  f.DumpToDOT();
+  /*
   if (arguments[1] == 'd') {
-    List<Grammar> grammars = [];
-    var g = Grammar.fromFile('input.txt');
-
+   
     print("Searching for Conjunctive grammar");
 
     var rules_lst = [];
@@ -116,10 +118,9 @@ void main(List<String> arguments) {
 
       print(getStrFromStack(p.stack_screens[n]));
       print('=========================');
-    }
+    */
+}
 
     // stack.GSStoDot('merged');
-    stack1.GSStoDot('actions');
-    stack2.GSStoDot('final');
-  }
-}
+   // stack1.GSStoDot('actions');
+  //  stack2.GSStoDot('final');

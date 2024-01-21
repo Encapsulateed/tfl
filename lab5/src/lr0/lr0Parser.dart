@@ -10,7 +10,7 @@ class LR0Parser {
   int nodes_id_sequense = 0;
 
   List<Stack<String>> stack_screens = [];
-  Map<int, GSSNode<String>> Nodes = {};
+  Map<int, GSSNode<List<String>>> Nodes = {};
 
   LR0Parser(Grammar grammar) {
     _grammar = grammar;
