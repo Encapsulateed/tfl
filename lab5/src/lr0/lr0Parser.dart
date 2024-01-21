@@ -29,9 +29,9 @@ class LR0Parser {
   // Новый шифт
 
   //Что делает state_id?
-  void Shift(GSSNode<List<String>> v, int state_id)
-  {
-    nodes[node_id_next()] = stack.push([(int.parse(v.value[0]) + 1).toString(), state_id.toString()], v);
+  void Shift(GSSNode<List<String>> v, int state_id) {
+    nodes[node_id_next()] = stack
+        .push([(int.parse(v.value[0]) + 1).toString(), state_id.toString()], v);
   }
 
   /*void reduce(Stack<String> tokenStack, Action action) {
@@ -52,8 +52,8 @@ class LR0Parser {
 
   // Новый редьюс
 
-  void Reduce (GSSNode<List<String>> v, int rule_id, String x, List<GSSNode<List<String>>> P)
-  {
+  void Reduce(GSSNode<List<String>> v, int rule_id, String x,
+      List<GSSNode<List<String>>> P) {
     var rule = _grammar.rules[rule_id];
     for (var v1_s in v.ancestors(rule.right.length)) {
       var act = _table.lr0_table[int.parse(v1_s.value[0])]?[x]!;
@@ -69,8 +69,11 @@ class LR0Parser {
         for (final l in v_ss.prev.values) {
           if (l.value == v1_s.value && l.prev.values != v1_s.prev.values) {
             //Надо ли пушить? Ну вроде надо
-            nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
-            var act = _table.lr0_table[int.parse(nodes[node_id_curr()]!.value[0])]?[x]!; //Точно ли x посылаем?
+            nodes[node_id_next()] =
+                stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+            var act =
+                _table.lr0_table[int.parse(nodes[node_id_curr()]!.value[0])]
+                    ?[x]!; //Точно ли x посылаем?
             for (var obj in act!) {
               if (obj.actionTitle.startsWith("r")) {
                 Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P);
@@ -79,8 +82,11 @@ class LR0Parser {
           } else {
             v_ss = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?);
             if (P.contains(v_ss)) {
-              nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
-              var act = _table.lr0_table[int.parse(nodes[node_id_curr()]!.value[0])]?[x]!; //Точно ли x посылаем?
+              nodes[node_id_next()] = stack.push(
+                  v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+              var act =
+                  _table.lr0_table[int.parse(nodes[node_id_curr()]!.value[0])]
+                      ?[x]!; //Точно ли x посылаем?
               for (var obj in act!) {
                 if (obj.actionTitle.startsWith("r")) {
                   Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P);
@@ -90,7 +96,8 @@ class LR0Parser {
           }
         }
       } else {
-        nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?);
+        nodes[node_id_next()] =
+            stack.push(v_ss_value, v1_s as GSSNode<List<String>>?);
       }
     }
   }
@@ -157,8 +164,7 @@ class LR0Parser {
 
    */
 
-  bool parse(List<String> word_tokens)
-  {
+  bool parse(List<String> word_tokens) {
     word_tokens.add("\$");
     nodes[node_id_curr()] = stack.push(["0", "0"]);
 
@@ -174,7 +180,7 @@ class LR0Parser {
             return true;
           }
 
-          if (obj.actionTitle.startsWith("s")){
+          if (obj.actionTitle.startsWith("s")) {
             Shift(v, obj.stateNumber!);
           }
 
@@ -183,7 +189,7 @@ class LR0Parser {
           }
         }
       }
-      if (stack.levels[i].numberOfNodes == 0) {
+      if (stack.levels[i - 1].numberOfNodes == 0) {
         return false;
       }
     }

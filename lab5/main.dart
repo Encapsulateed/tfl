@@ -9,9 +9,9 @@ void main(List<String> arguments) {
   // dart main .dart -w"input your word" -c
 
   String word = '';
-    print('Input word');
+  print('Input word');
 
-  word = stdin.readLineSync()?? 'null';
+  word = stdin.readLineSync() ?? 'null';
   bool conj = false;
   int step_num = 0;
   print(arguments);
@@ -30,7 +30,9 @@ void main(List<String> arguments) {
   var cg = conjunctiveGrammar.fromFile('input.txt');
   print(word);
 
-  List<bool> results = [];
+  var p = LR0Parser(cg.possible_grammars[0]);
+  print(p.parse(word.split('')));
+  /** List<bool> results = [];
   for (var grammar in cg.possible_grammars) {
     LR0Parser curr_parser = LR0Parser(grammar);
 
@@ -51,5 +53,5 @@ void main(List<String> arguments) {
       print('Слово не распознаётся');
     }
   }
-  print(step_num);
+  print(step_num); */
 }
