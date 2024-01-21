@@ -15,6 +15,8 @@ void main(List<String> arguments) {
   bool conj = false;
   int step_num = 0;
   print(arguments);
+  print(conj);
+  print(step_num);
   for (var argument in arguments) {
     var match_conj = RegExp(r'-c').firstMatch(argument);
     var match_step = RegExp(r'-p(\w+)').firstMatch(argument);
