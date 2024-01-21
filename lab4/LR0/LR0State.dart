@@ -31,7 +31,6 @@ void printLR0States(List<LR0State> states) {
 void printLR0StatesDot(
     List<LR0State> states, Map<String, List<List<String>>> grammar) {
   print('digraph LR0Automaton {');
-  print('  node [shape=circle, style=filled, fillcolor=lightblue];');
 
   for (var i = 0; i < states.length; i++) {
     var currentState = states[i];
