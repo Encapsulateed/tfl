@@ -133,8 +133,9 @@ class LR0FMS extends FSM {
         if (beta == "eps") {
           continue;
         }
-
+        print(newl);
         newl.move();
+
         var X = newl.getNext();
 
         var transition_set = super
@@ -145,7 +146,7 @@ class LR0FMS extends FSM {
         if (transition_set.length == 0) {
           State N0 = State();
           bool existed = false;
-          // тут логика, есди какое-то состояние уже содержит эту продукцию
+
           if (statyByLR0[newl.toString()] != null) {
             N0 = statyByLR0[newl.toString()]!;
             existed = true;
@@ -157,6 +158,8 @@ class LR0FMS extends FSM {
             }
             super.states.add(N0);
             statyByLR0[newl.toString()] = N0;
+
+            if (newl.getNext() != 'eps') {}
           }
 
           Transaction transaction = Transaction.ivan(state, N0, beta);
@@ -176,7 +179,17 @@ class LR0FMS extends FSM {
             transition_set[0].to.name += '\n${newl.toString()}';
             (transition_set[0].to.value as List<LR0Situation>)
                 .add(newl.clone());
-            statyByLR0[newl.toString()] = transition_set[0].to;
+            if (newl.getNext() != 'eps') {
+              statyByLR0[newl.toString()] = transition_set[0].to;
+            } else {
+              break;
+            }
+
+            List<State> first = [];
+            First(transition_set[0].to, first);
+            first.forEach((element) {
+              load_rules(element, transition_set[0].to, X);
+            });
           }
         }
       } catch (e) {

@@ -3,59 +3,69 @@ rankdir = LR
 dummy [shape=none, label="", width=0, height=0]
 "0 S0 -> ·S
 S -> ·AA
-A -> ·AA
-A -> ·aa" [label = "0 S0 -> ·S
+A -> ·aA
+A -> ·b" [label = "0 S0 -> ·S
 S -> ·AA
-A -> ·AA
-A -> ·aa", shape = circle]
+A -> ·aA
+A -> ·b", shape = circle]
 "1 S0 -> S·" [label = "1 S0 -> S·", shape = doublecircle]
 "2 S -> A·A
-A -> ·AA
-A -> ·aa
-A -> A·A" [label = "2 S -> A·A
-A -> ·AA
-A -> ·aa
-A -> A·A", shape = circle]
-"3 A -> a·a" [label = "3 A -> a·a", shape = circle]
-"4 S -> AA·
-A -> A·A
-A -> AA·" [label = "4 S -> AA·
-A -> A·A
-A -> AA·", shape = doublecircle]
-"5 A -> aa·" [label = "5 A -> aa·", shape = doublecircle]
+A -> ·aA
+A -> ·b" [label = "2 S -> A·A
+A -> ·aA
+A -> ·b", shape = circle]
+"3 A -> a·A
+A -> ·aA
+A -> ·b" [label = "3 A -> a·A
+A -> ·aA
+A -> ·b", shape = circle]
+"4 A -> b·" [label = "4 A -> b·", shape = doublecircle]
+"5 S -> AA·" [label = "5 S -> AA·", shape = doublecircle]
+"6 A -> aA·" [label = "6 A -> aA·", shape = doublecircle]
 dummy -> "0 S0 -> ·S
 S -> ·AA
-A -> ·AA
-A -> ·aa"
+A -> ·aA
+A -> ·b"
 "0 S0 -> ·S
 S -> ·AA
-A -> ·AA
-A -> ·aa" -> "1 S0 -> S·" [label = "S"]
+A -> ·aA
+A -> ·b" -> "1 S0 -> S·" [label = "S"]
 "0 S0 -> ·S
 S -> ·AA
-A -> ·AA
-A -> ·aa" -> "2 S -> A·A
-A -> ·AA
-A -> ·aa
-A -> A·A" [label = "A"]
+A -> ·aA
+A -> ·b" -> "2 S -> A·A
+A -> ·aA
+A -> ·b" [label = "A"]
 "0 S0 -> ·S
 S -> ·AA
-A -> ·AA
-A -> ·aa" -> "3 A -> a·a" [label = "a"]
+A -> ·aA
+A -> ·b" -> "3 A -> a·A
+A -> ·aA
+A -> ·b" [label = "a"]
+"0 S0 -> ·S
+S -> ·AA
+A -> ·aA
+A -> ·b" -> "4 A -> b·" [label = "b"]
 "2 S -> A·A
-A -> ·AA
-A -> ·aa
-A -> A·A" -> "4 S -> AA·
-A -> A·A
-A -> AA·" [label = "A"]
+A -> ·aA
+A -> ·b" -> "5 S -> AA·" [label = "A"]
 "2 S -> A·A
-A -> ·AA
-A -> ·aa
-A -> A·A" -> "3 A -> a·a" [label = "a"]
-"3 A -> a·a" -> "5 A -> aa·" [label = "a"]
-"4 S -> AA·
-A -> A·A
-A -> AA·" -> "4 S -> AA·
-A -> A·A
-A -> AA·" [label = "A"]
+A -> ·aA
+A -> ·b" -> "3 A -> a·A
+A -> ·aA
+A -> ·b" [label = "a"]
+"2 S -> A·A
+A -> ·aA
+A -> ·b" -> "4 A -> b·" [label = "b"]
+"3 A -> a·A
+A -> ·aA
+A -> ·b" -> "6 A -> aA·" [label = "A"]
+"3 A -> a·A
+A -> ·aA
+A -> ·b" -> "3 A -> a·A
+A -> ·aA
+A -> ·b" [label = "a"]
+"3 A -> a·A
+A -> ·aA
+A -> ·b" -> "4 A -> b·" [label = "b"]
 }
