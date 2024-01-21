@@ -1,0 +1,3 @@
+analyzer:
+  exclude:
+    - lab5/src/tests/
