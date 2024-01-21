@@ -8,6 +8,4 @@ class conjunctiveProdutcion {
   String toString() {
     return '$left -> ${possible_right}';
   }
-
- 
 }

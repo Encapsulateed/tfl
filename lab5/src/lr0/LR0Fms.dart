@@ -8,7 +8,6 @@ class LR0FMS extends FSM {
   Map<String, State> statyByLR0 = {};
   Grammar _grammar = Grammar();
 
-  
   LR0FMS(Grammar CompleteGrammar) {
     this._grammar = CompleteGrammar;
     super.alphabet.addAll(_grammar.nonTerminals);
@@ -34,8 +33,6 @@ class LR0FMS extends FSM {
 
     return production_possible_LR0_situations;
   }
-
-
 
   void buildDFA() {
     // Начальное состояние соответвует G+ - пополненной грамматике
@@ -78,7 +75,7 @@ class LR0FMS extends FSM {
         if (beta == "eps") {
           continue;
         }
-      
+
         newl.move();
 
         var X = newl.getNext();
@@ -179,6 +176,4 @@ class LR0FMS extends FSM {
       }
     }
   }
-
-  
 }

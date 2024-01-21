@@ -208,7 +208,7 @@ class LR0Parser {
 
   void Log(int index) {
     String path = 'values/grammar_$index/';
-  var directory = Directory(path);
+    var directory = Directory(path);
 
     if (!directory.existsSync()) {
       directory.createSync(recursive: true);

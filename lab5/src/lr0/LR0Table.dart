@@ -18,11 +18,11 @@ class LR0Table {
     _grammar.terminals.add('\$');
     makeTable();
     _grammar.terminals.remove('\$');
-
   }
-  LR0FMS get(){
+  LR0FMS get() {
     return _fsm;
   }
+
   void makeTable() {
     for (var I in _fsm.states) {
       int index = _fsm.getStateIndex(I);
@@ -76,7 +76,6 @@ class LR0Table {
       }
     }
   }
-
 
   void logToFile(String path) {
     var file = File(path);
