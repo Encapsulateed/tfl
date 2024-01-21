@@ -25,24 +25,23 @@ void main() {
       // {7,5,2,0}
       nodes[2] = stack.push(["2"], nodes[0]);
       nodes[5] = stack.push(["5"], nodes[2]);
-      nodes[15] = stack.push(["7"], nodes[5]);
+      nodes[15] = stack.push(["7, 5"], nodes[5]);
 
       // {8,6,2,0}
       nodes[6] = stack.push(["6"], nodes[2]);
       nodes[8] = stack.push(["8"], nodes[6]);
 
       var result = nodes[7]?.ancestors(1);
-      print(result);
 
-      for (final ancestor in result!) {
+      /*for (final ancestor in result!) {
         print(ancestor.id);
-      }
+      }*/
 
-      stack.printStack(nodes[0]!);
+      //stack.printStack(nodes[0]!);
     });
 
     test('random staff', () {
-      print(DEFAULT_COMPARATOR(["7"], ["7"]));
+      print(nodes[8]?.prev);
     });
 
     /*test('has the right degrees: prev', () {
