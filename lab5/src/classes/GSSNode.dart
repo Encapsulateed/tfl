@@ -103,7 +103,8 @@ class _GSSNode<T> {
     return result;
   }
 
-  void _getAncestorsRecursive(_GSSNode<T> currentNode, int k, Set<_GSSNode<T>> result) {
+  void _getAncestorsRecursive(
+      _GSSNode<T> currentNode, int k, Set<_GSSNode<T>> result) {
     if (k < 0) {
       return;
     }
