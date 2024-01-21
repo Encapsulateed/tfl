@@ -95,6 +95,29 @@ class _GSSNode<T> {
     //return this.prev.values.toSet();
     return this.prev.values.toSet().map((e) => e as GSSNode<T>).toSet();
   }
+
+  Set<_GSSNode<T>> ancestors(int k) {
+    Set<_GSSNode<T>> result = {};
+    _getAncestorsRecursive(this, k, result);
+    result.remove(this);
+    return result;
+  }
+
+  void _getAncestorsRecursive(_GSSNode<T> currentNode, int k, Set<_GSSNode<T>> result) {
+    if (k < 0) {
+      return;
+    }
+
+    result.add(currentNode);
+
+    if (currentNode.level == 0) {
+      return;
+    }
+
+    for (final prevNode in currentNode.prev.values) {
+      _getAncestorsRecursive(prevNode, k - 1, result);
+    }
+  }
 }
 
 class GSSNode<T> extends _GSSNode<T> {
