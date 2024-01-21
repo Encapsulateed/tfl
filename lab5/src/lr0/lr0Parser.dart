@@ -117,7 +117,7 @@ class LR0Parser {
     tokenStack.push(_table.lr0_table[state_id]![rule.left]![0].toString());
   }
 
-  bool Parse(String word) {
+ bool Parse(String word) {
     Stack<String> inputStack = Stack();
     Stack<String> tokenStack = Stack();
 
@@ -130,7 +130,7 @@ class LR0Parser {
 
     while (true) {
       int state_id = int.parse(tokenStack.peek());
-
+    
       List<Action> action = [];
       try {
         action = _table.lr0_table[state_id]![inputStack.peek()]!;
@@ -176,6 +176,7 @@ class LR0Parser {
       }
     }
   }
+
 
   int node_id_next() {
     return nodes_id_sequense++;

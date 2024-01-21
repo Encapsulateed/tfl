@@ -8,9 +8,46 @@ class conjunctiveGrammar {
   List<conjunctiveProdutcion> rules = [];
 
   conjunctiveGrammar.fromFile(String filePath) {
+    _alternativsPreWork(filePath);
     _readGrammarFromFile(filePath);
     _makeCFGs();
   }
+
+  void _alternativsPreWork(String filePath) {
+    var lines = File(filePath).readAsStringSync().split('\n');
+    List<String> updated_rules = [];
+    for (var line in lines) {
+      if (line.trim().isNotEmpty) {
+        List<String> parts =
+            line.split('->').map((part) => part.trim()).toList();
+
+        var left = parts[0];
+        var right = parts[1].split('|').toList();
+        rules.add(conjunctiveProdutcion(
+            left, (right.map((e) => e.split('')).toList())));
+
+        for (var item in right) {
+          updated_rules.add('$left->$item');
+        }
+      }
+    }
+
+    var file = File(filePath);
+
+    // Открываем поток для записи в файл
+    var sink = file.openWrite();
+
+    try {
+      // Записываем каждую строку из списка в файл
+      for (var rule in updated_rules) {
+        sink.writeln(rule);
+      }
+    } finally {
+      // Закрываем поток и сохраняем изменения в файле
+      sink.close();
+    }
+  }
+
   void _readGrammarFromFile(String filePath) {
     var lines = File(filePath).readAsStringSync().split('\n');
 

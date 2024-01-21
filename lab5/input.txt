@@ -1,3 +1,4 @@
-S->AA
-A->a&b
-A->a
+E->E+T
+E->T
+T->n
+T->(E)
