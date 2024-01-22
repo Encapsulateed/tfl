@@ -55,9 +55,17 @@ class LR0FMS extends FSM {
         break;
       }
     }
-  }
+    for (var tr in super.transactions) {
+      var t = tr.to;
+      var f = tr.from;
 
-  void shift(State state, {bool need_load = true}) {
+      if (!super.states.contains(t)) {
+        super.states.add(t);
+      }
+      if (!super.states.contains(f)) {
+        super.states.add(f);
+      }
+    }
     for (var s in super.states) {
       for (var l in s.value as List<LR0Situation>) {
         if (l.getNext() == 'eps') {
@@ -66,7 +74,9 @@ class LR0FMS extends FSM {
         }
       }
     }
+  }
 
+  void shift(State state, {bool need_load = true}) {
     for (var l in state.value as List<LR0Situation>) {
       try {
         var newl = l.clone();
@@ -98,10 +108,12 @@ class LR0FMS extends FSM {
             if (newl.getNext() == 'eps') {
               super.finalStates.add(N0);
             }
-            super.states.add(N0);
-            statyByLR0[newl.toString()] = N0;
 
-            if (newl.getNext() != 'eps') {}
+            super.states.add(N0);
+
+            if (X != 'eps') {
+              statyByLR0[newl.toString()] = N0;
+            }
           }
 
           Transaction transaction = Transaction.ivan(state, N0, beta);
@@ -121,10 +133,9 @@ class LR0FMS extends FSM {
             transition_set[0].to.name += '\n${newl.toString()}';
             (transition_set[0].to.value as List<LR0Situation>)
                 .add(newl.clone());
-            if (newl.getNext() != 'eps') {
+
+            if (X != 'eps') {
               statyByLR0[newl.toString()] = transition_set[0].to;
-            } else {
-              break;
             }
 
             List<State> first = [];

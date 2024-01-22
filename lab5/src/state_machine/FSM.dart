@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:collection';
 
+import '../lr0/LR0Situation.dart';
+
 // Класс представляющий собой абстрактный конечный автомат
 // states - множество всех состояний автомата
 // startStates и finalStates - множества начальных и конечных состояний соотвественно
@@ -218,6 +220,8 @@ class FSM {
     }
 
     for (var transaction in this.transactions) {
+      print(transaction.to.name);
+
       res +=
           "\"${getStateIndex(transaction.from)} ${transaction.from.name}\" -> \"${getStateIndex(transaction.to)} ${transaction.to.name}\" [label = \"${transaction.letter}\"]\n";
     }
@@ -244,14 +248,26 @@ class State {
   State();
 
   State.valued(this.name, this.value);
+  bool _compareLists(List<dynamic> list1, List<dynamic> list2) {
+    if (list1.length != list2.length) {
+      return false;
+    }
+
+    for (int i = 0; i < list1.length; i++) {
+      if (list1[i] != list2[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is State &&
-          runtimeType == other.runtimeType &&
-          name == other.name &&
-          value == other.value;
+          _compareLists(
+              value as List<LR0Situation>, other.value as List<LR0Situation>);
 
   @override
   int get hashCode => name.hashCode;
