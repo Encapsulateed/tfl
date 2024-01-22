@@ -31,27 +31,28 @@ class LR0Parser {
     var rule = _grammar.rules[rule_id];
     print("RULE");
     print(rule);
+    print("LOOK UP FOOL");
     for (var v1_s in v.ancestors(rule.right.length)) {
-      var act = _table.lr0_table[int.parse(v1_s.value[1]) + 1]?[rule.left]!;
-      //print(v1_s.value[1]);
-      //print(rule.left);
+      var act = _table.lr0_table[int.parse(v1_s.value[1])]?[rule.left]!;
+      if (act?.length == 0) {
+        continue;
+      }
+      print(v1_s.value[1]);
+      print(rule.left);
       var s_ss = act?[0].stateNumber;
       var i = int.parse(v.value[0]);
-      var v_ss_value = [(i - 1).toString(), s_ss.toString()];
+      var v_ss_value = [i.toString(), s_ss.toString()]; // Тут было i - 1
       var v_ss = stack.levels[i - 1].find(v_ss_value);
 
       if (v_ss != null) {
         if (v_ss.prev.values.contains(v1_s)) {
           continue;
-        } // ?? Вроде как без элза, но мб книжка не сделала отступ
+        }
         for (final l in v_ss.prev.values) {
           if (l.value == v1_s.value && l.prev.values != v1_s.prev.values) {
-            //Надо ли пушить? Ну вроде надо
-            nodes[node_id_next()] =
-                stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+            nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
             var act =
-                _table.lr0_table[int.parse(nodes[node_id_curr()]!.value[0])]
-                    ?[x]!; //Точно ли x посылаем?
+                _table.lr0_table[int.parse(nodes[node_id_curr()]!.value[1])]?[x]!;
             for (var obj in act!) {
               if (obj.actionTitle.startsWith("r")) {
                 Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P);
@@ -60,11 +61,8 @@ class LR0Parser {
           } else {
             v_ss = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?);
             if (P.contains(v_ss)) {
-              nodes[node_id_next()] = stack.push(
-                  v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
-              var act =
-                  _table.lr0_table[int.parse(nodes[node_id_curr()]!.value[0])]
-                      ?[x]!; //Точно ли x посылаем?
+              nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+              var act = _table.lr0_table[int.parse(nodes[node_id_curr()]!.value[1])]?[x]!;
               for (var obj in act!) {
                 if (obj.actionTitle.startsWith("r")) {
                   Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P);
@@ -74,47 +72,53 @@ class LR0Parser {
           }
         }
       } else {
-        nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?);
+        stack.pop(v); //У Томиты нет попа и попы видимо
+        nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?, i);
       }
     }
   }
 
-  bool parse(List<String> word_tokens) {
+  bool parse(List<String> word_tokens, int n) {
     word_tokens.add("\$");
     nodes[node_id_curr()] = stack.push(["0", "0"]);
     _table.logToFile("aboba");
-
-    for (int i = 1; i < word_tokens.length + 1; i++) {
+    int i = 1;
+    while (i < word_tokens.length + 1) {
       List<GSSNode<List<String>>> P = []; // БУКВА ПЭ
       List<GSSNode<List<String>>> levelCopy = List.from(stack.levels[i - 1].nodes.values);
 
       for (GSSNode<List<String>> v in levelCopy) {
         P.add(v);
-        final act = _table.lr0_table[int.parse(v.value[0])]?[word_tokens[i - 1]]!;
+        final act = _table.lr0_table[int.parse(v.value[1])]?[word_tokens[i - 1]]!;
         print("act below");
-        print(int.parse(v.value[0]));
         print(word_tokens[i - 1]);
         print(act);
         print("---");
-        for (var obj in act!) {
-          print("obj info");
-          print(obj.actionTitle);
-          print("---");
-          if (obj.actionTitle == 'ACC') {
-            return true;
-          }
 
+        if (n == i) {
+          stack.printStack(nodes[0]!);
+          stack.GSStoDot("Step n");
+        }
+
+        for (var obj in act!) {
           if (obj.actionTitle.startsWith("s")) {
             Shift(v, obj.stateNumber!);
+            i++;
           }
 
           if (obj.actionTitle.startsWith("r")) {
-            Reduce(v, obj.ruleNumber!, word_tokens[i], P);
+            Reduce(v, obj.ruleNumber!, word_tokens[i - 1], P);
+          }
+
+          if (obj.actionTitle == 'ACC') {
+            stack.GSStoDot("chipichipi");
+            return true;
           }
         }
       }
 
-      if (i > stack.levels.length - 1) {
+      if (i > stack.levels.length) {
+        print("MISSION FAILED");
         stack.printStack(nodes[0]!);
         return false;
       }

@@ -29,11 +29,16 @@ class GSStackImpl<T> implements GSStack<T> {
   List<GSSLevel<T>> get levels => _levels;
 
   @override
-  GSSNode<T> push(T value, [GSSNode<T>? prev]) {
-    final level = (prev?.level ?? -1) + 1;
+  GSSNode<T> push(T value, [GSSNode<T>? prev, int? specifiedLevel]) {
+    final level = specifiedLevel ?? (prev?.level ?? -1) + 1;
 
-    if (this._levels.length == level) {
+    /*if (this._levels.length == level) {
       this._levels.add(GSSLevel(level));
+    }
+     */
+
+    while (this._levels.length <= level) {
+      this._levels.add(GSSLevel(this._levels.length));
     }
 
     final node = this._levels[level].find(value, _comparator) ??
@@ -129,13 +134,10 @@ class GSStackImpl<T> implements GSStack<T> {
     }
 
     for (int i = 1; i < _levels.length; i++) {
-      Set<List<String>> set = {};
       for (final node in _levels[i - 1].nodes.values) {
         for (final nextNode in node.next.values) {
-          if (nextNode.value != null &&
-              !set.contains([node.value, nextNode.value])) {
-            res += "  \"${node.value}\" -> \"${nextNode.value}\";\n";
-            set.add([node.value as String, nextNode.value as String]);
+          if (nextNode.value != null ) {
+            res += "  \"${nextNode.value}\" -> \"${node.value}\";\n";
           }
         }
       }
@@ -147,7 +149,7 @@ class GSStackImpl<T> implements GSStack<T> {
         "$res"
         "}\n";
 
-    File file = File('values/$f_name.txt');
+    File file = File('$f_name.txt');
     file.writeAsStringSync(res);
   }
 }
