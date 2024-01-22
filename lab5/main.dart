@@ -33,7 +33,8 @@ void main(List<String> arguments) {
   print(word);
 
   var p = LR0Parser(cg.possible_grammars[0]);
-  print(p.parse(word.split('')));
+  print(p.classicParser(word));
+  p.Log(1);
   /** List<bool> results = [];
   for (var grammar in cg.possible_grammars) {
     LR0Parser curr_parser = LR0Parser(grammar);

@@ -102,7 +102,7 @@ class LR0Parser {
     }
   }
 
-  /*bool Parse(String word) {
+  bool classicParser(String word) {
     Stack<String> inputStack = Stack();
     Stack<String> tokenStack = Stack();
 
@@ -152,7 +152,6 @@ class LR0Parser {
           tokenStack.pop();
         }
 
-        print('After reduce: ${tokenStack.peek()}');
 
         state_id = int.parse(tokenStack.peek());
         tokenStack.push(rule.left);
@@ -162,7 +161,7 @@ class LR0Parser {
     }
   }
 
-   */
+   
 
   bool parse(List<String> word_tokens) {
     word_tokens.add("\$");
