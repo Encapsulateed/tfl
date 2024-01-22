@@ -220,8 +220,6 @@ class FSM {
     }
 
     for (var transaction in this.transactions) {
-      print(transaction.to.name);
-
       res +=
           "\"${getStateIndex(transaction.from)} ${transaction.from.name}\" -> \"${getStateIndex(transaction.to)} ${transaction.to.name}\" [label = \"${transaction.letter}\"]\n";
     }
