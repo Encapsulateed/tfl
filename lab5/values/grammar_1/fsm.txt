@@ -2,137 +2,95 @@ digraph {
 rankdir = LR
 dummy [shape=none, label="", width=0, height=0]
 "0 S0 -> ·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x" [label = "0 S0 -> ·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x", shape = circle]
+S -> ·bbS
+S -> ·SbS
+S -> ·bb" [label = "0 S0 -> ·S
+S -> ·bbS
+S -> ·SbS
+S -> ·bb", shape = circle]
 "1 S0 -> S·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x" [label = "1 S0 -> S·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x", shape = doublecircle]
-"2 S -> x·" [label = "2 S -> x·", shape = doublecircle]
-"3 S -> SS·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·SS
-S -> S·x" [label = "3 S -> SS·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·SS
-S -> S·x", shape = circle]
-"4 S -> SSS·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x
-S -> SS·S" [label = "4 S -> SSS·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x
-S -> SS·S", shape = doublecircle]
-"5 S -> x·
-S -> Sx·" [label = "5 S -> x·
-S -> Sx·", shape = doublecircle]
-"4 S -> SSS·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x
-S -> SS·S" [label = "4 S -> SSS·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x
-S -> SS·S", shape = doublecircle]
+S -> S·bS" [label = "1 S0 -> S·
+S -> S·bS", shape = doublecircle]
+"2 S -> b·bS
+S -> b·b" [label = "2 S -> b·bS
+S -> b·b", shape = circle]
+"3 S -> Sb·S
+S -> ·SbS
+S -> ·bbS
+S -> ·bb" [label = "3 S -> Sb·S
+S -> ·SbS
+S -> ·bbS
+S -> ·bb", shape = circle]
+"4 S -> bb·S
+S -> ·bbS
+S -> ·bb
+S -> ·SbS
+S -> bb·" [label = "4 S -> bb·S
+S -> ·bbS
+S -> ·bb
+S -> ·SbS
+S -> bb·", shape = doublecircle]
+"5 S -> SbS·
+S -> S·bS" [label = "5 S -> SbS·
+S -> S·bS", shape = doublecircle]
+"6 S -> bbS·
+S -> S·bS" [label = "6 S -> bbS·
+S -> S·bS", shape = doublecircle]
 dummy -> "0 S0 -> ·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x"
+S -> ·bbS
+S -> ·SbS
+S -> ·bb"
 "0 S0 -> ·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x" -> "1 S0 -> S·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x" [label = "S"]
+S -> ·bbS
+S -> ·SbS
+S -> ·bb" -> "1 S0 -> S·
+S -> S·bS" [label = "S"]
 "0 S0 -> ·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x" -> "2 S -> x·" [label = "x"]
+S -> ·bbS
+S -> ·SbS
+S -> ·bb" -> "2 S -> b·bS
+S -> b·b" [label = "b"]
 "1 S0 -> S·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x" -> "3 S -> SS·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·SS
-S -> S·x" [label = "S"]
-"1 S0 -> S·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x" -> "5 S -> x·
-S -> Sx·" [label = "x"]
-"3 S -> SS·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·SS
-S -> S·x" -> "4 S -> SSS·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x
-S -> SS·S" [label = "S"]
-"3 S -> SS·S
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·SS
-S -> S·x" -> "5 S -> x·
-S -> Sx·" [label = "x"]
-"4 S -> SSS·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x
-S -> SS·S" -> "4 S -> SSS·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x
-S -> SS·S" [label = "S"]
-"4 S -> SSS·
-S -> S·SS
-S -> ·SSS
-S -> ·Sx
-S -> ·x
-S -> S·x
-S -> SS·S" -> "5 S -> x·
-S -> Sx·" [label = "x"]
+S -> S·bS" -> "3 S -> Sb·S
+S -> ·SbS
+S -> ·bbS
+S -> ·bb" [label = "b"]
+"2 S -> b·bS
+S -> b·b" -> "4 S -> bb·S
+S -> ·bbS
+S -> ·bb
+S -> ·SbS
+S -> bb·" [label = "b"]
+"3 S -> Sb·S
+S -> ·SbS
+S -> ·bbS
+S -> ·bb" -> "5 S -> SbS·
+S -> S·bS" [label = "S"]
+"3 S -> Sb·S
+S -> ·SbS
+S -> ·bbS
+S -> ·bb" -> "2 S -> b·bS
+S -> b·b" [label = "b"]
+"4 S -> bb·S
+S -> ·bbS
+S -> ·bb
+S -> ·SbS
+S -> bb·" -> "6 S -> bbS·
+S -> S·bS" [label = "S"]
+"4 S -> bb·S
+S -> ·bbS
+S -> ·bb
+S -> ·SbS
+S -> bb·" -> "2 S -> b·bS
+S -> b·b" [label = "b"]
+"5 S -> SbS·
+S -> S·bS" -> "3 S -> Sb·S
+S -> ·SbS
+S -> ·bbS
+S -> ·bb" [label = "b"]
+"6 S -> bbS·
+S -> S·bS" -> "3 S -> Sb·S
+S -> ·SbS
+S -> ·bbS
+S -> ·bb" [label = "b"]
 }

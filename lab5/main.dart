@@ -31,7 +31,7 @@ void main(List<String> arguments) {
   }
   var cg = conjunctiveGrammar.fromFile('input.txt');
   print(word);
-
+  // n+n
   var p = LR0Parser(cg.possible_grammars[0]);
   print(p.classicParser(word));
   p.Log(1);
