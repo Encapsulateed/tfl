@@ -1,0 +1,18 @@
+digraph {
+rankdir = LR
+dummy [shape=none, label="", width=0, height=0]
+  subgraph cluster_0 {
+    label="Level 0";
+    "[0, 0, b]" [label="[0, 0, b]"];
+  }
+  subgraph cluster_1 {
+    label="Level 1";
+    "[1, 2, b]" [label="[1, 2, b]"];
+  }
+  subgraph cluster_2 {
+    label="Level 2";
+    "[2, 4, b]" [label="[2, 4, b]"];
+  }
+  "[1, 2, b]" -> "[2, 4, b]";
+  "[0, 0, b]" -> "[1, 2, b]";
+}

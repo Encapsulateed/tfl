@@ -25,7 +25,7 @@ class LR0Parser {
     nodes[node_id_next()] = stack.push([(int.parse(v.value[0]) + 1).toString(), state_id.toString()], v);
   }
 
-  void Reduce(GSSNode<List<String>> v, int rule_id, String x, List<GSSNode<List<String>>> P) {
+  void Reduce(GSSNode<List<String>> v, int rule_id, String x, List<GSSNode<List<String>>> P,Set<GSSNode<List<String>>> out) {
     var rule = _grammar.rules[rule_id];
     print("RULE");
     print(rule);
@@ -67,7 +67,7 @@ class LR0Parser {
               var act = _table.lr0_table[s_ss]?[x]!;
               for (var obj in act!) {
                 if (obj.actionTitle.startsWith("r")) {
-                  Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P);
+                  Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P, out);
                 }
               }
             } else {
@@ -81,7 +81,7 @@ class LR0Parser {
                 var act = _table.lr0_table[s_ss]?[x]!;
                 for (var obj in act!) {
                   if (obj.actionTitle.startsWith("r")) {
-                    Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P);
+                    Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P,out);
                   }
                 }
               }
@@ -89,51 +89,11 @@ class LR0Parser {
           }
         }
       } else {
-
-        //Останки древних цивилизаций, которые хотели сделать поп красиво
-        /*GSSNode<List<String>>? temp = v;
-        print(temp.prev.values);
-
-        for (int t = 1; i < rule.right.length; i++) {
-          for (final prevNode in temp!.prev.values) {
-            GSSNode<List<String>>? node;
-            for (int k = 0; i < stack.levels.length; i++) {
-              if (stack.levels[k].find(prevNode.value) != null) {
-                node = stack.levels[k].find(prevNode.value);
-                continue;
-              }
-            }
-
-            for (final transfer in node!.prev.values) {
-              print("what a transfer");
-              print(transfer.value);
-              for (int m = 0; i < stack.levels.length; i++) {
-                print("LOOK");
-                for (final l in stack.levels[i].nodes.values) {
-                  print(l);
-                }
-                if (stack.levels[m].find(transfer.value) != null) {
-                  print("IM HERE");
-                  temp = stack.levels[m].find(transfer.value);
-                  print("RESULT MY FRIEND");
-                  print(temp!.value);
-                  continue;
-                }
-              }
-            }
-
-            stack.pop(node);
-            print("Pop check");
-            print(temp?.value);
-            print(temp?.prev.values);
-          }
-        };
-        //stack.pop(v);
-         */
-        //print("Bro im in tested part");
-        //stdin.readLineSync();
         stack.pop(v);
-        nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?, i);
+        int id = node_id_next();
+        nodes[id] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?, i);
+        print('ЧЛЕН CБОКУ ${nodes[id]}');
+        out.add(nodes[id]!);
       }
     }
   }
@@ -146,6 +106,8 @@ class LR0Parser {
     while (i < word_tokens.length + 1) {
       List<GSSNode<List<String>>> P = []; // БУКВА ПЭ
       List<GSSNode<List<String>>> levelCopy = List.from(stack.levels[i - 1].nodes.values);
+
+      Set<GSSNode<List<String>>> reduced = {};
 
       for (GSSNode<List<String>> v in levelCopy) {
         var check = false;
@@ -178,7 +140,8 @@ class LR0Parser {
 
         for (var obj in act) {
           if (obj.actionTitle.startsWith("r")) {
-            Reduce(v, obj.ruleNumber!, word_tokens[i - 1], P);
+            Reduce(v, obj.ruleNumber!, word_tokens[i - 1], P,reduced);
+            print('Я СДЕЛАЛ РЕДУС И ПОЛУЧИЛ МНОЖЕСТВО:: ${reduced}');
           }
         }
 
@@ -301,7 +264,9 @@ class LR0Parser {
 
     return sb.toString();
   }
+  void p (int a, ){
 
+  }
   void Log(int index) {
     String path = 'values/grammar_$index/';
     var directory = Directory(path);

@@ -28,14 +28,13 @@ void main(List<String> arguments) {
     }
   }
   var cg = conjunctiveGrammar.fromFile('input.txt');
-  print(word);
 
   List<bool> results = [];
   for (var grammar in cg.possible_grammars) {
     LR0Parser curr_parser = LR0Parser(grammar);
 
     curr_parser.Log(cg.possible_grammars.indexOf(grammar) + 1);
-    results.add(curr_parser.parse(word.split(''), 3));
+    results.add(curr_parser.parse(word.split(''), step_num));
     //results.add(curr_parser.glrParser(word.split(''), n: step_num));
   }
 
@@ -52,5 +51,5 @@ void main(List<String> arguments) {
       print('Слово не распознаётся');
     }
   }
-  print(step_num);
+
 }
