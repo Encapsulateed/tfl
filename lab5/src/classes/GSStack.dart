@@ -52,11 +52,6 @@ class GSStackImpl<T> implements GSStack<T> {
       return false;
     }
 
-    print("LEVEL BEFORE POP");
-    for (final l in this._levels) {
-      print(l.nodes.values);
-    }
-
     this._levels[node.level].remove(node);
 
     final isLevelEmpty = this._levels[node.level].length() == 0;
@@ -64,11 +59,6 @@ class GSStackImpl<T> implements GSStack<T> {
 
     if (isLastLevel && isLevelEmpty) {
       this._levels.removeLast();
-    }
-
-    print("LEVEL AFTER POP");
-    for (final l in this._levels) {
-      print(l.nodes.values);
     }
 
     return true;
