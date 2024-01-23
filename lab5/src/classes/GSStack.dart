@@ -146,7 +146,7 @@ class GSStackImpl<T> implements GSStack<T> {
       for (final node in _levels[i].nodes.values) {
         for (final prevNode in node.prev.values) {
           if (prevNode.value != null) {
-            res += "  \"${prevNode.value}\" -> \"${node.value}\";\n";
+            res += "  \"${node.value}\" -> \"${prevNode.value}\";\n";
           }
         }
       }
