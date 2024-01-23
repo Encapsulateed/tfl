@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import '../classes/GSSNode.dart';
 import '../classes/GSStack.dart';
 import '../utils/Action.dart';
@@ -36,25 +38,24 @@ class LR0Parser {
 
       try {
         action = _table.lr0_table[state_id]![inputStack.peek()]!;
-        print(action);
-        print('curr state: $state_id curr_s: ${inputStack.peek()}');
+
         if (action.length == 0) {
           throw 'Пустая ячейка!';
         }
-      } catch (e, s) {
+      } catch (e) {
         print('Ошибка $e');
-        print(s);
         return false;
       }
 
       if (action.length > 1) {
+        print('try: ${action}');
         print('КОНФЛИКТ!');
         return false;
       }
 
       var a = action[0];
       print(
-          '${getStrFromStack(tokenStack, reverse: false)} [${inputStack.peek()}]');
+          '${getStrFromStack(tokenStack, reverse: false)} [${inputStack.peek()}] {${a.actionTitle}}');
 
       if (a.actionTitle.startsWith('ACC')) {
         print('WORD ACCEP TED!');
@@ -234,5 +235,76 @@ class LR0Parser {
     }
     this._table.logToFile('${path}table.txt');
     this._table.get().DumpToDOT('${path}fsm.txt');
+  }
+
+  Queue<GSSNode<List<String>>> frontier = Queue();
+  Set<GSSNode<List<String>>> accepted = {};
+  bool glrParser(List<String> tokens, {int n = 0 - 1}) {
+    tokens.add('\$');
+    nodes[0] = stack.push(["0", "0", "${tokens[0]}"]);
+    frontier.add(nodes[0]!);
+    var t = _table.lr0_table;
+    int action_counter = 0;
+    while (frontier.isEmpty == false) {
+      var x = frontier.removeFirst();
+
+      int x_index = int.parse(x.value[1]);
+      int x_state = int.parse(x.value[0]);
+      for (var action in t[x_state]![tokens[x_index]]!) {
+        if (action.actionTitle.startsWith('s')) {
+          int new_id = node_id_next();
+          int goto = t[x_state]![tokens[x_index]]![0].stateNumber!;
+
+          nodes[new_id] = stack.push([
+            goto.toString(),
+            (x_index + 1).toString(),
+            "${tokens[x_index + 1]}"
+          ], x);
+
+          frontier.add(nodes[new_id]!);
+          new_action_pass(action_counter, n);
+          break;
+        } else if (action.actionTitle.startsWith('r')) {
+          var rule = _grammar.rules[action.ruleNumber!];
+          int m = rule.right.length;
+          String left = rule.left;
+          var s = x.ancestors(m).toList()[m - 1];
+
+          int new_id = node_id_next();
+
+          int s_state = int.parse(s.value[0]);
+          int goto = t[s_state]![left]![0].stateNumber!;
+
+          nodes[new_id] = stack.push(
+              [goto.toString(), x_index.toString(), "${tokens[x_index]}"],
+              s as GSSNode<List<String>>);
+
+          frontier.add(nodes[new_id]!);
+          new_action_pass(action_counter, n);
+
+          break;
+        } else if (action.actionTitle.startsWith('ACC')) {
+          nodes[node_id_next()] = stack.push(['acc', 'acc'], x);
+          accepted.add(x);
+          new_action_pass(action_counter, n);
+
+          break;
+        } else {
+          print('err');
+        }
+      }
+    }
+
+    return accepted.length > 0;
+  }
+
+  void new_action_pass(int action_counter, int n) {
+    ++action_counter;
+
+    if (n != -1 && action_counter == n) {
+      stack.GSStoDot('results/stack_dump_on_$action_counter');
+    } else if (n == -1) {
+      stack.GSStoDot('results/stack_dump_on_$action_counter');
+    }
   }
 }

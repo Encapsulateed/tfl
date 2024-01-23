@@ -13,10 +13,8 @@ void main(List<String> arguments) {
 
   word = stdin.readLineSync() ?? 'null';
   bool conj = false;
-  int step_num = 0;
-  print(arguments);
-  print(conj);
-  print(step_num);
+  int step_num = -1;
+
   for (var argument in arguments) {
     var match_conj = RegExp(r'-c').firstMatch(argument);
     var match_step = RegExp(r'-p(\w+)').firstMatch(argument);
@@ -31,18 +29,15 @@ void main(List<String> arguments) {
   }
   var cg = conjunctiveGrammar.fromFile('input.txt');
   print(word);
-  // n+n
-  var p = LR0Parser(cg.possible_grammars[0]);
-  print(p.classicParser(word));
-  p.Log(1);
-  /** List<bool> results = [];
+
+  List<bool> results = [];
   for (var grammar in cg.possible_grammars) {
     LR0Parser curr_parser = LR0Parser(grammar);
 
     curr_parser.Log(cg.possible_grammars.indexOf(grammar) + 1);
-    results.add(curr_parser.Parse(word));
+    results.add(curr_parser.glrParser(word.split(''), n: step_num));
   }
-  print(results);
+
   if (conj == true) {
     if (results.any((element) => element == true)) {
       print('Существует хотя бы один корректный разбор ');
@@ -56,5 +51,5 @@ void main(List<String> arguments) {
       print('Слово не распознаётся');
     }
   }
-  print(step_num); */
+  print(step_num);
 }
