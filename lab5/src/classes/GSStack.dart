@@ -32,11 +32,6 @@ class GSStackImpl<T> implements GSStack<T> {
   GSSNode<T> push(T value, [GSSNode<T>? prev, int? specifiedLevel]) {
     final level = specifiedLevel ?? (prev?.level ?? -1) + 1;
 
-    /*if (this._levels.length == level) {
-      this._levels.add(GSSLevel(level));
-    }
-     */
-
     while (this._levels.length <= level) {
       this._levels.add(GSSLevel(this._levels.length));
     }
@@ -57,6 +52,11 @@ class GSStackImpl<T> implements GSStack<T> {
       return false;
     }
 
+    print("LEVEL BEFORE POP");
+    for (final l in this._levels) {
+      print(l.nodes.values);
+    }
+
     this._levels[node.level].remove(node);
 
     final isLevelEmpty = this._levels[node.level].length() == 0;
@@ -64,6 +64,11 @@ class GSStackImpl<T> implements GSStack<T> {
 
     if (isLastLevel && isLevelEmpty) {
       this._levels.removeLast();
+    }
+
+    print("LEVEL AFTER POP");
+    for (final l in this._levels) {
+      print(l.nodes.values);
     }
 
     return true;
@@ -108,7 +113,7 @@ class GSStackImpl<T> implements GSStack<T> {
     print("STACK PRINT BEGIN\n"
         "-------\n"
         "Level 0");
-    print("| ${firstNode.toString()} |");
+    print("| ${firstNode.value} |");
     print("  Prev: First node");
     print("-------");
     for (int i = 1; i < _levels.length; i++) {
@@ -133,11 +138,11 @@ class GSStackImpl<T> implements GSStack<T> {
       res += "  }\n";
     }
 
-    for (int i = 1; i < _levels.length; i++) {
-      for (final node in _levels[i - 1].nodes.values) {
-        for (final nextNode in node.next.values) {
-          if (nextNode.value != null) {
-            res += "  \"${nextNode.value}\" -> \"${node.value}\";\n";
+    for (int i = _levels.length - 1; i >= 0; i--) {
+      for (final node in _levels[i].nodes.values) {
+        for (final prevNode in node.prev.values) {
+          if (prevNode.value != null) {
+            res += "  \"${prevNode.value}\" -> \"${node.value}\";\n";
           }
         }
       }
