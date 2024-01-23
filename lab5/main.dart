@@ -27,8 +27,8 @@ void main(List<String> arguments) {
       step_num = int.parse(match_step.group(1)!);
     }
   }
+
   var cg = conjunctiveGrammar.fromFile('input.txt');
-  print(word);
 
   List<bool> results = [];
   for (var grammar in cg.possible_grammars) {

@@ -21,9 +21,9 @@ class LR0Parser {
     _table = LR0Table(_grammar);
   }
 
-  void Shift(GSSNode<List<String>> v, int state_id) {
-    nodes[node_id_next()] = stack
-        .push([(int.parse(v.value[0]) + 1).toString(), state_id.toString()], v);
+  void Shift(GSSNode<List<String>> v, int state_id, String x) {
+    nodes[node_id_next()] = stack.push(
+        [(int.parse(v.value[0]) + 1).toString(), state_id.toString(), x], v);
   }
 
   void Reduce(GSSNode<List<String>> v, int rule_id, String x,
@@ -39,7 +39,7 @@ class LR0Parser {
       var i = int.parse(v.value[0]);
       var v_ss_value = [i.toString(), s_ss.toString()]; // Индексация верная
       var v_ss = stack.levels[i - 1].find(v_ss_value); // Индексация верная
-
+      v_ss_value.add(x);
       if (v_ss != null) {
         if (v_ss.prev.values.contains(v1_s)) {
           continue;
@@ -87,7 +87,7 @@ class LR0Parser {
 
   bool parse(List<String> word_tokens, int n) {
     word_tokens.add("\$");
-    nodes[node_id_curr()] = stack.push(["0", "0"]);
+    nodes[node_id_curr()] = stack.push(["0", "0", word_tokens[0]]);
     int i = 1;
     var endcheck = 0;
     while (i < word_tokens.length + 1) {
@@ -114,7 +114,7 @@ class LR0Parser {
 
         for (var obj in act!) {
           if (obj.actionTitle.startsWith("s")) {
-            Shift(v, obj.stateNumber!);
+            Shift(v, obj.stateNumber!, word_tokens[i]);
             check = true;
             continue;
           }
@@ -147,7 +147,7 @@ class LR0Parser {
 
         for (var obj in act!) {
           if (obj.actionTitle.startsWith("s")) {
-            Shift(hidenode, obj.stateNumber!);
+            Shift(hidenode, obj.stateNumber!, word_tokens[i]);
             check = true;
             continue;
           }
