@@ -69,6 +69,20 @@ class GSStackImpl<T> implements GSStack<T> {
     return this._levels.isEmpty;
   }
 
+  int countNodesWithoutNext() {
+    int count = 0;
+
+    for (int i = 0; i < _levels.length; i++) {
+      for (final node in _levels[i].nodes.values) {
+        if (node.next.isEmpty) {
+          count++;
+        }
+      }
+    }
+
+    return count;
+  }
+
   @override
   List<GSSNode<T>> getPreviousNodesFromNode(GSSNode<T> startNode) {
     List<GSSNode<T>> result = [];

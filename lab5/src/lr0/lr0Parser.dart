@@ -25,7 +25,7 @@ class LR0Parser {
     nodes[node_id_next()] = stack.push([(int.parse(v.value[0]) + 1).toString(), state_id.toString()], v);
   }
 
-  void Reduce(GSSNode<List<String>> v, int rule_id, String x, List<GSSNode<List<String>>> P) {
+  void Reduce(GSSNode<List<String>> v, int rule_id, String x, List<GSSNode<List<String>>> P, Set<GSSNode<List<String>>> out) {
     var rule = _grammar.rules[rule_id];
     print("RULE");
     print(rule);
@@ -50,7 +50,6 @@ class LR0Parser {
        */
       print(i);
       print(v_ss_value);
-      print(v_ss?.level);
       //stdin.readLineSync();
 
       if (v_ss != null) {
@@ -63,11 +62,13 @@ class LR0Parser {
           //stdin.readLineSync();
           for (final l in v_ss.prev.values) {
             if (l.value == v1_s.value && l.prev.values != v1_s.prev.values) {
-              nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+              int ind = node_id_next();
+              nodes[ind] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
               var act = _table.lr0_table[s_ss]?[x]!;
+
               for (var obj in act!) {
                 if (obj.actionTitle.startsWith("r")) {
-                  Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P);
+                  Reduce(nodes[ind]!, obj.ruleNumber!, x, P, out);
                 }
               }
             } else {
@@ -77,11 +78,12 @@ class LR0Parser {
               if (P.contains(v_ss)) {
                 //print("IM HERE ITS UNDEREST ELSE MAIN LALALA");
                 //stdin.readLineSync();
-                nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+                int ind = node_id_next();
+                nodes[ind] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
                 var act = _table.lr0_table[s_ss]?[x]!;
                 for (var obj in act!) {
                   if (obj.actionTitle.startsWith("r")) {
-                    Reduce(nodes[node_id_curr()]!, obj.ruleNumber!, x, P);
+                    Reduce(nodes[ind]!, obj.ruleNumber!, x, P, out);
                   }
                 }
               }
@@ -133,7 +135,10 @@ class LR0Parser {
         //print("Bro im in tested part");
         //stdin.readLineSync();
         stack.pop(v);
-        nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?, i);
+        //nodes[node_id_next()] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?, i);
+        int id = node_id_next();
+        nodes[id] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?, i);
+        out.add(nodes[id]!);
       }
     }
   }
@@ -143,15 +148,32 @@ class LR0Parser {
     nodes[node_id_curr()] = stack.push(["0", "0"]);
     int i = 1;
     var endcheck = 0;
+    _table.logToFile("aboba");
     while (i < word_tokens.length + 1) {
+      //stack.addLevelAtIndex(i);
       List<GSSNode<List<String>>> P = []; // БУКВА ПЭ
       List<GSSNode<List<String>>> levelCopy = List.from(stack.levels[i - 1].nodes.values);
+      Set<GSSNode<List<String>>> reduced = {};
+      var check = false;
+      var dollarcheck = 0;
+      /*print("LEVELCOPY");
+      for (final l in levelCopy) {
+        print(l.value);
+      }
+      print("LEVELCOPY END");
+       */
 
       for (GSSNode<List<String>> v in levelCopy) {
-        var check = false;
+        //var check = false;
         P.add(v);
         final act = _table.lr0_table[int.parse(v.value[1])]?[word_tokens[i - 1]]!;
         if (act?.length == 0) {
+          print("ABOBI");
+          print(v.value);
+          print(word_tokens[i - 1]);
+          if (word_tokens[i - 1] == '\$'){
+            dollarcheck++;
+          }
           endcheck++;
           continue;
         }
@@ -162,7 +184,7 @@ class LR0Parser {
         print("---");
 
         if (n == i) {
-          stack.printStack(nodes[0]!);
+          //stack.printStack(nodes[0]!);
           stack.GSStoDot("Step n");
         }
 
@@ -178,32 +200,67 @@ class LR0Parser {
 
         for (var obj in act) {
           if (obj.actionTitle.startsWith("r")) {
-            Reduce(v, obj.ruleNumber!, word_tokens[i - 1], P);
+            Reduce(v, obj.ruleNumber!, word_tokens[i - 1], P, reduced);
           }
         }
-
-        print("IM HERE");
 
         for (var obj in act) {
           if (obj.actionTitle == 'ACC') {
             GSSNode<List<String>> lastNode = stack.levels.last.nodes.values.last;
             nodes[node_id_next()] = stack.push(["ACC", "ACC"], lastNode);
-            stack.printStack(nodes[0]!);
+            //stack.printStack(nodes[0]!);
             stack.GSStoDot("chipichipi");
             return true;
           }
         }
-
-        if (check) {
-          i++;
-        }
-
-        stack.printStack(nodes[0]!);
       }
 
-      if (endcheck == 2) {
+      for (final hidenode in reduced) {
+        P.add(hidenode);
+        final act = _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i - 1]]!;
+        if (act?.length == 0) {
+          /*print("ABOBI");
+          print(hidenode.value);
+          print(word_tokens[i - 1]);
+          endcheck++;
+
+           */
+          continue;
+        }
+
+        for (var obj in act!) {
+          if (obj.actionTitle.startsWith("s")) {
+            Shift(hidenode, obj.stateNumber!);
+            check = true;
+            continue;
+          }
+        }
+
+        for (var obj in act) {
+          if (obj.actionTitle == 'ACC') {
+            GSSNode<List<String>> lastNode = stack.levels.last.nodes.values.last;
+            nodes[node_id_next()] = stack.push(["ACC", "ACC"], lastNode);
+            //stack.printStack(nodes[0]!);
+            stack.GSStoDot("chipichipi");
+            return true;
+          }
+        }
+      }
+
+      if (check) {
+        i++;
+      }
+
+      if (stack.countNodesWithoutNext() == 2 && endcheck == stack.countNodesWithoutNext()) {
         print("MISSION FAILED");
-        stack.printStack(nodes[0]!);
+        //stack.printStack(nodes[0]!);
+        stack.GSStoDot("chipichipi");
+        return false;
+      }
+
+      if (endcheck == stack.countNodesWithoutNext() + 1) {
+        print("MISSION FAILED");
+        //stack.printStack(nodes[0]!);
         stack.GSStoDot("chipichipi");
         return false;
       }

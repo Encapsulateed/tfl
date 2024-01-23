@@ -52,5 +52,4 @@ void main(List<String> arguments) {
       print('Слово не распознаётся');
     }
   }
-  print(step_num);
 }
