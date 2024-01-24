@@ -3,33 +3,6 @@ rankdir = LR
 dummy [shape=none, label="", width=0, height=0]
   subgraph cluster_0 {
     label="Level 0";
-    "[0, 0, b]" [label="[0, 0, b]"];
+    "[0, 0, $]" [label="[0, 0, $]"];
   }
-  subgraph cluster_1 {
-    label="Level 1";
-    "[1, 2, b]" [label="[1, 2, b]"];
-  }
-  subgraph cluster_2 {
-    label="Level 2";
-    "[2, 3, b]" [label="[2, 3, b]"];
-    "[2, 1, b]" [label="[2, 1, b]"];
-  }
-  subgraph cluster_3 {
-    label="Level 3";
-    "[3, 2, b]" [label="[3, 2, b]"];
-  }
-  subgraph cluster_4 {
-    label="Level 4";
-    "[4, 1, $]" [label="[4, 1, $]"];
-  }
-  subgraph cluster_5 {
-    label="Level 5";
-    "[ACC, ACC]" [label="[ACC, ACC]"];
-  }
-  "[ACC, ACC]" -> "[4, 1, $]";
-  "[4, 1, $]" -> "[0, 0, b]";
-  "[3, 2, b]" -> "[2, 3, b]";
-  "[2, 3, b]" -> "[1, 2, b]";
-  "[2, 1, b]" -> "[0, 0, b]";
-  "[1, 2, b]" -> "[0, 0, b]";
 }

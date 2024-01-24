@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../utils/grammar.dart';
 import '../utils/Production.dart';
 import '../state_machine/FSM.dart';
@@ -50,6 +52,10 @@ class LR0FMS extends FSM {
 
       for (int i = 1; i < p_l; i++) {
         shift(getStateByIndex(i));
+
+        // super.DumpToDOT('t');
+        //print('dump');
+        //stdin.readLineSync();
       }
       int n_l = super.states.length;
       if (p_l == n_l) {
@@ -77,10 +83,28 @@ class LR0FMS extends FSM {
     }
   }
 
+  void addMove(State from, State to, LR0Situation s) {
+    if (moved[from] == null) {
+      moved[from] = {};
+    }
+    if (moved[from]![to] == null) {
+      moved[from]![to] = [];
+    }
+
+    moved[from]![to]!.add(s);
+  }
+
+  bool checkMove(State from, State to, LR0Situation s) {
+    try {
+      return moved[from]![to]!.contains(s);
+    } catch (e) {
+      return false;
+    }
+  }
+
   void shift(State state, {bool need_load = true}) {
     for (var l in state.value as List<LR0Situation>) {
       try {
-        
         var newl = l.clone();
         var beta = newl.next;
 
@@ -120,6 +144,7 @@ class LR0FMS extends FSM {
 
           Transaction transaction = Transaction.ivan(state, N0, beta);
           super.transactions.add(transaction);
+          addMove(state, N0, l);
 
           if (existed == false) {
             List<State> first = [];
@@ -132,25 +157,13 @@ class LR0FMS extends FSM {
           if ((transition_set[0].to.value as List<LR0Situation>)
                   .contains(newl) ==
               false) {
-
-            // to; from
-            if (moved[transition_set[0].to] == null) {
-              moved[transition_set[0].to] = {};
-            }
-            if (moved[transition_set[0].to]![state] == null) {
-              moved[transition_set[0].to]![state] = [];
-            }
-            moved[transition_set[0].to]![state]!.add(l);
-            if(state == getStateByIndex(4)){
-              print(l);
-            }
-            
             transition_set[0].to.name += '\n${newl.toString()}';
-
-
             (transition_set[0].to.value as List<LR0Situation>)
                 .add(newl.clone());
 
+            //addMove(state, transition_set[0].to, l);
+
+        
             if (X != 'eps') {
               statyByLR0[newl.toString()] = transition_set[0].to;
             }
@@ -162,10 +175,9 @@ class LR0FMS extends FSM {
             });
           }
         }
-      } catch (e, s) {
-       // print(e);
-        //print(s);
+      } catch (e) {
         return;
+        // continue;
       }
     }
   }
@@ -183,30 +195,19 @@ class LR0FMS extends FSM {
             prev_lr0.LR0_pointer = 0;
           }
 
-          if ((N0.value as List<LR0Situation>).contains(prev_lr0) == false) {
+          var prev_copy = prev_lr0.clone();
+           prev_copy.move();
+          
 
-            if (moved[state] != null) {
-              if (moved[state]![N0] != null) {
-                if (moved[state]![N0]!.contains(prev_lr0)) {
-                  continue;
-                }
-              }
-            }
-
+          if ((N0.value as List<LR0Situation>).contains(prev_lr0) == false &&
+              (N0.value as List<LR0Situation>).contains(prev_copy) == false) {
             (N0.value as List<LR0Situation>).add(prev_lr0.clone());
             N0.name += '\n${prev_lr0.toString()}';
             statyByLR0[prev_lr0.toString()] = N0;
-            if (moved[state] == null) {
-              moved[state] = {};
-            }
-            if (moved[state]![N0] == null) {
-              moved[state]![N0] = [];
-            }
-            moved[state]![N0]!.add(prev_lr0);
           }
-
+          
           if (_grammar.nonTerminals.contains(prev_lr0.getNext()) &&
-              X != prev_lr0.getNext()) {
+              X != prev_lr0.getNext() ) {
             load_rules(state, N0, prev_lr0.getNext());
           }
         }
