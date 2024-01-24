@@ -1,8 +1,0 @@
-digraph {
-rankdir = LR
-dummy [shape=none, label="", width=0, height=0]
-  subgraph cluster_0 {
-    label="Level 0";
-    "[0, 0, $]" [label="[0, 0, $]"];
-  }
-}

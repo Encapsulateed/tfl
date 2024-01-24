@@ -1,3 +1,0 @@
-S->bbS
-S->SSS
-S->bb

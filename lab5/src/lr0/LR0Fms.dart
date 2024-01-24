@@ -163,7 +163,6 @@ class LR0FMS extends FSM {
 
             //addMove(state, transition_set[0].to, l);
 
-        
             if (X != 'eps') {
               statyByLR0[newl.toString()] = transition_set[0].to;
             }
@@ -176,6 +175,7 @@ class LR0FMS extends FSM {
           }
         }
       } catch (e) {
+        print(e);
         return;
         // continue;
       }
@@ -186,9 +186,16 @@ class LR0FMS extends FSM {
     if (state == N0) {
       return;
     }
+    var trans = super
+        .transactions
+        .where((trans) => trans.from == state && trans.to == N0)
+        .toList()
+        .firstOrNull;
 
     if (_grammar.nonTerminals.contains(X)) {
-      for (var l_0 in state.value as List<LR0Situation>) {
+      var copySt = [...state.value as List<LR0Situation>];
+
+      for (var l_0 in copySt) {
         if (l_0.left == X) {
           var prev_lr0 = LR0Situation(l_0.left, l_0.right, l_0.LR0_pointer - 1);
           if (prev_lr0.LR0_pointer == -1) {
@@ -196,18 +203,31 @@ class LR0FMS extends FSM {
           }
 
           var prev_copy = prev_lr0.clone();
-           prev_copy.move();
-          
+          prev_copy.move();
 
-          if ((N0.value as List<LR0Situation>).contains(prev_lr0) == false &&
-              (N0.value as List<LR0Situation>).contains(prev_copy) == false) {
-            (N0.value as List<LR0Situation>).add(prev_lr0.clone());
-            N0.name += '\n${prev_lr0.toString()}';
-            statyByLR0[prev_lr0.toString()] = N0;
+          if ((N0.value as List<LR0Situation>).contains(prev_lr0) == false) {
+            {
+              if (trans == null) {
+                //print('Сейчас я добавлю LR0 ${prev_lr0}  к ${getStateIndex(N0)} из ${getStateIndex(state)}');
+                (N0.value as List<LR0Situation>).add(prev_lr0.clone());
+                N0.name += '\n${prev_lr0.toString()}';
+                statyByLR0[prev_lr0.toString()] = N0;
+              } else {
+                if ((state.value as List<LR0Situation>).contains(prev_copy) ==
+                    false) {
+
+                  (N0.value as List<LR0Situation>).add(prev_lr0.clone());
+                 // print('Сейчас я добавлю LR0 ${prev_lr0}  к ${getStateIndex(N0)} из ${getStateIndex(state)}');
+
+                  N0.name += '\n${prev_lr0.toString()}';
+                  statyByLR0[prev_lr0.toString()] = N0;
+                }
+              }
+            }
           }
-          
+
           if (_grammar.nonTerminals.contains(prev_lr0.getNext()) &&
-              X != prev_lr0.getNext() ) {
+              X != prev_lr0.getNext()) {
             load_rules(state, N0, prev_lr0.getNext());
           }
         }
