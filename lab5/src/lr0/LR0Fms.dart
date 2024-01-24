@@ -6,6 +6,7 @@ import 'LR0Situation.dart';
 class LR0FMS extends FSM {
   LR0FMS.empty();
   Map<String, State> statyByLR0 = {};
+  Map<State, Map<State, List<LR0Situation>>> moved = {};
   Grammar _grammar = Grammar();
 
   LR0FMS(Grammar CompleteGrammar) {
@@ -79,6 +80,7 @@ class LR0FMS extends FSM {
   void shift(State state, {bool need_load = true}) {
     for (var l in state.value as List<LR0Situation>) {
       try {
+        
         var newl = l.clone();
         var beta = newl.next;
 
@@ -130,7 +132,22 @@ class LR0FMS extends FSM {
           if ((transition_set[0].to.value as List<LR0Situation>)
                   .contains(newl) ==
               false) {
+
+            // to; from
+            if (moved[transition_set[0].to] == null) {
+              moved[transition_set[0].to] = {};
+            }
+            if (moved[transition_set[0].to]![state] == null) {
+              moved[transition_set[0].to]![state] = [];
+            }
+            moved[transition_set[0].to]![state]!.add(l);
+            if(state == getStateByIndex(4)){
+              print(l);
+            }
+            
             transition_set[0].to.name += '\n${newl.toString()}';
+
+
             (transition_set[0].to.value as List<LR0Situation>)
                 .add(newl.clone());
 
@@ -145,7 +162,9 @@ class LR0FMS extends FSM {
             });
           }
         }
-      } catch (e) {
+      } catch (e, s) {
+       // print(e);
+        //print(s);
         return;
       }
     }
@@ -165,9 +184,25 @@ class LR0FMS extends FSM {
           }
 
           if ((N0.value as List<LR0Situation>).contains(prev_lr0) == false) {
+
+            if (moved[state] != null) {
+              if (moved[state]![N0] != null) {
+                if (moved[state]![N0]!.contains(prev_lr0)) {
+                  continue;
+                }
+              }
+            }
+
             (N0.value as List<LR0Situation>).add(prev_lr0.clone());
             N0.name += '\n${prev_lr0.toString()}';
             statyByLR0[prev_lr0.toString()] = N0;
+            if (moved[state] == null) {
+              moved[state] = {};
+            }
+            if (moved[state]![N0] == null) {
+              moved[state]![N0] = [];
+            }
+            moved[state]![N0]!.add(prev_lr0);
           }
 
           if (_grammar.nonTerminals.contains(prev_lr0.getNext()) &&
@@ -183,7 +218,9 @@ class LR0FMS extends FSM {
     for (var tr in super.transactions.where((t) => t.to == X)) {
       if (X != tr.from) {
         first.add(tr.from);
-        First(tr.from, first);
+        if (!first.contains(X)) {
+          First(tr.from, first);
+        }
       }
     }
   }
