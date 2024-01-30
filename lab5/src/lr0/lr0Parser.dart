@@ -22,8 +22,7 @@ class LR0Parser {
   }
 
   void Shift(GSSNode<List<String>> v, int state_id, String x) {
-    nodes[node_id_next()] = stack.push(
-        [(int.parse(v.value[0]) + 1).toString(), state_id.toString(), x], v);
+    nodes[node_id_next()] = stack.push([(int.parse(v.value[0]) + 1).toString(), state_id.toString(), x], v);
   }
 
   void Reduce(GSSNode<List<String>> v, int rule_id, String x,
@@ -89,24 +88,29 @@ class LR0Parser {
     word_tokens.add("\$");
     nodes[node_id_curr()] = stack.push(["0", "0", word_tokens[0]]);
     int i = 1;
-    var endcheck = 0;
+    //var endcheck = 0;
+    bool test = false;
     while (i < word_tokens.length + 1) {
       List<GSSNode<List<String>>> P = []; // БУКВА ПЭ
-      List<GSSNode<List<String>>> levelCopy =
-          List.from(stack.levels[i - 1].nodes.values);
+      List<GSSNode<List<String>>> levelCopy = List.from(stack.levels[i - 1].nodes.values);
       Set<GSSNode<List<String>>> reduced = {};
       var check = false;
 
       for (GSSNode<List<String>> v in levelCopy) {
         //var check = false;
         P.add(v);
-        final act =
-            _table.lr0_table[int.parse(v.value[1])]?[word_tokens[i - 1]]!;
+        final act = _table.lr0_table[int.parse(v.value[1])]?[word_tokens[i - 1]]!;
         if (act?.length == 0) {
           if (word_tokens[i - 1] == '\$') {}
-          endcheck++;
+          //endcheck++;
           continue;
         }
+
+        print("act below");
+        print(v.value[1]);
+        print(word_tokens[i - 1]);
+        print(act);
+        print("---");
 
         if (n == i) {
           stack.GSStoDot("Step $n");
@@ -116,6 +120,7 @@ class LR0Parser {
           if (obj.actionTitle.startsWith("s")) {
             Shift(v, obj.stateNumber!, word_tokens[i]);
             check = true;
+            test = true;
             continue;
           }
         }
@@ -123,13 +128,17 @@ class LR0Parser {
         for (var obj in act) {
           if (obj.actionTitle.startsWith("r")) {
             Reduce(v, obj.ruleNumber!, word_tokens[i - 1], P, reduced);
+            if (reduced.length != 0) {
+              //print("REDUCED");
+              //print(reduced);
+              test = true;
+            }
           }
         }
 
         for (var obj in act) {
           if (obj.actionTitle == 'ACC') {
-            GSSNode<List<String>> lastNode =
-                stack.levels.last.nodes.values.last;
+            GSSNode<List<String>> lastNode = stack.levels.last.nodes.values.last;
             nodes[node_id_next()] = stack.push(["ACC", "ACC"], lastNode);
             stack.GSStoDot("result");
             return true;
@@ -139,8 +148,7 @@ class LR0Parser {
 
       for (final hidenode in reduced) {
         P.add(hidenode);
-        final act = _table.lr0_table[int.parse(hidenode.value[1])]
-            ?[word_tokens[i - 1]]!;
+        final act = _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i - 1]]!;
         if (act?.length == 0) {
           continue;
         }
@@ -149,16 +157,15 @@ class LR0Parser {
           if (obj.actionTitle.startsWith("s")) {
             Shift(hidenode, obj.stateNumber!, word_tokens[i]);
             check = true;
+            test = true;
             continue;
           }
         }
 
         for (var obj in act) {
           if (obj.actionTitle == 'ACC') {
-            GSSNode<List<String>> lastNode =
-                stack.levels.last.nodes.values.last;
+            GSSNode<List<String>> lastNode = stack.levels.last.nodes.values.last;
             nodes[node_id_next()] = stack.push(["ACC", "ACC"], lastNode);
-            //stack.printStack(nodes[0]!);
             stack.GSStoDot("result");
             return true;
           }
@@ -169,7 +176,20 @@ class LR0Parser {
         i++;
       }
 
-      if (stack.countNodesWithoutNext() == 2 &&
+      //print("IM HERE");
+      //print(stack.countNodesWithoutNext());
+      //print(endcheck);
+      //print(stack.levels[i - 1].numberOfNodes);
+      //stdin.readLineSync();
+
+      if (test == false) {
+        stack.GSStoDot("result");
+        return false;
+      } else {
+        test = false;
+      }
+
+      /*if (stack.countNodesWithoutNext() == 2 &&
           endcheck == stack.countNodesWithoutNext()) {
         //stack.printStack(nodes[0]!);
         stack.GSStoDot("result");
@@ -180,7 +200,7 @@ class LR0Parser {
         //stack.printStack(nodes[0]!);
         stack.GSStoDot("result");
         return false;
-      }
+      }*/
     }
 
     return false;
