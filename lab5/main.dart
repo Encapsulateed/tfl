@@ -12,6 +12,9 @@ void main(List<String> arguments) {
   print('Input word');
 
   word = stdin.readLineSync() ?? 'null';
+  word = word.trim().replaceAll(' ', '');
+  print(word);
+
   bool conj = false;
   int step_num = -1;
 

@@ -242,7 +242,7 @@ class State {
   // здесь хранится смысловая часть состояния автомата
   // в случае 5ЛР - это LR0 ситуация (см. класс LR0Situation)
   dynamic value;
-
+  Map<String, List<LR0Situation>> moved = {};
   State();
 
   State.valued(this.name, this.value);
