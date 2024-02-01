@@ -21,33 +21,54 @@ class LR0Parser {
     _table = LR0Table(_grammar);
   }
 
-  void Shift(GSSNode<List<String>> v, int state_id, String x) {
-    nodes[node_id_next()] = stack.push([(int.parse(v.value[0]) + 1).toString(), state_id.toString(), x], v);
+  void Shift(GSSNode<List<String>> v, int state_id) {
+    nodes[node_id_next()] = stack.push([(int.parse(v.value[0]) + 1).toString(), state_id.toString()], v);
   }
 
-  void Reduce(GSSNode<List<String>> v, int rule_id, String x,
-      List<GSSNode<List<String>>> P, Set<GSSNode<List<String>>> out) {
+  void Reduce(GSSNode<List<String>> v, int rule_id, String x, List<GSSNode<List<String>>> P, Set<GSSNode<List<String>>> out) {
     var rule = _grammar.rules[rule_id];
+    print("ancestors");
+    print(v.ancestors(rule.right.length));
+    print(rule.right);
+    print("------");
     for (var v1_s in v.ancestors(rule.right.length)) {
       var act = _table.lr0_table[int.parse(v1_s.value[1])]?[rule.left]!;
       if (act?.length == 0) {
         continue;
       }
 
-      var s_ss = act?[0].stateNumber;
+      var s_ss = act?[0].stateNumber; // GOTO
       var i = int.parse(v.value[0]);
-      var v_ss_value = [i.toString(), s_ss.toString()]; // Индексация верная
-      var v_ss = stack.levels[i - 1].find(v_ss_value); // Индексация верная
-      v_ss_value.add(x);
+      var v_ss_value = [i.toString(), s_ss.toString()];
+      var v_ss = stack.levels[i].find(v_ss_value);
+      //v_ss_value.add(x);
+      print("REDUCE CHECK");
+      print("Level:");
+      print(stack.levels[i].nodes);
+      print("Value");
+      print(v_ss_value);
+      print("Prevs:");
+      print(v_ss?.prev.values);
+      print("V1_s: ");
+      print(v1_s);
+      print("---");
+      stdin.readLineSync();
       if (v_ss != null) {
         if (v_ss.prev.values.contains(v1_s)) {
+          print("ASSHOLE");
           continue;
         } else {
-          for (final l in v_ss.prev.values) {
-            if (l.value == v1_s.value && l.prev.values != v1_s.prev.values) {
+          List<GSSNode<List<String>>> prevCopy = List.from(v_ss.prev.values);
+          for (final l in prevCopy) {
+            print("IM HERE");
+            print(l);
+            print(v1_s);
+            print(l.prev.values);
+            print("---");
+            if (l.value == v1_s.value) {
+              print("EBANATTTTT");
               int ind = node_id_next();
-              nodes[ind] = stack.push(
-                  v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+              nodes[ind] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
               var act = _table.lr0_table[s_ss]?[x]!;
 
               for (var obj in act!) {
@@ -56,15 +77,19 @@ class LR0Parser {
                 }
               }
             } else {
-              //print("IM HERE, ITS ELSE UNDER MAIN");
+              print("IM HERE, ITS ELSE UNDER MAIN");
               //stdin.readLineSync();
-              v_ss = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?);
+              print(v_ss.prev.values);
+              print(v1_s);
+              //print(v_ss);
+              v_ss.addPrevByValue(v1_s);
+              //v_ss = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?);
+              print(v_ss.prev.values);
               if (P.contains(v_ss)) {
-                //print("IM HERE ITS UNDEREST ELSE MAIN LALALA");
+                print("IM HERE ITS UNDEREST ELSE MAIN LALALA");
                 //stdin.readLineSync();
                 int ind = node_id_next();
-                nodes[ind] = stack.push(
-                    v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+                nodes[ind] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
                 var act = _table.lr0_table[s_ss]?[x]!;
                 for (var obj in act!) {
                   if (obj.actionTitle.startsWith("r")) {
@@ -86,29 +111,26 @@ class LR0Parser {
 
   bool parse(List<String> word_tokens, int n) {
     word_tokens.add("\$");
-    nodes[node_id_curr()] = stack.push(["0", "0", word_tokens[0]]);
-    int i = 1;
-    //var endcheck = 0;
+    nodes[node_id_curr()] = stack.push(["0", "0"]);
+    int i = 0;
     bool test = false;
-    while (i < word_tokens.length + 1) {
+    while (i < word_tokens.length) {
       List<GSSNode<List<String>>> P = []; // БУКВА ПЭ
-      List<GSSNode<List<String>>> levelCopy = List.from(stack.levels[i - 1].nodes.values);
+      List<GSSNode<List<String>>> levelCopy = List.from(stack.levels[i].nodes.values);
       Set<GSSNode<List<String>>> reduced = {};
       var check = false;
 
       for (GSSNode<List<String>> v in levelCopy) {
-        //var check = false;
         P.add(v);
-        final act = _table.lr0_table[int.parse(v.value[1])]?[word_tokens[i - 1]]!;
+        final act = _table.lr0_table[int.parse(v.value[1])]?[word_tokens[i]]!;
         if (act?.length == 0) {
-          if (word_tokens[i - 1] == '\$') {}
-          //endcheck++;
+          if (word_tokens[i] == '\$') {}
           continue;
         }
 
         print("act below");
         print(v.value[1]);
-        print(word_tokens[i - 1]);
+        print(word_tokens[i]);
         print(act);
         print("---");
 
@@ -118,7 +140,7 @@ class LR0Parser {
 
         for (var obj in act!) {
           if (obj.actionTitle.startsWith("s")) {
-            Shift(v, obj.stateNumber!, word_tokens[i]);
+            Shift(v, obj.stateNumber!);
             check = true;
             test = true;
             continue;
@@ -127,10 +149,8 @@ class LR0Parser {
 
         for (var obj in act) {
           if (obj.actionTitle.startsWith("r")) {
-            Reduce(v, obj.ruleNumber!, word_tokens[i - 1], P, reduced);
+            Reduce(v, obj.ruleNumber!, word_tokens[i], P, reduced);
             if (reduced.length != 0) {
-              //print("REDUCED");
-              //print(reduced);
               test = true;
             }
           }
@@ -148,14 +168,14 @@ class LR0Parser {
 
       for (final hidenode in reduced) {
         P.add(hidenode);
-        final act = _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i - 1]]!;
+        final act = _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i]]!;
         if (act?.length == 0) {
           continue;
         }
 
         for (var obj in act!) {
           if (obj.actionTitle.startsWith("s")) {
-            Shift(hidenode, obj.stateNumber!, word_tokens[i]);
+            Shift(hidenode, obj.stateNumber!);
             check = true;
             test = true;
             continue;
@@ -176,31 +196,12 @@ class LR0Parser {
         i++;
       }
 
-      //print("IM HERE");
-      //print(stack.countNodesWithoutNext());
-      //print(endcheck);
-      //print(stack.levels[i - 1].numberOfNodes);
-      //stdin.readLineSync();
-
       if (test == false) {
         stack.GSStoDot("result");
         return false;
       } else {
         test = false;
       }
-
-      /*if (stack.countNodesWithoutNext() == 2 &&
-          endcheck == stack.countNodesWithoutNext()) {
-        //stack.printStack(nodes[0]!);
-        stack.GSStoDot("result");
-        return false;
-      }
-
-      if (endcheck == stack.countNodesWithoutNext() + 1) {
-        //stack.printStack(nodes[0]!);
-        stack.GSStoDot("result");
-        return false;
-      }*/
     }
 
     return false;

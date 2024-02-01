@@ -1,3 +1,5 @@
+import '../types/Comparator.dart';
+
 class _GSSNode<T> {
   T value;
   int level;
@@ -23,6 +25,14 @@ class _GSSNode<T> {
     this.prevLength++;
     this.prev[node.id] = node;
     node.addNext(this);
+  }
+
+  void addPrevByValue(_GSSNode<T> node) {
+    if (!this.prev.values.any((existingNode) => DEFAULT_COMPARATOR(existingNode.value, node.value))) {
+      final newId = this.prev.values.length + 1;
+      this.prev[newId] = node;
+      node.addNext(this);
+    }
   }
 
   void addNext(_GSSNode<T> node) {
