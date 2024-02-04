@@ -8,7 +8,6 @@ class conjunctiveGrammar {
   List<conjunctiveProdutcion> rules = [];
 
   conjunctiveGrammar.fromFile(String filePath) {
-    _alternativsPreWork(filePath);
     _readGrammarFromFile(filePath);
     _makeCFGs();
   }
@@ -44,22 +43,21 @@ class conjunctiveGrammar {
       }
     } finally {
       // Закрываем поток и сохраняем изменения в файле
-      sink.close();
     }
   }
 
   void _readGrammarFromFile(String filePath) {
+    sleep(Duration(microseconds: 1000));
     var lines = File(filePath).readAsStringSync().split('\n');
 
     for (var line in lines) {
-      print(line);
       if (line.trim().isNotEmpty) {
         List<String> parts =
             line.split('->').map((part) => part.trim()).toList();
 
         var left = parts[0];
         var right = parts[1].split('&').toList();
-        print("$left -> $right");
+
         rules.add(conjunctiveProdutcion(
             left, (right.map((e) => e.split('')).toList())));
       }
