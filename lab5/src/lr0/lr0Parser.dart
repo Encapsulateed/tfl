@@ -45,6 +45,7 @@ class LR0Parser {
         } else {
           List<GSSNode<List<String>>> prevCopy = List.from(v_ss.prev.values);
           for (final l in prevCopy) {
+
             if (l.value == v1_s.value) {
               int ind = node_id_next();
               nodes[ind] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
@@ -56,7 +57,9 @@ class LR0Parser {
                 }
               }
             } else {
+
               v_ss.addPrevByValue(v1_s);
+
               if (P.contains(v_ss)) {
                 int ind = node_id_next();
                 nodes[ind] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
@@ -129,7 +132,14 @@ class LR0Parser {
         }
       }
 
-      for (final hidenode in reduced) {
+      if(reduced.every((r) => P.contains(r)) && reduced.length != 0) {
+        test = false;
+        check = true;
+      }
+
+      List<GSSNode<List<String>>> reducedCopy = List.from(reduced);
+
+      for (final hidenode in reducedCopy) {
         P.add(hidenode);
         final act = _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i]]!;
 
@@ -143,6 +153,15 @@ class LR0Parser {
             check = true;
             test = true;
             continue;
+          }
+        }
+
+        for (var obj in act) {
+          if (obj.actionTitle.startsWith("r")) {
+            Reduce(hidenode, obj.ruleNumber!, word_tokens[i], P, reduced);
+            if (reduced.length != 0) {
+              test = true;
+            }
           }
         }
 

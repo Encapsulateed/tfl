@@ -1,7 +1,6 @@
 import 'package:test/test.dart';
 import '../classes/GSStack.dart';
 import '../classes/GSSNode.dart';
-import '../types/Comparator.dart';
 
 void main() {
   group('GSStack: example', () {
@@ -20,19 +19,16 @@ void main() {
 
       // {7,4,1,0}
       nodes[4] = stack.push(["4"], nodes[1]);
-      nodes[9] = stack.push(["7"],
-          nodes[4]); // 7 isn't duplicated, as it ends up in the same layer
+      nodes[9] = stack.push(["7"], nodes[4]); // 7 isn't duplicated, as it ends up in the same layer
 
       // {7,5,2,0}
       nodes[2] = stack.push(["2"], nodes[0]);
       nodes[5] = stack.push(["5"], nodes[2]);
-      nodes[15] = stack.push(["7, 5"], nodes[5]);
+      nodes[7] = stack.push(["7"], nodes[5]);
 
       // {8,6,2,0}
       nodes[6] = stack.push(["6"], nodes[2]);
       nodes[8] = stack.push(["8"], nodes[6]);
-
-      var result = nodes[7]?.ancestors(1);
 
       /*for (final ancestor in result!) {
         print(ancestor.id);
@@ -42,7 +38,7 @@ void main() {
     });
 
     test('random staff', () {
-      print(nodes[8]?.prev);
+      print(nodes[7]?.ancestors(3));
     });
 
     /*test('has the right degrees: prev', () {

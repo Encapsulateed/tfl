@@ -115,11 +115,10 @@ class _GSSNode<T> {
 
   void _getAncestorsRecursive(
       _GSSNode<T> currentNode, int k, Set<_GSSNode<T>> result) {
-    if (k < 0) {
+    if (k == 0) {
+      result.add(currentNode);
       return;
     }
-
-    result.add(currentNode);
 
     if (currentNode.level == 0) {
       return;
