@@ -40,9 +40,8 @@ void main(List<String> arguments) {
     curr_parser.Log(cg.possible_grammars.indexOf(grammar) + 1);
     results.add(curr_parser.parse(word.split(''), step_num));
   }
-
   if (conj == true) {
-    if (results.any((element) => element == true)) {
+    if (results.every((element) => element == true)) {
       print('Существует хотя бы один корректный разбор ');
     } else {
       print('слово не принадлежит языку введеёной грамматики');
