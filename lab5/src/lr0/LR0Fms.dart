@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../utils/grammar.dart';
 import '../utils/Production.dart';
 import '../state_machine/FSM.dart';
@@ -15,7 +17,6 @@ class LR0FMS extends FSM {
     this._grammar = CompleteGrammar;
     super.alphabet.addAll(_grammar.nonTerminals);
     super.alphabet.addAll(_grammar.terminals);
-
     buildDFA();
   }
 
@@ -37,16 +38,62 @@ class LR0FMS extends FSM {
     return production_possible_LR0_situations;
   }
 
+  List<LR0Situation> CLOSURE() {
+    Set<String> possibleNT = {};
+    Set<LR0Situation> first_state = {};
+    first_state.add(LR0Situation(_grammar.startNonTerminal + '0',
+        _grammar.startNonTerminal.split(''), 0));
+    for (var r in _grammar.rules
+        .where((element) => element.left == _grammar.startNonTerminal)) {
+      if (_grammar.nonTerminals.contains(r.right[0])) {
+        possibleNT.add(r.right[0]);
+        for (var rr
+            in _grammar.rules.where((element) => element.left == r.right[0])) {
+          if (!first_state.any((element) =>
+              element.left == rr.left && element.right == rr.right)) {
+            first_state.add(LR0Situation(rr.left, rr.right, 0));
+          }
+        }
+      }
+    }
+    // print(first_state);
+    return first_state.toList();
+  }
+
+  void UPDATE_FIRST() {
+    for (var state
+        in super.states.where((element) => getStateIndex(element) != 0)) {
+      List<LR0Situation> for_add = [];
+      for (var lr0 in state.value as List<LR0Situation>) {
+        var next = lr0.getNext();
+        if (_grammar.nonTerminals.contains(next)) {
+          for (var rule in _grammar.rules) {
+            if (rule.right.length == 2) {
+              if (rule.left == next) {
+                (for_add).add(LR0Situation(rule.left, rule.right, 0));
+              }
+            }
+          }
+        }
+      }
+
+      for (var lr in for_add) {
+        state.name += '\n' + lr.toString();
+        (state.value as List<LR0Situation>).add(lr);
+        load_rules(getStateByIndex(0), state, lr.getNext());
+      }
+    }
+  }
+
   void buildDFA() {
     // Начальное состояние соответвует G+ - пополненной грамматике
-    List<LR0Situation> first_state_value = []
-      ..addAll(_grammar.rules.map((P) => zeroClosure(P)[0].clone()));
+    List<LR0Situation> first_state_value = CLOSURE();
     var state_name = first_state_value.join('\n');
     State first_state = State.valued(state_name, first_state_value);
     super.states.add(first_state);
     super.startStates.add(first_state);
     shift(first_state);
-
+    UPDATE_FIRST();
     while (true) {
       int p_l = super.states.length;
 
@@ -84,6 +131,11 @@ class LR0FMS extends FSM {
         }
       }
     }
+    List<State> first = [];
+    First(getStateByIndex(7), first);
+    first.forEach((element) {
+      //  print(getStateIndex(element));
+    });
   }
 
   Set<LR0Situation> getDstSet(State s, String X) {
@@ -209,7 +261,8 @@ class LR0FMS extends FSM {
           }
         }
       } catch (e) {
-        //print(e);
+        //print(state.name);
+        print(e);
         return;
         // continue;
       }
@@ -273,12 +326,9 @@ class LR0FMS extends FSM {
 
   void First(State X, List<State> first) {
     for (var tr in super.transactions.where((t) => t.to == X)) {
-      if (X != tr.from) {
+      if (X != tr.from && !first.contains(tr.from)) {
         first.add(tr.from);
         First(tr.from, first);
-        if (!first.contains(X)) {
-          break;
-        }
       }
     }
   }

@@ -29,7 +29,7 @@ class LR0Table {
 
       lr0_table[index] = {};
       for (var X in _grammar.nonTerminals) {
-        if (X != _grammar.start_non_terminal + "0") {
+        if (X != _grammar.startNonTerminal + "0") {
           lr0_table[index]![X] = [];
         }
       }
@@ -70,7 +70,7 @@ class LR0Table {
       if (_grammar.terminals.contains(X)) {
         lr0_table[index_I]![X]!.add(Action.shift(index_J));
       } else if (_grammar.nonTerminals.contains(X)) {
-        if (X != _grammar.start_non_terminal + '0') {
+        if (X != _grammar.startNonTerminal + '0') {
           lr0_table[index_I]![X]!.add(Action.goto(index_J));
         }
       }

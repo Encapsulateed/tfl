@@ -8,6 +8,7 @@ class conjunctiveGrammar {
   List<conjunctiveProdutcion> rules = [];
 
   conjunctiveGrammar.fromFile(String filePath) {
+//    _alternativsPreWork(filePath);
     _readGrammarFromFile(filePath);
     _makeCFGs();
   }
@@ -31,23 +32,13 @@ class conjunctiveGrammar {
       }
     }
 
-    var file = File(filePath);
-
-    // Открываем поток для записи в файл
-    var sink = file.openWrite();
-
-    try {
-      // Записываем каждую строку из списка в файл
-      for (var rule in updated_rules) {
-        sink.writeln(rule);
-      }
-    } finally {
-      // Закрываем поток и сохраняем изменения в файле
-    }
+    // Записываем обновленные правила в файл
+    File(filePath).writeAsStringSync(updated_rules.join('\n'));
   }
 
   void _readGrammarFromFile(String filePath) {
     sleep(Duration(microseconds: 1000));
+
     var lines = File(filePath).readAsStringSync().split('\n');
 
     for (var line in lines) {

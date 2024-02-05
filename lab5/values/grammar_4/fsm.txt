@@ -1,0 +1,199 @@
+digraph {
+rankdir = LR
+dummy [shape=none, label="", width=0, height=0]
+"0 S0 -> ·S
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+S -> ·b
+S -> ·b" [label = "0 S0 -> ·S
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+S -> ·b
+S -> ·b", shape = circle]
+"1 [S0 -> S·]" [label = "1 [S0 -> S·]", shape = doublecircle]
+"2 [S -> a·Sb]
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+[S -> a·|b]
+[S -> a·Sb&aSb]" [label = "2 [S -> a·Sb]
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+[S -> a·|b]
+[S -> a·Sb&aSb]", shape = circle]
+"3 [S -> b·]" [label = "3 [S -> b·]", shape = doublecircle]
+"4 [S -> aS·b]
+[S -> aS·b&aSb]" [label = "4 [S -> aS·b]
+[S -> aS·b&aSb]", shape = circle]
+"5 [S -> a|·b]" [label = "5 [S -> a|·b]", shape = circle]
+"6 [S -> aSb·]
+[S -> aSb·&aSb]" [label = "6 [S -> aSb·]
+[S -> aSb·&aSb]", shape = doublecircle]
+"7 [S -> a|b·]" [label = "7 [S -> a|b·]", shape = doublecircle]
+"8 [S -> aSb&·aSb]" [label = "8 [S -> aSb&·aSb]", shape = circle]
+"9 [S -> aSb&a·Sb]
+S -> aS·b
+S -> aS·b&aSb
+S -> a·Sb
+S -> a·Sb&aSb
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb" [label = "9 [S -> aSb&a·Sb]
+S -> aS·b
+S -> aS·b&aSb
+S -> a·Sb
+S -> a·Sb&aSb
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb", shape = circle]
+"10 [S -> aSb&aS·b]
+[S -> aS·b]
+[S -> aS·b&aSb]" [label = "10 [S -> aSb&aS·b]
+[S -> aS·b]
+[S -> aS·b&aSb]", shape = circle]
+"11 [S -> aSb·]
+[S -> aSb·&aSb]
+[S -> b·]" [label = "11 [S -> aSb·]
+[S -> aSb·&aSb]
+[S -> b·]", shape = doublecircle]
+"12 [S -> aSb&aSb·]
+[S -> aSb·]" [label = "12 [S -> aSb&aSb·]
+[S -> aSb·]", shape = doublecircle]
+dummy -> "0 S0 -> ·S
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+S -> ·b
+S -> ·b"
+"0 S0 -> ·S
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+S -> ·b
+S -> ·b" -> "1 [S0 -> S·]" [label = "S"]
+"0 S0 -> ·S
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+S -> ·b
+S -> ·b" -> "2 [S -> a·Sb]
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+[S -> a·|b]
+[S -> a·Sb&aSb]" [label = "a"]
+"0 S0 -> ·S
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+S -> ·b
+S -> ·b" -> "3 [S -> b·]" [label = "b"]
+"2 [S -> a·Sb]
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+[S -> a·|b]
+[S -> a·Sb&aSb]" -> "4 [S -> aS·b]
+[S -> aS·b&aSb]" [label = "S"]
+"2 [S -> a·Sb]
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+[S -> a·|b]
+[S -> a·Sb&aSb]" -> "2 [S -> a·Sb]
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+[S -> a·|b]
+[S -> a·Sb&aSb]" [label = "a"]
+"2 [S -> a·Sb]
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+[S -> a·|b]
+[S -> a·Sb&aSb]" -> "3 [S -> b·]" [label = "b"]
+"2 [S -> a·Sb]
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+[S -> a·|b]
+[S -> a·Sb&aSb]" -> "5 [S -> a|·b]" [label = "|"]
+"4 [S -> aS·b]
+[S -> aS·b&aSb]" -> "6 [S -> aSb·]
+[S -> aSb·&aSb]" [label = "b"]
+"5 [S -> a|·b]" -> "7 [S -> a|b·]" [label = "b"]
+"6 [S -> aSb·]
+[S -> aSb·&aSb]" -> "8 [S -> aSb&·aSb]" [label = "&"]
+"8 [S -> aSb&·aSb]" -> "9 [S -> aSb&a·Sb]
+S -> aS·b
+S -> aS·b&aSb
+S -> a·Sb
+S -> a·Sb&aSb
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb" [label = "a"]
+"9 [S -> aSb&a·Sb]
+S -> aS·b
+S -> aS·b&aSb
+S -> a·Sb
+S -> a·Sb&aSb
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb" -> "10 [S -> aSb&aS·b]
+[S -> aS·b]
+[S -> aS·b&aSb]" [label = "S"]
+"9 [S -> aSb&a·Sb]
+S -> aS·b
+S -> aS·b&aSb
+S -> a·Sb
+S -> a·Sb&aSb
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb" -> "11 [S -> aSb·]
+[S -> aSb·&aSb]
+[S -> b·]" [label = "b"]
+"10 [S -> aSb&aS·b]
+[S -> aS·b]
+[S -> aS·b&aSb]" -> "12 [S -> aSb&aSb·]
+[S -> aSb·]" [label = "b"]
+"9 [S -> aSb&a·Sb]
+S -> aS·b
+S -> aS·b&aSb
+S -> a·Sb
+S -> a·Sb&aSb
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb" -> "2 [S -> a·Sb]
+S -> ·aSb
+S -> ·a|b
+S -> ·b
+S -> ·aSb&aSb
+[S -> a·|b]
+[S -> a·Sb&aSb]" [label = "a"]
+"11 [S -> aSb·]
+[S -> aSb·&aSb]
+[S -> b·]" -> "8 [S -> aSb&·aSb]" [label = "&"]
+}

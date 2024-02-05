@@ -11,5 +11,7 @@ class Production {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || this.toString() == other.toString();
+      identical(this, other) ||
+      this.toString() == other.toString() ||
+      (this.left == (other as Production).left && this.right == other.right);
 }

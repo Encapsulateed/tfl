@@ -1,0 +1,214 @@
+digraph {
+rankdir = LR
+dummy [shape=none, label="", width=0, height=0]
+"0 S0 -> ·S
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC" [label = "0 S0 -> ·S
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC", shape = circle]
+"1 [S0 -> S·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" [label = "1 [S0 -> S·]
+[S -> S·B]
+B -> ·CS
+C -> ·b", shape = doublecircle]
+"2 [C -> b·]" [label = "2 [C -> b·]", shape = doublecircle]
+"3 [S -> C·A]
+[S -> C·C]
+C -> ·b
+A -> ·CS" [label = "3 [S -> C·A]
+[S -> C·C]
+C -> ·b
+A -> ·CS", shape = circle]
+"4 [S -> SB·]" [label = "4 [S -> SB·]", shape = doublecircle]
+"5 [B -> C·S]
+S -> ·CA
+C -> ·b
+S -> ·SB
+S -> ·CC" [label = "5 [B -> C·S]
+S -> ·CA
+C -> ·b
+S -> ·SB
+S -> ·CC", shape = circle]
+"6 [S -> CA·]" [label = "6 [S -> CA·]", shape = doublecircle]
+"7 [S -> CC·]
+[A -> C·S]
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC" [label = "7 [S -> CC·]
+[A -> C·S]
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC", shape = doublecircle]
+"8 [B -> CS·]
+[S -> S·B]
+C -> ·b
+B -> ·CS" [label = "8 [B -> CS·]
+[S -> S·B]
+C -> ·b
+B -> ·CS", shape = doublecircle]
+"9 [A -> CS·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" [label = "9 [A -> CS·]
+[S -> S·B]
+B -> ·CS
+C -> ·b", shape = doublecircle]
+"8 [B -> CS·]
+[S -> S·B]
+C -> ·b
+B -> ·CS" [label = "8 [B -> CS·]
+[S -> S·B]
+C -> ·b
+B -> ·CS", shape = doublecircle]
+"9 [A -> CS·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" [label = "9 [A -> CS·]
+[S -> S·B]
+B -> ·CS
+C -> ·b", shape = doublecircle]
+dummy -> "0 S0 -> ·S
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC"
+"0 S0 -> ·S
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC" -> "1 [S0 -> S·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" [label = "S"]
+"0 S0 -> ·S
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC" -> "2 [C -> b·]" [label = "b"]
+"0 S0 -> ·S
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC" -> "3 [S -> C·A]
+[S -> C·C]
+C -> ·b
+A -> ·CS" [label = "C"]
+"1 [S0 -> S·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" -> "4 [S -> SB·]" [label = "B"]
+"1 [S0 -> S·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" -> "5 [B -> C·S]
+S -> ·CA
+C -> ·b
+S -> ·SB
+S -> ·CC" [label = "C"]
+"1 [S0 -> S·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" -> "2 [C -> b·]" [label = "b"]
+"3 [S -> C·A]
+[S -> C·C]
+C -> ·b
+A -> ·CS" -> "6 [S -> CA·]" [label = "A"]
+"3 [S -> C·A]
+[S -> C·C]
+C -> ·b
+A -> ·CS" -> "7 [S -> CC·]
+[A -> C·S]
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC" [label = "C"]
+"3 [S -> C·A]
+[S -> C·C]
+C -> ·b
+A -> ·CS" -> "2 [C -> b·]" [label = "b"]
+"5 [B -> C·S]
+S -> ·CA
+C -> ·b
+S -> ·SB
+S -> ·CC" -> "8 [B -> CS·]
+[S -> S·B]
+C -> ·b
+B -> ·CS" [label = "S"]
+"5 [B -> C·S]
+S -> ·CA
+C -> ·b
+S -> ·SB
+S -> ·CC" -> "3 [S -> C·A]
+[S -> C·C]
+C -> ·b
+A -> ·CS" [label = "C"]
+"5 [B -> C·S]
+S -> ·CA
+C -> ·b
+S -> ·SB
+S -> ·CC" -> "2 [C -> b·]" [label = "b"]
+"7 [S -> CC·]
+[A -> C·S]
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC" -> "9 [A -> CS·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" [label = "S"]
+"7 [S -> CC·]
+[A -> C·S]
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC" -> "2 [C -> b·]" [label = "b"]
+"7 [S -> CC·]
+[A -> C·S]
+C -> ·b
+S -> ·CA
+S -> ·SB
+S -> ·CC" -> "3 [S -> C·A]
+[S -> C·C]
+C -> ·b
+A -> ·CS" [label = "C"]
+"8 [B -> CS·]
+[S -> S·B]
+C -> ·b
+B -> ·CS" -> "4 [S -> SB·]" [label = "B"]
+"8 [B -> CS·]
+[S -> S·B]
+C -> ·b
+B -> ·CS" -> "2 [C -> b·]" [label = "b"]
+"8 [B -> CS·]
+[S -> S·B]
+C -> ·b
+B -> ·CS" -> "5 [B -> C·S]
+S -> ·CA
+C -> ·b
+S -> ·SB
+S -> ·CC" [label = "C"]
+"9 [A -> CS·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" -> "4 [S -> SB·]" [label = "B"]
+"9 [A -> CS·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" -> "5 [B -> C·S]
+S -> ·CA
+C -> ·b
+S -> ·SB
+S -> ·CC" [label = "C"]
+"9 [A -> CS·]
+[S -> S·B]
+B -> ·CS
+C -> ·b" -> "2 [C -> b·]" [label = "b"]
+}

@@ -13,7 +13,6 @@ void main(List<String> arguments) {
 
   word = stdin.readLineSync() ?? 'null';
   word = word.trim().replaceAll(' ', '');
-  print(word);
 
   bool conj = false;
   int step_num = -1;
@@ -32,7 +31,7 @@ void main(List<String> arguments) {
   }
 
   var cg = conjunctiveGrammar.fromFile('input.txt');
-
+  //print(cg.possible_grammars[0]);
   List<bool> results = [];
   for (var grammar in cg.possible_grammars) {
     LR0Parser curr_parser = LR0Parser(grammar);
@@ -53,4 +52,6 @@ void main(List<String> arguments) {
       print('Слово не распознаётся');
     }
   }
+  /**
+   *  */
 }
