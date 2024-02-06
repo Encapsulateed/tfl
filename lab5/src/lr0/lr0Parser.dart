@@ -28,6 +28,11 @@ class LR0Parser {
   void Reduce(GSSNode<List<String>> v, int rule_id, String x, List<GSSNode<List<String>>> P, Set<GSSNode<List<String>>> out) {
     var rule = _grammar.rules[rule_id];
 
+    print("ancestors");
+    print(v.ancestors(rule.right.length));
+    print(rule.right);
+    print("------");
+
     for (var v1_s in v.ancestors(rule.right.length)) {
       var act = _table.lr0_table[int.parse(v1_s.value[1])]?[rule.left]!;
       if (act?.length == 0) {
@@ -39,12 +44,29 @@ class LR0Parser {
       var v_ss_value = [i.toString(), s_ss.toString()];
       var v_ss = stack.levels[i].find(v_ss_value);
 
+      print("REDUCE CHECK");
+      print("Level:");
+      print(stack.levels[i].nodes);
+      print("Value");
+      print(v_ss_value);
+      print("Prevs:");
+      print(v_ss?.prev.values);
+      print("V1_s: ");
+      print(v1_s);
+      print("---");
+
       if (v_ss != null) {
         if (v_ss.prev.values.contains(v1_s)) {
           continue;
         } else {
           List<GSSNode<List<String>>> prevCopy = List.from(v_ss.prev.values);
           for (final l in prevCopy) {
+
+            print("IM HERE");
+            print(l);
+            print(v1_s);
+            print(l.prev.values);
+            print("---");
 
             if (l.value == v1_s.value) {
               int ind = node_id_next();
@@ -58,9 +80,16 @@ class LR0Parser {
               }
             } else {
 
+              print("IM HERE, ITS ELSE UNDER MAIN");
+              //stdin.readLineSync();
+              print(v_ss.prev.values);
+              print(v1_s);
+
               v_ss.addPrevByValue(v1_s);
 
               if (P.contains(v_ss)) {
+                print("IM HERE ITS UNDEREST ELSE MAIN LALALA");
+
                 int ind = node_id_next();
                 nodes[ind] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
                 var act = _table.lr0_table[s_ss]?[x]!;
@@ -100,6 +129,12 @@ class LR0Parser {
           continue;
         }
 
+        print("act below");
+        print(v.value[1]);
+        print(word_tokens[i]);
+        print(act);
+        print("---");
+
         if (n == i) {
           stack.GSStoDot("Step $n");
         }
@@ -137,9 +172,15 @@ class LR0Parser {
         check = true;
       }
 
+      var count = reduced.length;
       List<GSSNode<List<String>>> reducedCopy = List.from(reduced);
 
       for (final hidenode in reducedCopy) {
+
+        print("LOOKING FOR HIDENODE");
+        print(hidenode);
+        print("---");
+
         P.add(hidenode);
         final act = _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i]]!;
 
@@ -171,6 +212,52 @@ class LR0Parser {
             nodes[node_id_next()] = stack.push(["ACC", "ACC"], lastNode);
             stack.GSStoDot("result");
             return true;
+          }
+        }
+      }
+
+      while (count != reduced.length) {
+        count = reduced.length;
+        reducedCopy = List.from(reduced);
+
+        for (final hidenode in reducedCopy) {
+
+          print("LOOKING FOR HIDENODE");
+          print(hidenode);
+          print("---");
+
+          P.add(hidenode);
+          final act = _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i]]!;
+
+          if (act?.length == 0) {
+            continue;
+          }
+
+          for (var obj in act!) {
+            if (obj.actionTitle.startsWith("s")) {
+              Shift(hidenode, obj.stateNumber!);
+              check = true;
+              test = true;
+              continue;
+            }
+          }
+
+          for (var obj in act) {
+            if (obj.actionTitle.startsWith("r")) {
+              Reduce(hidenode, obj.ruleNumber!, word_tokens[i], P, reduced);
+              if (reduced.length != 0) {
+                test = true;
+              }
+            }
+          }
+
+          for (var obj in act) {
+            if (obj.actionTitle == 'ACC') {
+              GSSNode<List<String>> lastNode = stack.levels.last.nodes.values.last;
+              nodes[node_id_next()] = stack.push(["ACC", "ACC"], lastNode);
+              stack.GSStoDot("result");
+              return true;
+            }
           }
         }
       }
