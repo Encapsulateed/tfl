@@ -31,14 +31,18 @@ void main(List<String> arguments) {
   }
 
   var cg = conjunctiveGrammar.fromFile('input.txt');
-  //print(cg.possible_grammars[0]);
+
   List<bool> results = [];
   for (var grammar in cg.possible_grammars) {
+   // print(grammar);
     LR0Parser curr_parser = LR0Parser(grammar);
 
     curr_parser.Log(cg.possible_grammars.indexOf(grammar) + 1);
-    results.add(curr_parser.parse(word.split(''), step_num));
+    bool res = curr_parser.parse(word.split(''), step_num);
+    results.add(res);
+  //  results.add(curr_parser.parse(word.split(''), step_num));
   }
+  print(results);
   if (conj == true) {
     if (results.every((element) => element == true)) {
       print('Существует хотя бы один корректный разбор ');

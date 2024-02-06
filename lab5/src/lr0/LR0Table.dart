@@ -24,7 +24,8 @@ class LR0Table {
   }
 
   void makeTable() {
-    for (var I in _fsm.states) {
+    for (var I
+        in _fsm.states.where((element) => _fsm.getStateIndex(element) != -1)) {
       int index = _fsm.getStateIndex(I);
 
       lr0_table[index] = {};
@@ -43,8 +44,8 @@ class LR0Table {
         continue;
       }
 
-      for (int i = 0; i < (I.value as List<LR0Situation>).length; i++) {
-        var lr0_situation = I.value[i] as LR0Situation;
+      for (int i = 0; i < (I.value).length; i++) {
+        var lr0_situation = I.value[i];
         if (lr0_situation.getNext() == 'eps') {
           int reduce_id = _grammar.getRuleIndex(lr0_situation);
 
@@ -71,7 +72,9 @@ class LR0Table {
         lr0_table[index_I]![X]!.add(Action.shift(index_J));
       } else if (_grammar.nonTerminals.contains(X)) {
         if (X != _grammar.startNonTerminal + '0') {
-          lr0_table[index_I]![X]!.add(Action.goto(index_J));
+          if (index_I != -1) {
+            lr0_table[index_I]![X]!.add(Action.goto(index_J));
+          }
         }
       }
     }

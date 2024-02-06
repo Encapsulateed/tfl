@@ -45,8 +45,9 @@ class Grammar {
       }
     }
     this.rules = [...prd];
-    to_cnf();
-    //  complete();
+   // to_cnf();
+      complete();
+    //  update_grammar();
   }
 
   void _readGrammarFromFile(String filePath) {

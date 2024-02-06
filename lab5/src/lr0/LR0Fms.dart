@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import '../utils/grammar.dart';
 import '../utils/Production.dart';
 import '../state_machine/FSM.dart';
@@ -17,7 +15,12 @@ class LR0FMS extends FSM {
     this._grammar = CompleteGrammar;
     super.alphabet.addAll(_grammar.nonTerminals);
     super.alphabet.addAll(_grammar.terminals);
+
     buildDFA();
+
+   // super.transactions.remove(super.transactions.where(
+     //   (t) => t.from == getStateByIndex(0) && t.to == getStateByIndex(1)));
+   // super.states.remove(getStateByIndex(0));
   }
 
   List<LR0Situation> closure(Production production) {
@@ -38,73 +41,40 @@ class LR0FMS extends FSM {
     return production_possible_LR0_situations;
   }
 
-  List<LR0Situation> CLOSURE() {
-    Set<String> possibleNT = {};
-    Set<LR0Situation> first_state = {};
-    first_state.add(LR0Situation(_grammar.startNonTerminal + '0',
-        _grammar.startNonTerminal.split(''), 0));
-    for (var r in _grammar.rules
-        .where((element) => element.left == _grammar.startNonTerminal)) {
-      if (_grammar.nonTerminals.contains(r.right[0])) {
-        possibleNT.add(r.right[0]);
-        for (var rr
-            in _grammar.rules.where((element) => element.left == r.right[0])) {
-          if (!first_state.any((element) =>
-              element.left == rr.left && element.right == rr.right)) {
-            first_state.add(LR0Situation(rr.left, rr.right, 0));
-          }
-        }
-      }
-    }
-    // print(first_state);
-    return first_state.toList();
+  void create_super_zero_state() {
+    List<LR0Situation> first_state_value = []
+      ..addAll(_grammar.user_rules.map((P) => zeroClosure(P)[0].clone()));
+    var state_name = first_state_value.join('\n');
+    State zero = State.valued(state_name, first_state_value);
+    super.states.add(zero);
   }
 
-  void UPDATE_FIRST() {
-    for (var state
-        in super.states.where((element) => getStateIndex(element) != 0)) {
-      List<LR0Situation> for_add = [];
-      for (var lr0 in state.value as List<LR0Situation>) {
-        var next = lr0.getNext();
-        if (_grammar.nonTerminals.contains(next)) {
-          for (var rule in _grammar.rules) {
-            if (rule.right.length == 2) {
-              if (rule.left == next) {
-                (for_add).add(LR0Situation(rule.left, rule.right, 0));
-              }
-            }
-          }
-        }
-      }
+  void create_first_state() {
+    LR0Situation lr0 = LR0Situation.fromProduction(_grammar.rules[0]);
+    var state_name = lr0.toString();
+    State first = State.valued(state_name, [lr0.clone()]);
+    super.states.add(first);
+    super.startStates.add(first);
 
-      for (var lr in for_add) {
-        state.name += '\n' + lr.toString();
-        (state.value as List<LR0Situation>).add(lr);
-        load_rules(getStateByIndex(0), state, lr.getNext());
-      }
-    }
+    super.transactions.add(
+        Transaction.ivan(getStateByIndex(0), first, _grammar.startNonTerminal));
+    load_rules(getStateByIndex(0), first, _grammar.startNonTerminal);
   }
 
   void buildDFA() {
     // Начальное состояние соответвует G+ - пополненной грамматике
-    List<LR0Situation> first_state_value = CLOSURE();
-    var state_name = first_state_value.join('\n');
-    State first_state = State.valued(state_name, first_state_value);
-    super.states.add(first_state);
-    super.startStates.add(first_state);
-    shift(first_state);
-    UPDATE_FIRST();
+    create_super_zero_state();
+    create_first_state();
+
     while (true) {
       int p_l = super.states.length;
 
-      for (int i = 0; i < p_l; i++) {
+      for (int i = 1; i < p_l; i++) {
         try {
           shift(getStateByIndex(i));
-        } catch (e) {}
-
-        // super.DumpToDOT('t');
-        //print('dump');
-        //stdin.readLineSync();
+        } catch (e) {
+          print(e);
+        }
       }
       int n_l = super.states.length;
       if (p_l == n_l) {
@@ -131,11 +101,6 @@ class LR0FMS extends FSM {
         }
       }
     }
-    List<State> first = [];
-    First(getStateByIndex(7), first);
-    first.forEach((element) {
-      //  print(getStateIndex(element));
-    });
   }
 
   Set<LR0Situation> getDstSet(State s, String X) {
@@ -176,7 +141,7 @@ class LR0FMS extends FSM {
   }
 
   void shift(State state, {bool need_load = true}) {
-    for (var l in state.value as List<LR0Situation>) {
+    for (var l in state.value) {
       try {
         var newl = l.clone();
         var beta = newl.next;
@@ -191,23 +156,21 @@ class LR0FMS extends FSM {
 
         var transition_set = super
             .transactions
-            .where((trans) => trans.from == state && trans.letter == beta)
+            .where((trans) =>
+                trans.from == state &&
+                trans.letter == beta &&
+                trans.to != getStateByIndex(1))
             .toList();
 
         if (transition_set.length == 0) {
           State N0 = State();
           bool existed = false;
-          /**
-           *  if (statyByLR0[newl.toString()] != null) {
-            getDst(state, X);
-            N0 = statyByLR0[newl.toString()]!;
-            existed = true;
-           */
 
           if (statyByLR0[newl.toString()] != null) {
-            //  getDst(state, X);
-            N0 = getDst(state, beta)!;
-            existed = true;
+            if (getDst(state, beta) != null) {
+              N0 = getDst(state, beta)!;
+              existed = true;
+            }
           } else {
             N0 = State.valued('[${newl.toString()}]', [newl.clone()]);
             N0.moved[beta] = [];
@@ -236,14 +199,13 @@ class LR0FMS extends FSM {
             });
           }
         } else {
-          if ((transition_set[0].to.value as List<LR0Situation>)
-                  .contains(newl) ==
-              false) {
+          if ((transition_set[0].to.value).contains(newl) == false) {
             transition_set[0].to.name += '\n[${newl.toString()}]';
-            transition_set[0].to.moved[transition_set[0].letter]!.add(newl);
+            if (transition_set[0].to.moved[transition_set[0].letter] != null) {
+              transition_set[0].to.moved[transition_set[0].letter]!.add(newl);
+            }
 
-            (transition_set[0].to.value as List<LR0Situation>)
-                .add(newl.clone());
+            (transition_set[0].to.value).add(newl.clone());
 
             //addMove(state, transition_set[0].to, l);
             var temp = newl.clone();
@@ -260,27 +222,26 @@ class LR0FMS extends FSM {
             });
           }
         }
-      } catch (e) {
-        //print(state.name);
-        print(e);
+      } catch (e, s) {
+        print(s);
         return;
         // continue;
       }
     }
   }
 
-  void load_rules(State state, State N0, String X) {
-    if (state == N0) {
+  void load_rules(State from, State to, String X) {
+    if (from == to) {
       return;
     }
     var trans = super
         .transactions
-        .where((trans) => trans.from == state && trans.to == N0)
+        .where((trans) => trans.from == from && trans.to == to)
         .toList()
         .firstOrNull;
 
     if (_grammar.nonTerminals.contains(X)) {
-      var copySt = [...state.value as List<LR0Situation>];
+      var copySt = [...from.value as List<LR0Situation>];
 
       for (var l_0 in copySt) {
         if (l_0.left == X) {
@@ -292,21 +253,20 @@ class LR0FMS extends FSM {
           var prev_copy = prev_lr0.clone();
           prev_copy.move();
 
-          if ((N0.value as List<LR0Situation>).contains(prev_lr0) == false) {
+          if ((to.value).contains(prev_lr0) == false) {
             {
               if (trans == null) {
                 //print('Сейчас я добавлю LR0 ${prev_lr0}  к ${getStateIndex(N0)} из ${getStateIndex(state)}');
-                (N0.value as List<LR0Situation>).add(prev_lr0.clone());
-                N0.name += '\n${prev_lr0.toString()}';
-                statyByLR0[prev_lr0.toString()] = N0;
+                (to.value).add(prev_lr0.clone());
+                to.name += '\n${prev_lr0.toString()}';
+                statyByLR0[prev_lr0.toString()] = to;
               } else {
-                if ((state.value as List<LR0Situation>).contains(prev_copy) ==
-                    false) {
-                  (N0.value as List<LR0Situation>).add(prev_lr0.clone());
+                if ((from.value).contains(prev_copy) == false) {
+                  (to.value).add(prev_lr0.clone());
                   // print('Сейчас я добавлю LR0 ${prev_lr0}  к ${getStateIndex(N0)} из ${getStateIndex(state)}');
 
-                  N0.name += '\n${prev_lr0.toString()}';
-                  statyByLR0[prev_lr0.toString()] = N0;
+                  to.name += '\n${prev_lr0.toString()}';
+                  statyByLR0[prev_lr0.toString()] = to;
                   if (statyByLR0[prev_lr0.toString()] == null) {
                     // statyByLR0[prev_lr0.toString()] = N0;
                   }
@@ -317,7 +277,7 @@ class LR0FMS extends FSM {
 
           if (_grammar.nonTerminals.contains(prev_lr0.getNext()) &&
               X != prev_lr0.getNext()) {
-            load_rules(state, N0, prev_lr0.getNext());
+            load_rules(from, to, prev_lr0.getNext());
           }
         }
       }

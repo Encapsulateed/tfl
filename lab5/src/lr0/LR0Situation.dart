@@ -14,6 +14,10 @@ class LR0Situation extends Production {
     }
   }
 
+  LR0Situation.fromProduction(Production p): super(p.left,p.right){
+      LR0_pointer = 0;
+  }
+
   @override
   String toString() {
     var tmp = [];
