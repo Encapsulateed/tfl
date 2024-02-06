@@ -3,8 +3,6 @@ import '../utils/grammar.dart';
 import 'LR0Fms.dart';
 import 'dart:io';
 
-import 'LR0Situation.dart';
-
 class LR0Table {
   LR0FMS _fsm = LR0FMS.empty();
   Grammar _grammar = Grammar();

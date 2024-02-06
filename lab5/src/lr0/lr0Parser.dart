@@ -22,10 +22,12 @@ class LR0Parser {
   }
 
   void Shift(GSSNode<List<String>> v, int state_id) {
-    nodes[node_id_next()] = stack.push([(int.parse(v.value[0]) + 1).toString(), state_id.toString()], v);
+    nodes[node_id_next()] = stack
+        .push([(int.parse(v.value[0]) + 1).toString(), state_id.toString()], v);
   }
 
-  void Reduce(GSSNode<List<String>> v, int rule_id, String x, List<GSSNode<List<String>>> P, Set<GSSNode<List<String>>> out) {
+  void Reduce(GSSNode<List<String>> v, int rule_id, String x,
+      List<GSSNode<List<String>>> P, Set<GSSNode<List<String>>> out) {
     var rule = _grammar.rules[rule_id];
 
     print("ancestors");
@@ -61,7 +63,6 @@ class LR0Parser {
         } else {
           List<GSSNode<List<String>>> prevCopy = List.from(v_ss.prev.values);
           for (final l in prevCopy) {
-
             print("IM HERE");
             print(l);
             print(v1_s);
@@ -70,7 +71,8 @@ class LR0Parser {
 
             if (l.value == v1_s.value) {
               int ind = node_id_next();
-              nodes[ind] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+              nodes[ind] = stack.push(
+                  v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
               var act = _table.lr0_table[s_ss]?[x]!;
 
               for (var obj in act!) {
@@ -79,7 +81,6 @@ class LR0Parser {
                 }
               }
             } else {
-
               print("IM HERE, ITS ELSE UNDER MAIN");
               //stdin.readLineSync();
               print(v_ss.prev.values);
@@ -91,7 +92,8 @@ class LR0Parser {
                 print("IM HERE ITS UNDEREST ELSE MAIN LALALA");
 
                 int ind = node_id_next();
-                nodes[ind] = stack.push(v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
+                nodes[ind] = stack.push(
+                    v_ss_value, v1_s as GSSNode<List<String>>?); //vc_ss
                 var act = _table.lr0_table[s_ss]?[x]!;
                 for (var obj in act!) {
                   if (obj.actionTitle.startsWith("r")) {
@@ -117,7 +119,8 @@ class LR0Parser {
     bool test = false;
     while (i < word_tokens.length) {
       List<GSSNode<List<String>>> P = []; // БУКВА ПЭ
-      List<GSSNode<List<String>>> levelCopy = List.from(stack.levels[i].nodes.values);
+      List<GSSNode<List<String>>> levelCopy =
+          List.from(stack.levels[i].nodes.values);
       Set<GSSNode<List<String>>> reduced = {};
       var check = false;
 
@@ -159,7 +162,8 @@ class LR0Parser {
 
         for (var obj in act) {
           if (obj.actionTitle == 'ACC') {
-            GSSNode<List<String>> lastNode = stack.levels.last.nodes.values.last;
+            GSSNode<List<String>> lastNode =
+                stack.levels.last.nodes.values.last;
             nodes[node_id_next()] = stack.push(["ACC", "ACC"], lastNode);
             stack.GSStoDot("result");
             return true;
@@ -167,7 +171,7 @@ class LR0Parser {
         }
       }
 
-      if(reduced.every((r) => P.contains(r)) && reduced.length != 0) {
+      if (reduced.every((r) => P.contains(r)) && reduced.length != 0) {
         test = false;
         check = true;
       }
@@ -176,13 +180,13 @@ class LR0Parser {
       List<GSSNode<List<String>>> reducedCopy = List.from(reduced);
 
       for (final hidenode in reducedCopy) {
-
         print("LOOKING FOR HIDENODE");
         print(hidenode);
         print("---");
 
         P.add(hidenode);
-        final act = _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i]]!;
+        final act =
+            _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i]]!;
 
         if (act?.length == 0) {
           continue;
@@ -208,7 +212,8 @@ class LR0Parser {
 
         for (var obj in act) {
           if (obj.actionTitle == 'ACC') {
-            GSSNode<List<String>> lastNode = stack.levels.last.nodes.values.last;
+            GSSNode<List<String>> lastNode =
+                stack.levels.last.nodes.values.last;
             nodes[node_id_next()] = stack.push(["ACC", "ACC"], lastNode);
             stack.GSStoDot("result");
             return true;
@@ -221,13 +226,13 @@ class LR0Parser {
         reducedCopy = List.from(reduced);
 
         for (final hidenode in reducedCopy) {
-
           print("LOOKING FOR HIDENODE");
           print(hidenode);
           print("---");
 
           P.add(hidenode);
-          final act = _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i]]!;
+          final act =
+              _table.lr0_table[int.parse(hidenode.value[1])]?[word_tokens[i]]!;
 
           if (act?.length == 0) {
             continue;
@@ -253,7 +258,8 @@ class LR0Parser {
 
           for (var obj in act) {
             if (obj.actionTitle == 'ACC') {
-              GSSNode<List<String>> lastNode = stack.levels.last.nodes.values.last;
+              GSSNode<List<String>> lastNode =
+                  stack.levels.last.nodes.values.last;
               nodes[node_id_next()] = stack.push(["ACC", "ACC"], lastNode);
               stack.GSStoDot("result");
               return true;

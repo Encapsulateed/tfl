@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:collection';
 
 import '../lr0/LR0Situation.dart';
 
@@ -27,7 +26,7 @@ class FSM {
   }
 
   int getStateIndex(State state) {
-    return states.toList().indexOf(state) -1;
+    return states.toList().indexOf(state) - 1;
   }
 
   State getStateByIndex(int index) {
@@ -73,12 +72,12 @@ class State {
   String name = '';
   // здесь хранится смысловая часть состояния автомата
   // в случае 5ЛР - это LR0 ситуация (см. класс LR0Situation)
-  List<LR0Situation> value=[];
+  List<LR0Situation> value = [];
   Map<String, List<LR0Situation>> moved = {};
   State();
 
   State.valued(this.name, this.value);
-  bool _compareLists( List<LR0Situation> list1,  List<LR0Situation> list2) {
+  bool _compareLists(List<LR0Situation> list1, List<LR0Situation> list2) {
     if (list1.length != list2.length) {
       return false;
     }
@@ -95,9 +94,7 @@ class State {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is State &&
-          _compareLists(
-              value, other.value);
+      other is State && _compareLists(value, other.value);
 
   @override
   int get hashCode => name.hashCode;

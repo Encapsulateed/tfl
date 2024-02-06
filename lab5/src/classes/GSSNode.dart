@@ -28,7 +28,8 @@ class _GSSNode<T> {
   }
 
   void addPrevByValue(_GSSNode<T> node) {
-    if (!this.prev.values.any((existingNode) => DEFAULT_COMPARATOR(existingNode.value, node.value))) {
+    if (!this.prev.values.any(
+        (existingNode) => DEFAULT_COMPARATOR(existingNode.value, node.value))) {
       final newId = this.prev.values.length + 1;
       this.prev[newId] = node;
       node.addNext(this);

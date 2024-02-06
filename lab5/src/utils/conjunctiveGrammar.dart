@@ -13,7 +13,7 @@ class conjunctiveGrammar {
     _makeCFGs();
   }
 
-  void _alternativsPreWork(String filePath) {
+/**  void _alternativsPreWork(String filePath) {
     var lines = File(filePath).readAsStringSync().split('\n');
     List<String> updated_rules = [];
     for (var line in lines) {
@@ -35,7 +35,7 @@ class conjunctiveGrammar {
     // Записываем обновленные правила в файл
     File(filePath).writeAsStringSync(updated_rules.join('\n'));
   }
-
+ */
   void _readGrammarFromFile(String filePath) {
     sleep(Duration(microseconds: 1000));
 

@@ -18,9 +18,9 @@ class LR0FMS extends FSM {
 
     buildDFA();
 
-   // super.transactions.remove(super.transactions.where(
-     //   (t) => t.from == getStateByIndex(0) && t.to == getStateByIndex(1)));
-   // super.states.remove(getStateByIndex(0));
+    // super.transactions.remove(super.transactions.where(
+    //   (t) => t.from == getStateByIndex(0) && t.to == getStateByIndex(1)));
+    // super.states.remove(getStateByIndex(0));
   }
 
   List<LR0Situation> closure(Production production) {
@@ -94,7 +94,7 @@ class LR0FMS extends FSM {
     }
 
     for (var s in super.states) {
-      for (var l in s.value as List<LR0Situation>) {
+      for (var l in s.value) {
         if (l.getNext() == 'eps') {
           super.finalStates.add(s);
           break;
@@ -105,7 +105,7 @@ class LR0FMS extends FSM {
 
   Set<LR0Situation> getDstSet(State s, String X) {
     Set<LR0Situation> dst_move_set = {};
-    for (var lr0 in s.value as List<LR0Situation>) {
+    for (var lr0 in s.value) {
       var copy = lr0.clone();
       if (copy.getNext() == X) {
         copy.move();
@@ -241,7 +241,7 @@ class LR0FMS extends FSM {
         .firstOrNull;
 
     if (_grammar.nonTerminals.contains(X)) {
-      var copySt = [...from.value as List<LR0Situation>];
+      var copySt = [...from.value];
 
       for (var l_0 in copySt) {
         if (l_0.left == X) {
