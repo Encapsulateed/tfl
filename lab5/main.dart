@@ -14,16 +14,10 @@ void main(List<String> arguments) {
   word = stdin.readLineSync() ?? 'null';
   word = word.trim().replaceAll(' ', '');
 
-  bool conj = false;
   int step_num = -1;
 
   for (var argument in arguments) {
-    var match_conj = RegExp(r'-c').firstMatch(argument);
     var match_step = RegExp(r'-p(\w+)').firstMatch(argument);
-
-    if (match_conj != null) {
-      conj = true;
-    }
 
     if (match_step != null) {
       step_num = int.parse(match_step.group(1)!);
@@ -43,18 +37,10 @@ void main(List<String> arguments) {
     //  results.add(curr_parser.parse(word.split(''), step_num));
   }
   print(results);
-  if (conj == true) {
-    if (results.every((element) => element == true)) {
-      print('Существует хотя бы один корректный разбор ');
-    } else {
-      print('слово не принадлежит языку введеёной грамматики');
-    }
+  if (results.every((element) => element == true)) {
+    print('Существует хотя бы один корректный разбор ');
   } else {
-    if (results[0] == true) {
-      print('Слово распознано');
-    } else {
-      print('Слово не распознаётся');
-    }
+    print('слово не принадлежит языку введеёной грамматики');
   }
   /**
    *  */
