@@ -42,7 +42,7 @@ class conjunctiveGrammar {
     var lines = File(filePath).readAsStringSync().split('\n');
 
     for (var line in lines) {
-      if (line.trim().isNotEmpty) {
+      if (line.trim().replaceAll(' ', '').isNotEmpty) {
         List<String> parts =
             line.split('->').map((part) => part.trim()).toList();
 

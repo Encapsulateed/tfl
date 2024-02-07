@@ -43,7 +43,7 @@ class LR0Table {
       }
 
       for (int i = 0; i < (I.value).length; i++) {
-        var lr0_situation = I.value[i];
+        var lr0_situation = I.value.toList()[i];
         if (lr0_situation.getNext() == 'eps') {
           int reduce_id = _grammar.getRuleIndex(lr0_situation);
 

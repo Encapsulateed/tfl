@@ -1,5 +1,5 @@
-S->aQ&Rb
-S->a
-S->b
-Q->Sb
-R->aS
+S -> aQ&Rb
+S -> a
+S -> b
+Q -> Sb
+R -> aS

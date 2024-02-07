@@ -58,7 +58,7 @@ class LR0FMS extends FSM {
 
     super.transactions.add(
         Transaction.ivan(getStateByIndex(0), first, _grammar.startNonTerminal));
-    load_rules(getStateByIndex(0), first, _grammar.startNonTerminal);
+    load_rules(first, _grammar.startNonTerminal);
   }
 
   void buildDFA() {
@@ -169,9 +169,12 @@ class LR0FMS extends FSM {
           if (statyByLR0[newl.toString()] != null) {
             if (getDst(state, beta) != null) {
               N0 = getDst(state, beta)!;
-              existed = true;
+            } else {
+              //   N0 = statyByLR0[newl.toString()]!;
             }
-          } else {
+          }
+
+          if (N0.name == '') {
             N0 = State.valued('[${newl.toString()}]', [newl.clone()]);
             N0.moved[beta] = [];
             N0.moved[beta]!.add(newl);
@@ -187,16 +190,12 @@ class LR0FMS extends FSM {
             }
           }
 
-          Transaction transaction = Transaction.ivan(state, N0, beta);
-
-          super.transactions.add(transaction);
-
+          super.transactions.add(Transaction.ivan(state, N0, beta));
+          load_rules(N0, X);
           if (existed == false) {
             List<State> first = [];
             First(N0, first);
-            first.forEach((element) {
-              load_rules(element, N0, X);
-            });
+            first.forEach((element) {});
           }
         } else {
           if ((transition_set[0].to.value).contains(newl) == false) {
@@ -214,12 +213,7 @@ class LR0FMS extends FSM {
             if (X != 'eps') {
               statyByLR0[newl.toString()] = transition_set[0].to;
             }
-
-            List<State> first = [];
-            First(transition_set[0].to, first);
-            first.forEach((element) {
-              load_rules(element, transition_set[0].to, X);
-            });
+            load_rules(transition_set[0].to, X);
           }
         }
       } catch (e, s) {
@@ -230,54 +224,20 @@ class LR0FMS extends FSM {
     }
   }
 
-  void load_rules(State from, State to, String X) {
-    if (from == to) {
-      return;
-    }
-    var trans = super
-        .transactions
-        .where((trans) => trans.from == from && trans.to == to)
-        .toList()
-        .firstOrNull;
-
+  void load_rules(State to, String X) {
     if (_grammar.nonTerminals.contains(X)) {
-      var copySt = [...from.value];
+      for (var p in _grammar.rules.where((r) => r.left == X)) {
+        var new_lr0 = LR0Situation.fromProduction(p);
+        if (!to.value.any((e) =>
+            e.left == new_lr0.left &&
+            e.right == new_lr0.right &&
+            new_lr0.LR0_pointer == e.LR0_pointer)) {
+          to.name += '\n${new_lr0.toString()}';
+          to.value.add(new_lr0);
 
-      for (var l_0 in copySt) {
-        if (l_0.left == X) {
-          var prev_lr0 = LR0Situation(l_0.left, l_0.right, l_0.LR0_pointer - 1);
-          if (prev_lr0.LR0_pointer == -1) {
-            prev_lr0.LR0_pointer = 0;
-          }
-
-          var prev_copy = prev_lr0.clone();
-          prev_copy.move();
-
-          if ((to.value).contains(prev_lr0) == false) {
-            {
-              if (trans == null) {
-                //print('Сейчас я добавлю LR0 ${prev_lr0}  к ${getStateIndex(N0)} из ${getStateIndex(state)}');
-                (to.value).add(prev_lr0.clone());
-                to.name += '\n${prev_lr0.toString()}';
-                statyByLR0[prev_lr0.toString()] = to;
-              } else {
-                if ((from.value).contains(prev_copy) == false) {
-                  (to.value).add(prev_lr0.clone());
-                  // print('Сейчас я добавлю LR0 ${prev_lr0}  к ${getStateIndex(N0)} из ${getStateIndex(state)}');
-
-                  to.name += '\n${prev_lr0.toString()}';
-                  statyByLR0[prev_lr0.toString()] = to;
-                  if (statyByLR0[prev_lr0.toString()] == null) {
-                    // statyByLR0[prev_lr0.toString()] = N0;
-                  }
-                }
-              }
-            }
-          }
-
-          if (_grammar.nonTerminals.contains(prev_lr0.getNext()) &&
-              X != prev_lr0.getNext()) {
-            load_rules(from, to, prev_lr0.getNext());
+          if (_grammar.nonTerminals.contains(new_lr0.getNext()) &&
+              X != new_lr0.getNext()) {
+            load_rules(to, new_lr0.getNext());
           }
         }
       }
