@@ -37,7 +37,8 @@ class FSM {
   void DumpToDOT(String path) {
     String res = "";
 
-    for (var state in this.states) {
+    for (var state
+        in this.states.where((element) => getStateIndex(element) != -1)) {
       String shape = "circle";
       if (finalStates.contains(state)) {
         shape = "doublecircle";

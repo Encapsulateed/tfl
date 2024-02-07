@@ -56,14 +56,13 @@ class LR0FMS extends FSM {
     super.states.add(first);
     super.startStates.add(first);
 
-    super.transactions.add(
-        Transaction.ivan(getStateByIndex(0), first, _grammar.startNonTerminal));
     load_rules(first, _grammar.startNonTerminal);
   }
 
   void buildDFA() {
     // Начальное состояние соответвует G+ - пополненной грамматике
     create_super_zero_state();
+
     create_first_state();
 
     while (true) {
@@ -73,7 +72,7 @@ class LR0FMS extends FSM {
         try {
           shift(getStateByIndex(i));
         } catch (e) {
-          print(e);
+          //  print(e);
         }
       }
       int n_l = super.states.length;
